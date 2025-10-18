@@ -42,3 +42,4 @@ refreshVersions {
 }
 
 include(":composeApp")
+include(":base")
