@@ -37,10 +37,6 @@ kotlin {
   }
 
   sourceSets {
-    androidMain.dependencies {
-      implementation(compose.preview)
-      implementation(libs.androidx.activity.compose)
-    }
     commonMain.dependencies {
       implementation(compose.runtime)
       implementation(compose.foundation)
@@ -51,12 +47,16 @@ kotlin {
       implementation(libs.androidx.lifecycle.viewmodelCompose)
       implementation(libs.androidx.lifecycle.runtimeCompose)
     }
-    commonTest.dependencies {
-      implementation(libs.kotlin.test)
+    androidMain.dependencies {
+      implementation(compose.preview)
+      implementation(libs.androidx.activity.compose)
     }
     jvmMain.dependencies {
       implementation(compose.desktop.currentOs)
       implementation(libs.kotlinx.coroutinesSwing)
+    }
+    commonTest.dependencies {
+      implementation(libs.kotlin.test)
     }
   }
 }
