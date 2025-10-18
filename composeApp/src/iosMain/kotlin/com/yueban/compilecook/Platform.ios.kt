@@ -1,3 +1,5 @@
+@file:Suppress("MatchingDeclarationName")
+
 package com.yueban.compilecook
 
 import platform.UIKit.UIDevice

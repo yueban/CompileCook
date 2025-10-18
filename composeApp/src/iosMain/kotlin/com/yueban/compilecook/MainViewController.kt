@@ -1,3 +1,5 @@
+@file:Suppress("FunctionNaming")
+
 package com.yueban.compilecook
 
 import androidx.compose.ui.window.ComposeUIViewController
