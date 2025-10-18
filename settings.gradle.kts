@@ -13,6 +13,9 @@ pluginManagement {
     mavenCentral()
     gradlePluginPortal()
   }
+  plugins {
+    id("de.fayard.refreshVersions") version "0.60.6"
+  }
 }
 
 dependencyResolutionManagement {
@@ -30,6 +33,12 @@ dependencyResolutionManagement {
 
 plugins {
   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+  id("de.fayard.refreshVersions")
+}
+
+refreshVersions {
+  file("build/tmp/refreshVersions").mkdirs()
+  versionsPropertiesFile = file("build/tmp/refreshVersions/versions.properties")
 }
 
 include(":composeApp")
