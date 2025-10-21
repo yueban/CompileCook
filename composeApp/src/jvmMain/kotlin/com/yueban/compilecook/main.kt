@@ -5,11 +5,15 @@ package com.yueban.compilecook
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-fun main() = application {
-  Window(
-    onCloseRequest = ::exitApplication,
-    title = "CompileCook",
-  ) {
-    App()
+fun main() {
+  AppInitializer.init(BuildKonfig.DEBUG)
+
+  application {
+    Window(
+      onCloseRequest = ::exitApplication,
+      title = "CompileCook",
+    ) {
+      App()
+    }
   }
 }

@@ -7,6 +7,8 @@ import androidx.compose.ui.window.ComposeViewport
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
+  AppInitializer.init(BuildKonfig.DEBUG)
+
   ComposeViewport {
     App()
   }
