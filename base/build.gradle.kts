@@ -1,4 +1,5 @@
 import buildsrc.Configs
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
   alias(libs.plugins.kotlinMultiplatform)
@@ -28,6 +29,19 @@ kotlin {
     iosTarget.binaries.framework {
       baseName = "baseKit"
     }
+  }
+
+  jvm()
+
+  js {
+    browser()
+    binaries.executable()
+  }
+
+  @OptIn(ExperimentalWasmDsl::class)
+  wasmJs {
+    browser()
+    binaries.executable()
   }
 
   sourceSets {
