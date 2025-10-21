@@ -38,6 +38,7 @@ kotlin {
 
   sourceSets {
     commonMain.dependencies {
+      implementation(project(":repo"))
       implementation(project(":base"))
 
       implementation(compose.runtime)
