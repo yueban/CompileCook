@@ -89,6 +89,9 @@ android {
     sourceCompatibility = Configs.sourceCompatibility
     targetCompatibility = Configs.targetCompatibility
   }
+  buildFeatures {
+    buildConfig = true
+  }
 }
 
 dependencies {
