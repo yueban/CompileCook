@@ -56,6 +56,7 @@ kotlinx-coroutines = "1.10.2"
 detekt = "1.23.8"
 test-runner = "1.7.0"
 test-core = "1.7.0"
+napier = "2.7.1"
 
 [libraries]
 
@@ -74,3 +75,4 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "test-runner" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "test-core" }
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
