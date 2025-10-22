@@ -13,6 +13,7 @@ plugins {
   alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
   alias(libs.plugins.detekt)
   alias(libs.plugins.buildconfig) apply false
+  alias(libs.plugins.kotlin.serialization) apply false
 }
 
 val buildDirProvider: DirectoryProperty = project.layout.buildDirectory

@@ -50,6 +50,7 @@ kotlin {
       api(libs.kotlinx.coroutines.core)
       api(project.dependencies.platform(libs.koin.bom))
       api(libs.koin.core)
+      api(libs.kotlinx.serialization)
       implementation(libs.napier)
       implementation(libs.coil.compose)
     }
