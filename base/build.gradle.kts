@@ -51,6 +51,7 @@ kotlin {
       api(project.dependencies.platform(libs.koin.bom))
       api(libs.koin.core)
       implementation(libs.napier)
+      implementation(libs.coil.compose)
     }
     androidMain.dependencies {
     }

@@ -60,6 +60,7 @@ test-core = "1.7.0"
 napier = "2.7.1"
 buildconfig = "5.7.0"
 koin-bom = "4.1.1"
+coil = "3.3.0"
 
 [libraries]
 
@@ -82,3 +83,5 @@ androidx-test-core = { module = "androidx.test:core", version.ref = "test-core" 
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
