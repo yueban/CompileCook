@@ -2,6 +2,8 @@ package com.yueban.compilecook.logger
 
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import org.koin.core.logger.Level
+import org.koin.core.logger.MESSAGE
 
 object Logger {
   fun init(debug: Boolean) {
@@ -18,4 +20,16 @@ object Logger {
   fun e(message: String, throwable: Throwable? = null, tag: String? = null) = Napier.e(message, throwable, tag)
   fun e(throwable: Throwable? = null, tag: String? = null) = Napier.e("", throwable, tag)
   fun wtf(message: String, throwable: Throwable? = null, tag: String? = null) = Napier.wtf(message, throwable, tag)
+}
+
+class KoinLogger(debug: Boolean) : org.koin.core.logger.Logger(if (debug) Level.INFO else Level.ERROR) {
+  override fun display(level: Level, msg: MESSAGE) {
+    when (level) {
+      Level.DEBUG -> Logger.d(msg)
+      Level.INFO -> Logger.i(msg)
+      Level.WARNING -> Logger.w(msg)
+      Level.ERROR -> Logger.e(msg)
+      Level.NONE -> Unit
+    }
+  }
 }
