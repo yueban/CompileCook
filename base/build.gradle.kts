@@ -47,6 +47,9 @@ kotlin {
   sourceSets {
     commonMain.dependencies {
       api(libs.kotlin.stdlib)
+      api(libs.kotlinx.coroutines.core)
+      api(project.dependencies.platform(libs.koin.bom))
+      api(libs.koin.core)
       implementation(libs.napier)
     }
     androidMain.dependencies {
