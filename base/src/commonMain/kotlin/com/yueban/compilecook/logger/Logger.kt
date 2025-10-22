@@ -1,4 +1,4 @@
-package com.yueban.compilecook.util
+package com.yueban.compilecook.logger
 
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier

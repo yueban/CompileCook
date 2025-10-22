@@ -1,6 +1,6 @@
 package com.yueban.compilecook.di
 
-import com.yueban.compilecook.util.Logger
+import com.yueban.compilecook.logger.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
