@@ -12,34 +12,10 @@ plugins {
 }
 
 buildConfig {
-//  generator = object : BuildConfigKotlinGenerator() {
-//    override fun adaptSpec(spec: TypeSpec) = spec.toBuilder()
-//      .addAnnotation(
-//        AnnotationSpec.builder(ClassName.bestGuess("kotlin.js.JsName"))
-//          .addMember("name = %S", spec.name!!)
-//          .build()
-//      )
-//      .build()
-//  }
-
   className("BuildKonfig")
   packageName("com.yueban.compilecook")
 
   buildConfigField("DEBUG", Configs.DEBUG)
-
-//  sourceSets.jvmMain {
-//    useKotlinOutput()
-//  }
-//
-//  sourceSets.named("jvmMain") {
-//    useKotlinOutput()
-//  }
-//
-//  sourceSets.named("jsMain") {
-//  }
-//
-//  sourceSets.named("wasmJsMain") {
-//  }
 }
 
 kotlin {
