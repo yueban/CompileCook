@@ -2,7 +2,7 @@ package com.yueban.compilecook
 
 object IosAppInitializer {
   fun onCreate() {
-    AppInitializer.init(BuildKonfig.DEBUG)
+    AppInitializer.init()
   }
 
   @Suppress("EmptyFunctionBlock")

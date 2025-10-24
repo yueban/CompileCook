@@ -6,8 +6,8 @@ import org.koin.android.ext.koin.androidContext
 class AndroidApp : Application() {
   override fun onCreate() {
     super.onCreate()
-    AppInitializer.init(debug = BuildKonfig.DEBUG, koinInitializer = {
+    AppInitializer.init {
       androidContext(this@AndroidApp)
-    })
+    }
   }
 }
