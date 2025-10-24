@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,11 +22,16 @@ import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.compose_multiplatform
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 
 @Composable
 @Preview
 fun App() {
   MaterialTheme {
+    val appInitializerSignal: AppInitializerSignal = koinInject()
+    val isReady by appInitializerSignal.isReady.collectAsState()
+    if (!isReady) return@MaterialTheme
+
     var showContent by remember { mutableStateOf(false) }
     Column(
       modifier = Modifier

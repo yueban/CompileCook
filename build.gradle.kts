@@ -14,6 +14,7 @@ plugins {
   alias(libs.plugins.detekt)
   alias(libs.plugins.buildconfig) apply false
   alias(libs.plugins.kotlin.serialization) apply false
+  alias(libs.plugins.sqldelight) apply false
 }
 
 val buildDirProvider: DirectoryProperty = project.layout.buildDirectory

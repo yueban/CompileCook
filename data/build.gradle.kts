@@ -1,9 +1,11 @@
 import buildsrc.Configs
+import buildsrc.NpmDeps
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
   alias(libs.plugins.kotlinMultiplatform)
   alias(libs.plugins.androidKotlinMultiplatformLibrary)
+  alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -42,8 +44,22 @@ kotlin {
   sourceSets {
     commonMain.dependencies {
       implementation(project(":base"))
+      implementation(libs.sqldelight.coroutines.extensions)
     }
     androidMain.dependencies {
+      implementation(libs.sqldelight.android.driver)
+    }
+    nativeMain.dependencies {
+      implementation(libs.sqldelight.native.driver)
+    }
+    jvmMain.dependencies {
+      implementation(libs.sqldelight.sqlite.driver)
+    }
+    wasmJsMain.dependencies {
+      implementation(libs.sqldelight.web.driver)
+      implementation(npm(NpmDeps.sqldelightJsWorker, libs.versions.sqldelight.get()))
+      implementation(npm(NpmDeps.sqljs, libs.versions.sqljs.get()))
+      implementation(devNpm(NpmDeps.webpack, libs.versions.webpack.get()))
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)
@@ -52,6 +68,15 @@ kotlin {
       implementation(libs.androidx.test.runner)
       implementation(libs.androidx.test.core)
       implementation(libs.androidx.testExt.junit)
+    }
+  }
+}
+
+sqldelight {
+  databases {
+    create("AppDatabase") {
+      packageName.set("com.yueban.compilecook.data.db")
+      generateAsync = true
     }
   }
 }

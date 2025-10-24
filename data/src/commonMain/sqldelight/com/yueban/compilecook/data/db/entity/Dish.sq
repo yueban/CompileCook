@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS Dish (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    category INTEGER NOT NULL,
+    difficulty INTEGER NOT NULL,
+    image TEXT NOT NULL,
+    ingredient TEXT NOT NULL,
+    calculation TEXT NOT NULL,
+    operation TEXT NOT NULL,
+    addition TEXT
+);
+
+CREATE INDEX IF NOT EXISTS Dish_category ON Dish(category);
+CREATE INDEX IF NOT EXISTS Dish_difficulty ON Dish(difficulty);
+
+
+getAll:
+SELECT * FROM Dish;
+
+insertDish:
+INSERT INTO Dish(name,category,difficulty,image,ingredient,calculation,operation,addition)
+VALUES (?,?,?,?,?,?,?,?);

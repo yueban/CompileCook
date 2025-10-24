@@ -8,11 +8,10 @@
 
 /* Begin PBXFileReference section */
 		9874645EB42171ADBB2D9F3B /* CompileCook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CompileCook.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D51A8D2280543B528F250FF7 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		78126184A319150DF956FD85 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		78126184A319150DF956FD85 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -25,7 +24,7 @@
 		0754A53EA127593363AD6033 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				78126184A319150DF956FD85 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				78126184A319150DF956FD85 /* Exceptions for "iosApp" folder in "iosApp" target */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -255,6 +254,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "-lsqlite3";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -283,6 +283,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "-lsqlite3";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

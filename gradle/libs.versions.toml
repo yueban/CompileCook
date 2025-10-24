@@ -12,6 +12,7 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 
 [versions]
 
@@ -63,6 +64,9 @@ buildconfig = "5.7.0"
 koin-bom = "4.1.1"
 coil = "3.3.0"
 kotlinx-serialization = "1.9.0"
+sqldelight = "2.1.0"
+webpack = "9.1.0"
+sqljs = "1.8.0"
 
 [libraries]
 
@@ -89,3 +93,8 @@ koin-core = { module = "io.insert-koin:koin-core" }
 koin-compose = { module = "io.insert-koin:koin-compose" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight-web-driver = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
