@@ -108,6 +108,8 @@ compose.desktop {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
       packageName = "com.yueban.compilecook"
       packageVersion = "1.0.0"
+
+      modules("java.sql")
     }
   }
 }
