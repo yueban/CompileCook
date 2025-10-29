@@ -1,4 +1,4 @@
-package com.yueban.compilecook.data.db
+package com.yueban.compilecook.data.cache.db
 
 import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne

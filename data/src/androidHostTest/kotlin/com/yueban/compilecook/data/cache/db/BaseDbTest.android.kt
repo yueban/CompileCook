@@ -1,9 +1,9 @@
-package com.yueban.compilecook.data.db
+package com.yueban.compilecook.data.cache.db
 
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
-import app.cash.sqldelight.driver.worker.createDefaultWebWorkerDriver
+import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 
 actual fun provideInMemoryDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver =
-  createDefaultWebWorkerDriver()
+  JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).also { schema.create(it) }

@@ -1,15 +1,16 @@
-package com.yueban.compilecook.data.db
+package com.yueban.compilecook.data.cache.db
 
-import androidx.test.core.app.ApplicationProvider
+import android.content.Context
 import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import org.koin.core.context.GlobalContext
 
-actual fun provideInMemoryDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver =
+actual fun provideDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>, dbFileName: String): SqlDriver =
   AndroidSqliteDriver(
     schema = schema.synchronous(),
-    context = ApplicationProvider.getApplicationContext(),
-    name = null
+    context = GlobalContext.get().get<Context>(),
+    name = dbFileName
   )

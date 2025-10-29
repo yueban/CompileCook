@@ -82,7 +82,7 @@ kotlin {
 sqldelight {
   databases {
     create("AppDatabase") {
-      packageName.set("com.yueban.compilecook.data.db")
+      packageName.set("com.yueban.compilecook.data.cache.db")
       generateAsync = true
     }
   }
