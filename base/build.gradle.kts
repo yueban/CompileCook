@@ -47,7 +47,6 @@ kotlin {
       api(libs.koin.core)
       api(libs.kotlinx.serialization)
       implementation(libs.napier)
-      implementation(libs.coil.compose)
     }
     androidMain.dependencies {
     }

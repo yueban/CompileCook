@@ -54,6 +54,7 @@ kotlin {
       implementation(libs.androidx.lifecycle.runtimeCompose)
       implementation(project.dependencies.platform(libs.koin.bom))
       implementation(libs.koin.compose)
+      implementation(libs.coil.compose)
     }
     androidMain.dependencies {
       implementation(compose.preview)

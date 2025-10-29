@@ -5,6 +5,7 @@ import com.yueban.compilecook.di.coroutineModule
 import com.yueban.compilecook.logger.KoinLogger
 import com.yueban.compilecook.repo.di.initialDatabaseModule
 import com.yueban.compilecook.repo.di.loadDatabaseModule
+import com.yueban.compilecook.util.CoilUtil
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +30,7 @@ val initialAppModule = module {
 object AppInitializer {
   fun init(koinInitializer: KoinApplication.() -> Unit = {}) {
     UtilInitializer.init(BuildKonfig.DEBUG)
+    CoilUtil.init()
     initKoin(koinInitializer)
   }
 
