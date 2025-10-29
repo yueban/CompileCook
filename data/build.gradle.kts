@@ -63,11 +63,18 @@ kotlin {
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)
+      implementation(libs.kotlinx.coroutines.test)
     }
     getByName("androidDeviceTest").dependencies {
       implementation(libs.androidx.test.runner)
       implementation(libs.androidx.test.core)
       implementation(libs.androidx.testExt.junit)
+    }
+    getByName("androidHostTest").dependencies {
+      implementation(libs.sqldelight.sqlite.driver)
+    }
+    wasmJsTest.dependencies {
+      implementation(libs.kotlinx.browser)
     }
   }
 }

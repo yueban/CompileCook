@@ -56,6 +56,7 @@ kotlin = "2.2.20"
 ##  ⬆ = "2.2.21-RC2"
 ##  ⬆ = "2.3.0-Beta1"
 kotlinx-coroutines = "1.10.2"
+kotlinx-browser = "0.5.0"
 detekt = "1.23.8"
 test-runner = "1.7.0"
 test-core = "1.7.0"
@@ -84,6 +85,8 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "test-runner" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "test-core" }

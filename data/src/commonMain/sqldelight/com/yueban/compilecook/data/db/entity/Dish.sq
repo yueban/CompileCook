@@ -14,9 +14,43 @@ CREATE INDEX IF NOT EXISTS Dish_category ON Dish(category);
 CREATE INDEX IF NOT EXISTS Dish_difficulty ON Dish(difficulty);
 
 
+-- Read Operations
 getAll:
-SELECT * FROM Dish;
+SELECT * FROM Dish ORDER BY id;
 
+getById:
+SELECT * FROM Dish WHERE id = ?;
+
+getByCategory:
+SELECT * FROM Dish WHERE category = ?;
+
+getByDifficulty:
+SELECT * FROM Dish WHERE difficulty = ?;
+
+
+-- Create Operation
 insertDish:
 INSERT INTO Dish(name,category,difficulty,image,ingredient,calculation,operation,addition)
 VALUES (?,?,?,?,?,?,?,?);
+
+
+-- Update Operation
+updateDish:
+UPDATE Dish
+SET name = ?,
+    category = ?,
+    difficulty = ?,
+    image = ?,
+    ingredient = ?,
+    calculation = ?,
+    operation = ?,
+    addition = ?
+WHERE id = ?;
+
+
+-- Delete Operations
+deleteById:
+DELETE FROM Dish WHERE id = ?;
+
+deleteAll:
+DELETE FROM Dish;
