@@ -4,7 +4,7 @@ import com.yueban.compilecook.di.BuildConfig
 import com.yueban.compilecook.di.coroutineModule
 import com.yueban.compilecook.logger.KoinLogger
 import com.yueban.compilecook.repo.di.initialDatabaseModule
-import com.yueban.compilecook.repo.di.loadDatabaseModule
+import com.yueban.compilecook.repo.di.loadDataModules
 import com.yueban.compilecook.util.CoilUtil
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +50,7 @@ object AppInitializer {
       modules(initialDatabaseModule)
     }.koin
     MainScope().launch {
-      loadDatabaseModule(koin)
+      loadDataModules(koin)
       koin.get<AppInitializerSignal>().complete()
     }
   }
