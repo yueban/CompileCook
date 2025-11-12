@@ -70,6 +70,7 @@ subprojects {
       compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
         optIn.add("org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi")
+        optIn.add("coil3.annotation.ExperimentalCoilApi")
       }
     }
   }
