@@ -55,14 +55,31 @@ kotlin {
       implementation(project.dependencies.platform(libs.koin.bom))
       implementation(libs.koin.compose)
       implementation(libs.coil.compose)
+      implementation(libs.coil.network.ktor3)
+      implementation(libs.markdown.renderer)
+      implementation(libs.markdown.renderer.m3)
+      implementation(libs.markdown.renderer.coil3)
     }
     androidMain.dependencies {
       implementation(compose.preview)
       implementation(libs.androidx.activity.compose)
+      implementation(project.dependencies.platform(libs.ktor.bom))
+      implementation(libs.ktor.client.okhttp)
+    }
+    nativeMain.dependencies {
+      implementation(libs.sqldelight.native.driver)
+      implementation(project.dependencies.platform(libs.ktor.bom))
+      implementation(libs.ktor.client.darwin)
     }
     jvmMain.dependencies {
       implementation(compose.desktop.currentOs)
       implementation(libs.kotlinx.coroutines.swing)
+      implementation(project.dependencies.platform(libs.ktor.bom))
+      implementation(libs.ktor.client.okhttp)
+    }
+    wasmJsMain.dependencies {
+      implementation(project.dependencies.platform(libs.ktor.bom))
+      implementation(libs.ktor.client.js)
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)

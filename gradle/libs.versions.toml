@@ -79,6 +79,8 @@ kotlinx-serialization = "1.9.0"
 sqldelight = "2.1.0"
 webpack = "9.1.0"
 sqljs = "1.8.0"
+markdown-renderer = "0.38.1"
+ktor = "3.3.2"
 
 [libraries]
 
@@ -112,3 +114,10 @@ sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", ver
 sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-web-driver = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
+markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdown-renderer" }
+markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdown-renderer" }
+markdown-renderer-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "markdown-renderer" }
+ktor-bom = { module = "io.ktor:ktor-bom", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin" }
+ktor-client-js = { module = "io.ktor:ktor-client-js" }
