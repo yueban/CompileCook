@@ -32,6 +32,7 @@ class DishLocalDataSourceImpl(
   override suspend fun insertDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
     dishQueries.insertDish(
       name = dish.name,
+      description = dish.description,
       category = dish.category,
       difficulty = dish.difficulty,
       image = dish.image,
@@ -47,6 +48,7 @@ class DishLocalDataSourceImpl(
       dishes.forEach { dish ->
         dishQueries.insertDish(
           name = dish.name,
+          description = dish.description,
           category = dish.category,
           difficulty = dish.difficulty,
           image = dish.image,
@@ -63,6 +65,7 @@ class DishLocalDataSourceImpl(
     dishQueries.updateDish(
       id = dish.id, // The ID is crucial for the WHERE clause
       name = dish.name,
+      description = dish.description,
       category = dish.category,
       difficulty = dish.difficulty,
       image = dish.image,

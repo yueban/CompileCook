@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS DishLocalEntity (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL,
+    description TEXT NOT NULL,
     category INTEGER NOT NULL,
     difficulty INTEGER NOT NULL,
     image TEXT NOT NULL,
@@ -30,14 +31,15 @@ SELECT * FROM DishLocalEntity WHERE difficulty = ?;
 
 -- Create Operation
 insertDish:
-INSERT INTO DishLocalEntity(name,category,difficulty,image,ingredient,calculation,operation,addition)
-VALUES (?,?,?,?,?,?,?,?);
+INSERT INTO DishLocalEntity(name,description,category,difficulty,image,ingredient,calculation,operation,addition)
+VALUES (?,?,?,?,?,?,?,?,?);
 
 
 -- Update Operation
 updateDish:
 UPDATE DishLocalEntity
 SET name = ?,
+    description = ?,
     category = ?,
     difficulty = ?,
     image = ?,
