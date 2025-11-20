@@ -11,7 +11,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val initialDatabaseModule = module {
-  single { provideDbDriver(AppDatabase.Companion.Schema, APP_DATABASE_FILE_NAME) }
+  single { provideDbDriver(AppDatabase.Schema, APP_DATABASE_FILE_NAME) }
   single { createDatabase(get()) }
 }
 

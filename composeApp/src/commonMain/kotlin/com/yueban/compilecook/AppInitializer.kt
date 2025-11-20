@@ -45,9 +45,9 @@ object AppInitializer {
           }
         },
         coroutineModule,
+        initialAppModule,
+        initialDatabaseModule,
       )
-      modules(initialAppModule)
-      modules(initialDatabaseModule)
     }.koin
     MainScope().launch {
       loadDataModules(koin)

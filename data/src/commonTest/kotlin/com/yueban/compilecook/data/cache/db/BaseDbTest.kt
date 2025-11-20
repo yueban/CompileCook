@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 expect fun provideInMemoryDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver
 
 fun testingDb(block: suspend AppDatabase.() -> Unit) = runTest {
-  val driver = provideInMemoryDbDriver(AppDatabase.Companion.Schema)
+  val driver = provideInMemoryDbDriver(AppDatabase.Schema)
   AppDatabase.Schema.awaitCreate(driver)
   AppDatabase(driver).block()
   driver.close()
