@@ -12,7 +12,7 @@ data class Dish(
   val ingredient: String,
   val calculation: String,
   val operation: String,
-  val addition: String?,
+  val addition: String,
 )
 
 fun DishLocalEntity.toDish(): Dish {
