@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.widget.MarkdownFileViewer
 import org.koin.compose.koinInject
 
 @Composable
@@ -27,8 +26,7 @@ fun App() {
         .verticalScroll(scrollState, true),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      // TODO: only for test
-      MarkdownFileViewer("小龙虾.md")
+      // TODO: display dish content from net
     }
   }
 }
