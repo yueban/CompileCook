@@ -12,9 +12,8 @@ import kotlinx.coroutines.withContext
 interface DishLocalDataSource {
   fun getAllDishes(): Flow<List<DishLocalEntity>>
   fun getDishByName(name: String): Flow<DishLocalEntity?>
-  suspend fun insertDish(dish: DishLocalEntity)
+  suspend fun upsertDish(dish: DishLocalEntity)
   suspend fun upsertDishes(dishes: List<DishLocalEntity>)
-  suspend fun updateDish(dish: DishLocalEntity)
   suspend fun deleteDishByName(name: String)
   suspend fun deleteAllDishes()
 }
@@ -29,7 +28,7 @@ class DishLocalDataSourceImpl(
   override fun getDishByName(name: String): Flow<DishLocalEntity?> =
     dishQueries.getByName(name).asFlow().mapToOneOrNull(dispatcher)
 
-  override suspend fun insertDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
+  override suspend fun upsertDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
     dishQueries.upsertDish(
       name = dish.name,
       description = dish.description,
@@ -59,20 +58,6 @@ class DishLocalDataSourceImpl(
         )
       }
     }
-  }
-
-  override suspend fun updateDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
-    dishQueries.upsertDish(
-      name = dish.name,
-      description = dish.description,
-      category = dish.category,
-      difficulty = dish.difficulty,
-      image = dish.image,
-      ingredient = dish.ingredient,
-      calculation = dish.calculation,
-      operation = dish.operation,
-      addition = dish.addition
-    )
   }
 
   override suspend fun deleteDishByName(name: String): Unit = withContext(dispatcher) {
