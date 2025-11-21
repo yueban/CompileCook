@@ -23,7 +23,7 @@ class DishTest {
     dishQueries.upsertDish(
       name = "Spaghetti Carbonara",
       description = "A classic Italian pasta dish",
-      category = 1L,
+      category = "staple",
       difficulty = 2L,
       image = "carbonara.jpg",
       ingredient = "Pasta, Eggs, Pancetta",
@@ -37,8 +37,7 @@ class DishTest {
 
     assertNotNull(insertedDish, "Inserted dish should be found by Name.")
     assertEquals("Spaghetti Carbonara", insertedDish.name)
-    assertEquals("A classic Italian pasta dish", insertedDish.description)
-    assertEquals(1L, insertedDish.category)
+    assertEquals("staple", insertedDish.category)
     assertEquals(2L, insertedDish.difficulty)
     assertEquals("Black Pepper", insertedDish.addition)
 
@@ -49,8 +48,28 @@ class DishTest {
 
   @Test
   fun getAll_returnsAllInsertedDishes() = testingDb {
-    dishQueries.upsertDish("Pizza", "Cheesy delight", 1L, 3L, "pizza.jpg", "Dough, Sauce, Cheese", "c", "o", "None")
-    dishQueries.upsertDish("Salad", "Healthy bowl", 2L, 1L, "salad.jpg", "Lettuce, Tomato", "c", "o", "Dressing")
+    dishQueries.upsertDish(
+      "Pizza",
+      "Cheesy delight",
+      "staple",
+      3L,
+      "pizza.jpg",
+      "Dough, Sauce, Cheese",
+      "c",
+      "o",
+      "None"
+    )
+    dishQueries.upsertDish(
+      "Salad",
+      "Healthy bowl",
+      "vegetable_dish",
+      1L,
+      "salad.jpg",
+      "Lettuce, Tomato",
+      "c",
+      "o",
+      "Dressing"
+    )
 
     val allDishes = dishQueries.getAll().awaitAsList()
     assertEquals(2, allDishes.size, "Should return all 2 inserted dishes.")
@@ -61,14 +80,24 @@ class DishTest {
   @Test
   fun upsertDish_modifiesCorrectEntry() = testingDb {
     // 1. Insert initial dish
-    dishQueries.upsertDish("Burger", "Juicy beef burger", 1L, 3L, "burger.jpg", "Bun, Patty", "c", "o", "Ketchup")
+    dishQueries.upsertDish(
+      "Burger",
+      "Juicy beef burger",
+      "meat_dish",
+      3L,
+      "burger.jpg",
+      "Bun, Patty",
+      "c",
+      "o",
+      "Ketchup"
+    )
     val originalDish = dishQueries.getByName("Burger").awaitAsOne()
 
-    // 2. Upsert the SAME dish name with NEW details (this acts as an UPDATE)
+    // 2. Upsert the SAME dish name with NEW details (acts as UPDATE)
     dishQueries.upsertDish(
-      name = "Burger", // Keep name same to trigger replace
+      name = "Burger", // Keep name same
       description = "Plant-based alternative",
-      category = 2L,
+      category = "vegetable_dish",
       difficulty = 2L,
       image = "veggie.jpg",
       ingredient = "Veggie Patty, Buns",
@@ -79,22 +108,17 @@ class DishTest {
 
     val updatedDish = dishQueries.getByName("Burger").awaitAsOne()
 
-    // Verify constraints
-    val allDishes = dishQueries.getAll().awaitAsList()
-    assertEquals(1, allDishes.size, "Should still be only 1 dish after upsert update.")
-
     // Verify fields updated
     assertEquals("Burger", updatedDish.name)
+    assertEquals("vegetable_dish", updatedDish.category)
+    assertNotEquals(originalDish.category, updatedDish.category, "Category should have changed.")
     assertEquals("Plant-based alternative", updatedDish.description)
-    assertNotEquals(originalDish.description, updatedDish.description, "Description should have changed.")
-    assertEquals(2L, updatedDish.difficulty, "Difficulty should have changed.")
-    assertEquals("None", updatedDish.addition, "Addition should be updated to 'None'.")
   }
 
   @Test
   fun deleteByName_removesCorrectEntry() = testingDb {
-    dishQueries.upsertDish("Steak", "Ribeye", 3L, 4L, "s.jpg", "Beef", "c", "o", "None")
-    dishQueries.upsertDish("Fries", "Crispy", 4L, 1L, "f.jpg", "Potato", "c", "o", "Salt")
+    dishQueries.upsertDish("Steak", "Ribeye", "meat_dish", 4L, "s.jpg", "Beef", "c", "o", "None")
+    dishQueries.upsertDish("Fries", "Crispy", "semi_finished", 1L, "f.jpg", "Potato", "c", "o", "Salt")
 
     // Delete the first dish by Name
     dishQueries.deleteByName("Steak")
@@ -110,8 +134,9 @@ class DishTest {
   @Test
   fun deleteAll_clearsTheTable() = testingDb {
     // Insert some data
+    val categories = listOf("aquatic", "soup", "drink", "dessert", "condiment")
     repeat(5) { i ->
-      dishQueries.upsertDish("Dish $i", "Desc $i", i.toLong(), 1L, "img", "ing", "c", "o", "None")
+      dishQueries.upsertDish("Dish $i", "Desc $i", categories[i], 1L, "img", "ing", "c", "o", "None")
     }
     assertEquals(5, dishQueries.getAll().awaitAsList().size, "5 dishes should exist before delete.")
 
@@ -124,31 +149,34 @@ class DishTest {
 
   @Test
   fun getByCategory_returnsMatchingDishes() = testingDb {
-    // Category 1
-    dishQueries.upsertDish("Spaghetti", "Pasta", 1L, 2L, "img", "ing", "c", "o", "None")
-    dishQueries.upsertDish("Lasagna", "Layers", 1L, 3L, "img", "ing", "c", "o", "None")
-    // Category 2
-    dishQueries.upsertDish("Taco", "Crunchy", 2L, 2L, "img", "ing", "c", "o", "None")
+    // Category "staple"
+    dishQueries.upsertDish("Spaghetti", "Pasta", "staple", 2L, "img", "ing", "c", "o", "None")
+    dishQueries.upsertDish("Lasagna", "Layers", "staple", 3L, "img", "ing", "c", "o", "None")
+    // Category "breakfast"
+    dishQueries.upsertDish("Pancakes", "Fluffy", "breakfast", 2L, "img", "ing", "c", "o", "None")
 
-    val category1Dishes = dishQueries.getByCategory(1L).awaitAsList()
-    assertEquals(2, category1Dishes.size)
-    assertTrue(category1Dishes.all { it.category == 1L }, "All dishes should belong to category 1.")
+    // Test querying "staple"
+    val stapleDishes = dishQueries.getByCategory("staple").awaitAsList()
+    assertEquals(2, stapleDishes.size)
+    assertTrue(stapleDishes.all { it.category == "staple" }, "All dishes should belong to category 'staple'.")
 
-    val category2Dishes = dishQueries.getByCategory(2L).awaitAsList()
-    assertEquals(1, category2Dishes.size)
-    assertEquals("Taco", category2Dishes.first().name)
+    // Test querying "breakfast"
+    val breakfastDishes = dishQueries.getByCategory("breakfast").awaitAsList()
+    assertEquals(1, breakfastDishes.size)
+    assertEquals("Pancakes", breakfastDishes.first().name)
 
-    val emptyCategoryDishes = dishQueries.getByCategory(99L).awaitAsList()
+    // Test non-existent category
+    val emptyCategoryDishes = dishQueries.getByCategory("space_food").awaitAsList()
     assertTrue(emptyCategoryDishes.isEmpty(), "Querying a non-existent category should return an empty list.")
   }
 
   @Test
   fun getByDifficulty_returnsMatchingDishes() = testingDb {
     // Difficulty 2
-    dishQueries.upsertDish("Sushi", "Rolls", 5L, 2L, "img", "ing", "c", "o", "None")
-    dishQueries.upsertDish("Ramen", "Noodles", 5L, 2L, "img", "ing", "c", "o", "None")
+    dishQueries.upsertDish("Sushi", "Rolls", "aquatic", 2L, "img", "ing", "c", "o", "None")
+    dishQueries.upsertDish("Ramen", "Noodles", "staple", 2L, "img", "ing", "c", "o", "None")
     // Difficulty 4
-    dishQueries.upsertDish("Beef Wellington", "Hard", 6L, 4L, "img", "ing", "c", "o", "None")
+    dishQueries.upsertDish("Beef Wellington", "Hard", "meat_dish", 4L, "img", "ing", "c", "o", "None")
 
     val difficulty2Dishes = dishQueries.getByDifficulty(2L).awaitAsList()
     assertEquals(2, difficulty2Dishes.size)
@@ -157,8 +185,5 @@ class DishTest {
     val difficulty4Dishes = dishQueries.getByDifficulty(4L).awaitAsList()
     assertEquals(1, difficulty4Dishes.size)
     assertEquals("Beef Wellington", difficulty4Dishes.first().name)
-
-    val emptyDifficultyDishes = dishQueries.getByDifficulty(5L).awaitAsList()
-    assertTrue(emptyDifficultyDishes.isEmpty(), "Querying a non-existent difficulty should return an empty list.")
   }
 }

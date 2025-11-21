@@ -16,24 +16,11 @@ data class DishRemoteEntity(
   val addition: String,
 )
 
-private val categoryToIdMap = mapOf(
-  "aquatic" to 1L,
-  "breakfast" to 2L,
-  "condiment" to 3L,
-  "dessert" to 4L,
-  "drink" to 5L,
-  "meat_dish" to 6L,
-  "semi_finished" to 7L,
-  "soup" to 8L,
-  "staple" to 9L,
-  "vegetable_dish" to 10L
-)
-
-fun DishRemoteEntity.toLocalEntity(): DishLocalEntity {
-  return DishLocalEntity(
+fun DishRemoteEntity.toLocalEntity(): DishLocalEntity =
+  DishLocalEntity(
     name = this.name,
     description = this.description,
-    category = categoryToIdMap[this.category] ?: 0,
+    category = category,
     difficulty = this.difficulty,
     image = this.image,
     ingredient = this.ingredient,
@@ -41,4 +28,3 @@ fun DishRemoteEntity.toLocalEntity(): DishLocalEntity {
     operation = this.operation,
     addition = this.addition
   )
-}

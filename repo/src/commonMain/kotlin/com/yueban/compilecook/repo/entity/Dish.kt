@@ -5,7 +5,7 @@ import com.yueban.compilecook.data.db.entity.DishLocalEntity
 data class Dish(
   val name: String,
   val description: String,
-  val category: Long,
+  val category: DishCategory,
   val difficulty: Long,
   val image: String,
   val ingredient: String,
@@ -14,25 +14,42 @@ data class Dish(
   val addition: String,
 )
 
-fun DishLocalEntity.toDish(): Dish {
-  return Dish(
-    name = this.name,
-    description = this.description,
-    category = this.category,
-    difficulty = this.difficulty,
-    image = this.image,
-    ingredient = this.ingredient,
-    calculation = this.calculation,
-    operation = this.operation,
-    addition = this.addition
-  )
+enum class DishCategory {
+  AQUATIC,
+  BREAKFAST,
+  CONDIMENT,
+  DESSERT,
+  DRINK,
+  MEAT_DISH,
+  SEMI_FINISHED,
+  SOUP,
+  STAPLE,
+  VEGETABLE_DISH,
+  UNKNOWN;
+
+  companion object {
+    fun fromValue(value: String): DishCategory =
+      when (value) {
+        "aquatic" -> AQUATIC
+        "breakfast" -> BREAKFAST
+        "condiment" -> CONDIMENT
+        "dessert" -> DESSERT
+        "drink" -> DRINK
+        "meat_dish" -> MEAT_DISH
+        "semi_finished" -> SEMI_FINISHED
+        "soup" -> SOUP
+        "staple" -> STAPLE
+        "vegetable_dish" -> VEGETABLE_DISH
+        else -> UNKNOWN
+      }
+  }
 }
 
-fun Dish.toLocalEntity(): DishLocalEntity {
-  return DishLocalEntity(
+fun DishLocalEntity.toDish(): Dish =
+  Dish(
     name = this.name,
     description = this.description,
-    category = this.category,
+    category = DishCategory.fromValue(this.category),
     difficulty = this.difficulty,
     image = this.image,
     ingredient = this.ingredient,
@@ -40,4 +57,3 @@ fun Dish.toLocalEntity(): DishLocalEntity {
     operation = this.operation,
     addition = this.addition
   )
-}
