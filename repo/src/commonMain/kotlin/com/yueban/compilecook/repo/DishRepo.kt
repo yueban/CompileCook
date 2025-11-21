@@ -14,11 +14,9 @@ import kotlinx.coroutines.launch
 
 interface DishRepo {
   fun getAllDishes(): Flow<List<Dish>>
-  fun getDishById(id: Long): Flow<Dish?>
-  suspend fun addDish(dish: Dish)
-  suspend fun addDishes(dishes: List<Dish>)
-  suspend fun updateDish(dish: Dish)
-  suspend fun deleteDishById(id: Long)
+  fun getDishByName(name: String): Flow<Dish?>
+  suspend fun addOrUpdateDishes(dishes: List<Dish>)
+  suspend fun deleteDishByName(name: String)
   suspend fun clearAllDishes()
 }
 
@@ -33,24 +31,20 @@ internal class DishRepoImpl(
 
   private suspend fun updateDishes() {
     val dishes = dishRemoteDataSource.getDishes().map { it.toLocalEntity() }
-    dishLocalDataSource.insertDishes(dishes)
+    dishLocalDataSource.upsertDishes(dishes)
     Logger.d("updated dishes: ${dishes.size}")
   }
 
   override fun getAllDishes(): Flow<List<Dish>> =
     dishLocalDataSource.getAllDishes().map { entities -> entities.map { it.toDish() } }
 
-  override fun getDishById(id: Long): Flow<Dish?> =
-    dishLocalDataSource.getDishById(id).map { it?.toDish() }
+  override fun getDishByName(name: String): Flow<Dish?> =
+    dishLocalDataSource.getDishByName(name).map { it?.toDish() }
 
-  override suspend fun addDish(dish: Dish) = dishLocalDataSource.insertDish(dish.toLocalEntity())
+  override suspend fun addOrUpdateDishes(dishes: List<Dish>) =
+    dishLocalDataSource.upsertDishes(dishes.map { it.toLocalEntity() })
 
-  override suspend fun addDishes(dishes: List<Dish>) =
-    dishLocalDataSource.insertDishes(dishes.map { it.toLocalEntity() })
-
-  override suspend fun updateDish(dish: Dish) = dishLocalDataSource.updateDish(dish.toLocalEntity())
-
-  override suspend fun deleteDishById(id: Long) = dishLocalDataSource.deleteDishById(id)
+  override suspend fun deleteDishByName(name: String) = dishLocalDataSource.deleteDishByName(name)
 
   override suspend fun clearAllDishes() = dishLocalDataSource.deleteAllDishes()
 }

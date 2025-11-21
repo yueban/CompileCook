@@ -3,7 +3,6 @@ package com.yueban.compilecook.repo.entity
 import com.yueban.compilecook.data.db.entity.DishLocalEntity
 
 data class Dish(
-  val id: Long,
   val name: String,
   val description: String,
   val category: Long,
@@ -17,7 +16,6 @@ data class Dish(
 
 fun DishLocalEntity.toDish(): Dish {
   return Dish(
-    id = this.id,
     name = this.name,
     description = this.description,
     category = this.category,
@@ -32,7 +30,6 @@ fun DishLocalEntity.toDish(): Dish {
 
 fun Dish.toLocalEntity(): DishLocalEntity {
   return DishLocalEntity(
-    id = this.id,
     name = this.name,
     description = this.description,
     category = this.category,

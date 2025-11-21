@@ -31,7 +31,6 @@ private val categoryToIdMap = mapOf(
 
 fun DishRemoteEntity.toLocalEntity(): DishLocalEntity {
   return DishLocalEntity(
-    id = 0,
     name = this.name,
     description = this.description,
     category = categoryToIdMap[this.category] ?: 0,

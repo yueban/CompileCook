@@ -11,11 +11,11 @@ import kotlinx.coroutines.withContext
 
 interface DishLocalDataSource {
   fun getAllDishes(): Flow<List<DishLocalEntity>>
-  fun getDishById(id: Long): Flow<DishLocalEntity?>
+  fun getDishByName(name: String): Flow<DishLocalEntity?>
   suspend fun insertDish(dish: DishLocalEntity)
-  suspend fun insertDishes(dishes: List<DishLocalEntity>)
+  suspend fun upsertDishes(dishes: List<DishLocalEntity>)
   suspend fun updateDish(dish: DishLocalEntity)
-  suspend fun deleteDishById(id: Long)
+  suspend fun deleteDishByName(name: String)
   suspend fun deleteAllDishes()
 }
 
@@ -26,11 +26,11 @@ class DishLocalDataSourceImpl(
   override fun getAllDishes(): Flow<List<DishLocalEntity>> =
     dishQueries.getAll().asFlow().mapToList(dispatcher)
 
-  override fun getDishById(id: Long): Flow<DishLocalEntity?> =
-    dishQueries.getById(id).asFlow().mapToOneOrNull(dispatcher)
+  override fun getDishByName(name: String): Flow<DishLocalEntity?> =
+    dishQueries.getByName(name).asFlow().mapToOneOrNull(dispatcher)
 
   override suspend fun insertDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
-    dishQueries.insertDish(
+    dishQueries.upsertDish(
       name = dish.name,
       description = dish.description,
       category = dish.category,
@@ -43,10 +43,10 @@ class DishLocalDataSourceImpl(
     )
   }
 
-  override suspend fun insertDishes(dishes: List<DishLocalEntity>) = withContext(dispatcher) {
+  override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = withContext(dispatcher) {
     dishQueries.transaction {
       dishes.forEach { dish ->
-        dishQueries.insertDish(
+        dishQueries.upsertDish(
           name = dish.name,
           description = dish.description,
           category = dish.category,
@@ -62,8 +62,7 @@ class DishLocalDataSourceImpl(
   }
 
   override suspend fun updateDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
-    dishQueries.updateDish(
-      id = dish.id, // The ID is crucial for the WHERE clause
+    dishQueries.upsertDish(
       name = dish.name,
       description = dish.description,
       category = dish.category,
@@ -76,8 +75,8 @@ class DishLocalDataSourceImpl(
     )
   }
 
-  override suspend fun deleteDishById(id: Long): Unit = withContext(dispatcher) {
-    dishQueries.deleteById(id)
+  override suspend fun deleteDishByName(name: String): Unit = withContext(dispatcher) {
+    dishQueries.deleteByName(name)
   }
 
   override suspend fun deleteAllDishes(): Unit = withContext(dispatcher) {

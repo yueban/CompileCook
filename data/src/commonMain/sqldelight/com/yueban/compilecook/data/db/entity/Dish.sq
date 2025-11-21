@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS DishLocalEntity (
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    name TEXT NOT NULL,
+    name TEXT PRIMARY KEY NOT NULL,
     description TEXT NOT NULL,
     category INTEGER NOT NULL,
     difficulty INTEGER NOT NULL,
@@ -17,10 +16,10 @@ CREATE INDEX IF NOT EXISTS Dish_difficulty ON DishLocalEntity(difficulty);
 
 -- Read Operations
 getAll:
-SELECT * FROM DishLocalEntity ORDER BY id;
+SELECT * FROM DishLocalEntity;
 
-getById:
-SELECT * FROM DishLocalEntity WHERE id = ?;
+getByName:
+SELECT * FROM DishLocalEntity WHERE name = ?;
 
 getByCategory:
 SELECT * FROM DishLocalEntity WHERE category = ?;
@@ -29,30 +28,14 @@ getByDifficulty:
 SELECT * FROM DishLocalEntity WHERE difficulty = ?;
 
 
--- Create Operation
-insertDish:
-INSERT INTO DishLocalEntity(name,description,category,difficulty,image,ingredient,calculation,operation,addition)
+-- Upsert Operation
+upsertDish:
+INSERT OR REPLACE INTO DishLocalEntity(name,description,category,difficulty,image,ingredient,calculation,operation,addition)
 VALUES (?,?,?,?,?,?,?,?,?);
 
-
--- Update Operation
-updateDish:
-UPDATE DishLocalEntity
-SET name = ?,
-    description = ?,
-    category = ?,
-    difficulty = ?,
-    image = ?,
-    ingredient = ?,
-    calculation = ?,
-    operation = ?,
-    addition = ?
-WHERE id = ?;
-
-
 -- Delete Operations
-deleteById:
-DELETE FROM DishLocalEntity WHERE id = ?;
+deleteByName:
+DELETE FROM DishLocalEntity WHERE name = ?;
 
 deleteAll:
 DELETE FROM DishLocalEntity;
