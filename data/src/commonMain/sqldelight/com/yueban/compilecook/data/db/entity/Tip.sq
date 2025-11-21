@@ -1,0 +1,29 @@
+CREATE TABLE IF NOT EXISTS TipLocalEntity (
+    name TEXT PRIMARY KEY NOT NULL,
+    type TEXT NOT NULL,
+    content TEXT NOT NULL
+);
+
+
+-- Read Operations
+getAll:
+SELECT * FROM TipLocalEntity;
+
+getByName:
+SELECT * FROM TipLocalEntity WHERE name = ?;
+
+getByType:
+SELECT * FROM TipLocalEntity WHERE type = ?;
+
+
+-- Upsert Operation
+upsertTip:
+INSERT OR REPLACE INTO TipLocalEntity(name,type,content)
+VALUES (?,?,?);
+
+-- Delete Operations
+deleteByName:
+DELETE FROM TipLocalEntity WHERE name = ?;
+
+deleteAll:
+DELETE FROM TipLocalEntity;

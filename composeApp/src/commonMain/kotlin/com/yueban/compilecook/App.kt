@@ -36,6 +36,12 @@ fun App() {
         Logger.d("$it")
         MarkdownViewer(it.description)
       }
+
+      val tips by dishRepo.getAllTips().collectAsState(emptyList())
+      tips.getOrNull(0)?.let {
+        Logger.d("$it")
+        MarkdownViewer(it.content)
+      }
     }
   }
 }

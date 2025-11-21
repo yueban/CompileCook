@@ -5,7 +5,9 @@ import com.yueban.compilecook.data.net.entity.toLocalEntity
 import com.yueban.compilecook.data.net.service.DishRemoteDataSource
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.Dish
+import com.yueban.compilecook.repo.entity.Tip
 import com.yueban.compilecook.repo.entity.toDish
+import com.yueban.compilecook.repo.entity.toTip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -14,6 +16,7 @@ import kotlinx.coroutines.launch
 interface DishRepo {
   fun getAllDishes(): Flow<List<Dish>>
   fun getDishByName(name: String): Flow<Dish?>
+  fun getAllTips(): Flow<List<Tip>>
   suspend fun deleteDishByName(name: String)
   suspend fun clearAllDishes()
 }
@@ -25,6 +28,7 @@ internal class DishRepoImpl(
 ) : DishRepo {
   init {
     coroutineScope.launch { updateDishes() }
+    coroutineScope.launch { updateTips() }
   }
 
   private suspend fun updateDishes() {
@@ -33,11 +37,20 @@ internal class DishRepoImpl(
     Logger.d("updated dishes: ${dishes.size}")
   }
 
+  private suspend fun updateTips() {
+    val tips = dishRemoteDataSource.getTips().map { it.toLocalEntity() }
+    dishLocalDataSource.upsertTips(tips)
+    Logger.d("updated tips: ${tips.size}")
+  }
+
   override fun getAllDishes(): Flow<List<Dish>> =
     dishLocalDataSource.getAllDishes().map { entities -> entities.map { it.toDish() } }
 
   override fun getDishByName(name: String): Flow<Dish?> =
     dishLocalDataSource.getDishByName(name).map { it?.toDish() }
+
+  override fun getAllTips(): Flow<List<Tip>> =
+    dishLocalDataSource.getAllTips().map { entities -> entities.map { it.toTip() } }
 
   override suspend fun deleteDishByName(name: String) = dishLocalDataSource.deleteDishByName(name)
 

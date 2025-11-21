@@ -18,5 +18,6 @@ val initialDatabaseModule = module {
 internal fun databaseModule(database: AppDatabase) = module {
   single { database }
   single { database.dishQueries }
+  single { database.tipQueries }
   singleOf(::DishLocalDataSourceImpl) bind DishLocalDataSource::class
 }
