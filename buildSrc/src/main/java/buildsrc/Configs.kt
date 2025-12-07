@@ -20,7 +20,7 @@ object Configs {
 
   const val testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-  val sourceCompatibility = JavaVersion.VERSION_21
-  val targetCompatibility = JavaVersion.VERSION_21
+  val sourceCompatibility = JavaVersion.VERSION_17
+  val targetCompatibility = JavaVersion.VERSION_17
   const val jvmToolchain = 21
 }
