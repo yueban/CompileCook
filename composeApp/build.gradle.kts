@@ -28,6 +28,10 @@ kotlin {
     iosTarget.binaries.framework {
       baseName = "ComposeApp"
       isStatic = true
+
+      export("com.arkivanov.decompose:decompose:${libs.versions.decompose}")
+      export("com.arkivanov.essenty:lifecycle:${libs.versions.essenty}")
+      export("com.arkivanov.essenty:state-keeper:${libs.versions.essenty}")
     }
   }
 
@@ -59,6 +63,8 @@ kotlin {
       implementation(libs.markdown.renderer)
       implementation(libs.markdown.renderer.m3)
       implementation(libs.markdown.renderer.coil3)
+      implementation(libs.decompose.decompose)
+      implementation(libs.decompose.extensions.compose)
     }
     androidMain.dependencies {
       implementation(compose.preview)
