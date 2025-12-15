@@ -72,6 +72,7 @@ subprojects {
         optIn.add("org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi")
         optIn.add("coil3.annotation.ExperimentalCoilApi")
         optIn.add("com.arkivanov.decompose.DelicateDecomposeApi")
+        optIn.add("com.arkivanov.decompose.ExperimentalDecomposeApi")
       }
     }
   }

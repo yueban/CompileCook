@@ -30,9 +30,10 @@ kotlin {
       baseName = "ComposeApp"
       isStatic = true
 
-      export("com.arkivanov.decompose:decompose:${libs.versions.decompose}")
-      export("com.arkivanov.essenty:lifecycle:${libs.versions.essenty}")
-      export("com.arkivanov.essenty:state-keeper:${libs.versions.essenty}")
+      export(libs.decompose.decompose)
+      export(libs.essenty.lifecycle)
+      export(libs.essenty.backHandler)
+      export(libs.essenty.stateKeeper)
     }
   }
 
@@ -49,6 +50,12 @@ kotlin {
       implementation(project(":repo"))
       implementation(project(":base"))
 
+      // for iOS export
+      api(libs.decompose.decompose)
+      api(libs.essenty.lifecycle)
+      api(libs.essenty.backHandler)
+      api(libs.essenty.stateKeeper)
+
       implementation(compose.runtime)
       implementation(compose.foundation)
       implementation(compose.material3)
@@ -64,8 +71,8 @@ kotlin {
       implementation(libs.markdown.renderer)
       implementation(libs.markdown.renderer.m3)
       implementation(libs.markdown.renderer.coil3)
-      implementation(libs.decompose.decompose)
       implementation(libs.decompose.extensions.compose)
+      implementation(libs.decompose.extensions.compose.experimental)
       implementation(libs.compose.material.icons)
     }
     androidMain.dependencies {

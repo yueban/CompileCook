@@ -5,9 +5,9 @@ import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.popTo
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
@@ -16,10 +16,10 @@ import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
 import kotlinx.serialization.Serializable
 
-interface RootComponent {
+interface RootComponent : BackHandlerOwner {
   val stack: Value<ChildStack<*, Child>>
 
-  fun onBackClicked(toIndex: Int)
+  fun onBackClicked()
   sealed class Child {
     class ListChild(val component: ListComponent) : Child()
     class DetailChild(val component: DetailComponent) : Child()
@@ -60,8 +60,8 @@ class DefaultRootComponent(
       onFinished = navigation::pop,
     )
 
-  override fun onBackClicked(toIndex: Int) {
-    navigation.popTo(index = toIndex)
+  override fun onBackClicked() {
+    navigation.pop()
   }
 
   @Serializable
