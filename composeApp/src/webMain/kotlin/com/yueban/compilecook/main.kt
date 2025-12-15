@@ -4,12 +4,46 @@ package com.yueban.compilecook
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
+import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.lifecycle.resume
+import com.arkivanov.essenty.lifecycle.stop
+import com.yueban.compilecook.ui.root.DefaultRootComponent
+import org.jetbrains.skiko.wasm.onWasmReady
+import web.dom.DocumentVisibilityState
+import web.dom.document
+import web.dom.visible
+import web.events.EventType
+import web.events.addEventListener
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
   AppInitializer.init()
 
-  ComposeViewport {
-    App()
+  val lifecycle = LifecycleRegistry()
+  val root = DefaultRootComponent(
+    componentContext = DefaultComponentContext(lifecycle = lifecycle)
+  )
+
+  lifecycle.attachToDocument()
+
+  onWasmReady {
+    ComposeViewport {
+      App(root)
+    }
   }
+}
+
+private fun LifecycleRegistry.attachToDocument() {
+  fun onVisibilityChanged() {
+    if (document.visibilityState == DocumentVisibilityState.visible) {
+      resume()
+    } else {
+      stop()
+    }
+  }
+
+  onVisibilityChanged()
+
+  document.addEventListener(type = EventType("visibilitychange"), handler = { onVisibilityChanged() })
 }

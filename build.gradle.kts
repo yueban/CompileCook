@@ -71,6 +71,7 @@ subprojects {
         freeCompilerArgs.add("-Xexpect-actual-classes")
         optIn.add("org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi")
         optIn.add("coil3.annotation.ExperimentalCoilApi")
+        optIn.add("com.arkivanov.decompose.DelicateDecomposeApi")
       }
     }
   }

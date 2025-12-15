@@ -9,6 +9,7 @@ plugins {
   alias(libs.plugins.composeCompiler)
   alias(libs.plugins.composeHotReload)
   alias(libs.plugins.buildconfig)
+  alias(libs.plugins.kotlin.serialization)
 }
 
 buildConfig {
@@ -65,6 +66,7 @@ kotlin {
       implementation(libs.markdown.renderer.coil3)
       implementation(libs.decompose.decompose)
       implementation(libs.decompose.extensions.compose)
+      implementation(libs.compose.material.icons)
     }
     androidMain.dependencies {
       implementation(compose.preview)
@@ -86,6 +88,7 @@ kotlin {
     wasmJsMain.dependencies {
       implementation(project.dependencies.platform(libs.ktor.bom))
       implementation(libs.ktor.client.js)
+      implementation(libs.kotlin.browser)
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)
