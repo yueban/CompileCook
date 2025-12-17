@@ -10,6 +10,7 @@ import java.util.Locale
 object Configs {
   const val DEBUG = true
 
+  const val packageName = "com.yueban.compilecook"
   const val applicationId = "com.yueban.compilecook"
   const val compileSdk = 36
   const val minSdk = 29

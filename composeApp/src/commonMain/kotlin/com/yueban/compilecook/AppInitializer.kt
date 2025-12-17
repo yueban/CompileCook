@@ -1,6 +1,5 @@
 package com.yueban.compilecook
 
-import com.yueban.compilecook.di.BuildConfig
 import com.yueban.compilecook.di.coroutineModule
 import com.yueban.compilecook.logger.KoinLogger
 import com.yueban.compilecook.repo.di.initialDatabaseModule
@@ -39,11 +38,6 @@ object AppInitializer {
       koinInitializer()
       logger(KoinLogger(BuildKonfig.DEBUG))
       modules(
-        module {
-          single {
-            BuildConfig(isDebug = BuildKonfig.DEBUG)
-          }
-        },
         coroutineModule,
         initialAppModule,
         initialDatabaseModule,

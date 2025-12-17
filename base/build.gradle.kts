@@ -4,6 +4,20 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
   alias(libs.plugins.kotlinMultiplatform)
   alias(libs.plugins.androidKotlinMultiplatformLibrary)
+  alias(libs.plugins.buildconfig)
+}
+
+buildConfig {
+  useKotlinOutput {
+    internalVisibility = false
+  }
+
+  className("BuildKonfig")
+  packageName(Configs.packageName)
+
+  buildConfigField("DEBUG", Configs.DEBUG)
+  buildConfigField("APP_NAME", Configs.applicationId)
+  buildConfigField("APP_VERSION", Configs.versionName)
 }
 
 kotlin {
@@ -49,6 +63,9 @@ kotlin {
       implementation(libs.napier)
     }
     androidMain.dependencies {
+    }
+    jvmMain.dependencies {
+      api(libs.appdirs)
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)
