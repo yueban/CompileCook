@@ -17,6 +17,12 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
   val model by component.model.subscribeAsState()
 
   LazyColumn(modifier.fillMaxSize().background(Color.Red)) {
+    item {
+      Text(
+        text = "Counter: ${model.counter}",
+        modifier = Modifier.clickable { component.onAddCount() }
+      )
+    }
     items(items = model.items) { item ->
       Text(
         text = item,

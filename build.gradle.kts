@@ -73,6 +73,7 @@ subprojects {
         optIn.add("coil3.annotation.ExperimentalCoilApi")
         optIn.add("com.arkivanov.decompose.DelicateDecomposeApi")
         optIn.add("com.arkivanov.decompose.ExperimentalDecomposeApi")
+        optIn.add("com.arkivanov.essenty.statekeeper.ExperimentalStateKeeperApi")
       }
     }
   }

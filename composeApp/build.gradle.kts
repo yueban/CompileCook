@@ -17,6 +17,8 @@ buildConfig {
   packageName("com.yueban.compilecook")
 
   buildConfigField("DEBUG", Configs.DEBUG)
+  buildConfigField("APP_NAME", Configs.applicationId)
+  buildConfigField("APP_VERSION", Configs.versionName)
 }
 
 kotlin {
@@ -91,6 +93,7 @@ kotlin {
       implementation(libs.kotlinx.coroutines.swing)
       implementation(project.dependencies.platform(libs.ktor.bom))
       implementation(libs.ktor.client.okhttp)
+      implementation(libs.appdirs)
     }
     wasmJsMain.dependencies {
       implementation(project.dependencies.platform(libs.ktor.bom))

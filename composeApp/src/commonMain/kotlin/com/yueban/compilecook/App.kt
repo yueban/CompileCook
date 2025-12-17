@@ -22,7 +22,7 @@ fun App(root: RootComponent) {
     if (!isReady) return@AppTheme
 
     Column {
-      Spacer(Modifier.height(24.dp))
+      Spacer(Modifier.height(48.dp))
       RootContent(component = root, modifier = Modifier.fillMaxSize())
     }
   }

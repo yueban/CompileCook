@@ -86,6 +86,7 @@ decompose = "3.4.0"
 essenty = "2.5.0"
 kotlin-browser = "2025.12.4"
 compose-material-icons-core = "1.7.3"
+appdirs = "1.5.0"
 
 [libraries]
 
@@ -137,3 +138,4 @@ essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = 
 essenty-backHandler = { module = "com.arkivanov.essenty:back-handler", version.ref = "essenty" }
 essenty-stateKeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
 kotlin-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlin-browser" }
+appdirs = { module = "net.harawata:appdirs", version.ref = "appdirs" }
