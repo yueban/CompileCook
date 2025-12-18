@@ -14,6 +14,8 @@ import com.yueban.compilecook.ui.inbox.DetailComponent
 import com.yueban.compilecook.ui.inbox.ListComponent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
 
 interface RootComponent : BackHandlerOwner {
@@ -29,6 +31,7 @@ interface RootComponent : BackHandlerOwner {
 class DefaultRootComponent(
   componentContext: ComponentContext,
 ) : RootComponent, ComponentContext by componentContext {
+  private val listEvents = Channel<ListComponent.Event>(Channel.BUFFERED)
   private val navigation = StackNavigation<Config>()
   override val stack: Value<ChildStack<*, RootComponent.Child>> =
     childStack(
@@ -48,6 +51,7 @@ class DefaultRootComponent(
   private fun listComponent(componentContext: ComponentContext): ListComponent =
     DefaultListComponent(
       componentContext = componentContext,
+      eventFlow = listEvents.receiveAsFlow(),
       onItemSelected = {
         navigation.push(Config.Detail(item = it))
       }
@@ -57,7 +61,9 @@ class DefaultRootComponent(
     DefaultDetailComponent(
       componentContext = componentContext,
       item = config.item,
-      onFinished = navigation::pop,
+      onFinished = { item ->
+        navigation.pop { listEvents.trySend(ListComponent.Event.BackFromDetail(item)) }
+      },
     )
 
   override fun onBackClicked() {

@@ -4,10 +4,12 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.statekeeper.saveable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
 interface ListComponent {
   val model: Value<Model>
+  val eventFlow: Flow<Event>
   fun onItemClicked(item: String)
   fun onAddCount()
 
@@ -15,10 +17,15 @@ interface ListComponent {
     val items: List<String>,
     val counter: Int,
   )
+
+  sealed interface Event {
+    data class BackFromDetail(val item: String) : Event
+  }
 }
 
 class DefaultListComponent(
   componentContext: ComponentContext,
+  override val eventFlow: Flow<ListComponent.Event>,
   private val onItemSelected: (item: String) -> Unit,
 ) : ListComponent, ComponentContext by componentContext {
   @Serializable

@@ -21,7 +21,7 @@ interface DetailComponent {
 class DefaultDetailComponent(
   componentContext: ComponentContext,
   item: String,
-  private val onFinished: ((Boolean) -> Unit) -> Unit,
+  private val onFinished: (item: String) -> Unit,
 ) : DetailComponent, ComponentContext by componentContext {
   private val retainedInstance = retainedInstance { RetainedInstance() }
   override val model: Value<DetailComponent.Model> =
@@ -32,7 +32,7 @@ class DefaultDetailComponent(
       )
     )
 
-  override fun onBackClicked() = onFinished.invoke { }
+  override fun onBackClicked() = onFinished.invoke(model.value.item)
 
   private class RetainedInstance : InstanceKeeper.Instance {
     val id: String = Random.nextInt().toString()
