@@ -23,5 +23,6 @@ fun DetailContent(component: DetailComponent, modifier: Modifier = Modifier) {
       Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
     }
     Text(text = model.item)
+    Text(text = model.instanceId)
   }
 }
