@@ -28,7 +28,7 @@ val initialAppModule = module {
 
 object AppInitializer {
   fun init(koinInitializer: KoinApplication.() -> Unit = {}) {
-    UtilInitializer.init(BuildKonfig.DEBUG)
+    UtilInitializer.init(BuildKonfig.IS_DEBUG)
     CoilUtil.init()
     initKoin(koinInitializer)
   }
@@ -36,7 +36,7 @@ object AppInitializer {
   private fun initKoin(koinInitializer: KoinApplication.() -> Unit = {}) {
     val koin = startKoin {
       koinInitializer()
-      logger(KoinLogger(BuildKonfig.DEBUG))
+      logger(KoinLogger(BuildKonfig.IS_DEBUG))
       modules(
         coroutineModule,
         initialAppModule,

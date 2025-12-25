@@ -15,7 +15,7 @@ buildConfig {
   className("BuildKonfig")
   packageName(Configs.packageName)
 
-  buildConfigField("DEBUG", Configs.DEBUG)
+  buildConfigField("IS_DEBUG", Configs.DEBUG)
   buildConfigField("APP_NAME", Configs.applicationId)
   buildConfigField("APP_VERSION", Configs.versionName)
 }
