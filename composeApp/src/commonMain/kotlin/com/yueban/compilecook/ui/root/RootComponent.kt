@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
@@ -14,12 +15,14 @@ import com.yueban.compilecook.ui.inbox.DetailComponent
 import com.yueban.compilecook.ui.inbox.ListComponent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
+import com.yueban.compilecook.util.Url
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
 
 interface RootComponent : BackHandlerOwner {
   val stack: Value<ChildStack<*, Child>>
+  fun onDeepLink(url: Url)
 
   fun onBackClicked()
   sealed class Child {
@@ -30,6 +33,7 @@ interface RootComponent : BackHandlerOwner {
 
 class DefaultRootComponent(
   componentContext: ComponentContext,
+  deepLinkUrl: Url? = null,
 ) : RootComponent, ComponentContext by componentContext {
   private val listEvents = Channel<ListComponent.Event>(Channel.BUFFERED)
   private val navigation = StackNavigation<Config>()
@@ -37,34 +41,38 @@ class DefaultRootComponent(
     childStack(
       source = navigation,
       serializer = Config.serializer(),
-      initialConfiguration = Config.List,
+      initialStack = { getInitialStack(deepLinkUrl) },
       handleBackButton = true,
       childFactory = ::child
     )
 
+  override fun onDeepLink(url: Url) {
+    navigation.navigate { getInitialStack(url) }
+  }
+
   private fun child(config: Config, componentContext: ComponentContext): RootComponent.Child =
     when (config) {
-      Config.List -> ListChild(listComponent(componentContext))
-      is Config.Detail -> DetailChild(detailComponent(componentContext, config))
+      Config.List -> DefaultListComponent(
+        componentContext = componentContext,
+        eventFlow = listEvents.receiveAsFlow(),
+        onItemSelected = {
+          navigation.push(Config.Detail(item = it))
+        }
+      ).let { ListChild(it) }
+
+      is Config.Detail -> DefaultDetailComponent(
+        componentContext = componentContext,
+        item = config.item,
+        onFinished = { item ->
+          navigation.pop { listEvents.trySend(ListComponent.Event.BackFromDetail(item)) }
+        },
+      ).let { DetailChild(it) }
     }
 
-  private fun listComponent(componentContext: ComponentContext): ListComponent =
-    DefaultListComponent(
-      componentContext = componentContext,
-      eventFlow = listEvents.receiveAsFlow(),
-      onItemSelected = {
-        navigation.push(Config.Detail(item = it))
-      }
-    )
-
-  private fun detailComponent(componentContext: ComponentContext, config: Config.Detail): DetailComponent =
-    DefaultDetailComponent(
-      componentContext = componentContext,
-      item = config.item,
-      onFinished = { item ->
-        navigation.pop { listEvents.trySend(ListComponent.Event.BackFromDetail(item)) }
-      },
-    )
+  private fun getInitialStack(deepLinkUrl: Url?): List<Config> {
+    val item = deepLinkUrl?.parameters["item"] ?: return listOf(Config.List)
+    return listOf(Config.List, Config.Detail(item = item))
+  }
 
   override fun onBackClicked() {
     navigation.pop()
