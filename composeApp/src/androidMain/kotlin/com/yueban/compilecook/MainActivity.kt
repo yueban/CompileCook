@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
   private fun Intent.toDeepLinkUrl(): Url? =
     if (action == Intent.ACTION_VIEW && data != null) {
-      Url(data.toString())
+      Url.parse(data.toString())
     } else {
       null
     }

@@ -6,23 +6,25 @@ import kotlinx.serialization.Serializable
 data class Url(
   val pathSegments: List<String>,
   val parameters: Map<String, String>,
-)
+) {
+  companion object {
+    fun parse(url: String): Url {
+      var path: String = url.substringAfter(delimiter = "://").substringAfter(delimiter = "/")
+      var parameters: Map<String, String> = emptyMap()
 
-fun Url(url: String): Url {
-  var path: String = url.substringAfter(delimiter = "://").substringAfter(delimiter = "/")
-  var parameters: Map<String, String> = emptyMap()
+      if ('?' in path) {
+        parameters =
+          path.substringAfter(delimiter = "?")
+            .split("&")
+            .map { it.split("=") }
+            .associate { (key, value) -> key to value }
 
-  if ('?' in path) {
-    parameters =
-      path.substringAfter(delimiter = "?")
-        .split("&")
-        .map { it.split("=") }
-        .associate { (key, value) -> key to value }
+        path = path.substringBefore(delimiter = "?")
+      }
 
-    path = path.substringBefore(delimiter = "?")
+      return Url(pathSegments = path.split("/"), parameters = parameters)
+    }
   }
-
-  return Url(pathSegments = path.split("/"), parameters = parameters)
 }
 
 fun Url.consumePathSegment(): Pair<String?, Url> =

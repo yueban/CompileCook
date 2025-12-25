@@ -22,6 +22,7 @@ kotlin {
       baseName = "ComposeApp"
       isStatic = true
 
+      export(project(":base"))
       export(libs.decompose.decompose)
       export(libs.essenty.lifecycle)
       export(libs.essenty.backHandler)
@@ -40,7 +41,8 @@ kotlin {
   sourceSets {
     commonMain.dependencies {
       implementation(project(":repo"))
-      implementation(project(":base"))
+      // for iOS export
+      api(project(":base"))
 
       // for iOS export
       api(libs.decompose.decompose)

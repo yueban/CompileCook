@@ -9,6 +9,10 @@ struct iOSApp: App {
         WindowGroup {
             RootView(root: appDelegate.root, backDispatcher: appDelegate.backDispatcher)
                 .ignoresSafeArea()
+                .onOpenURL { url in
+                    let kotlinUrl = Url.Companion.shared.parse(url: url.absoluteString)
+                    appDelegate.root.onDeepLink(url: kotlinUrl)
+                }
         }
     }
 }
@@ -23,7 +27,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             stateKeeper: stateKeeper,
             instanceKeeper: nil,
             backHandler: backDispatcher
-        )
+        ),
+        deepLinkUrl: nil
     )
 
     func application(_ application: UIApplication,
