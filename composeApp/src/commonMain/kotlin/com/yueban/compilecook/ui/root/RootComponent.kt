@@ -72,7 +72,7 @@ class DefaultRootComponent(
 
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
     val url = deepLinkUrl?.let { Url(it) }?.takeIf { it.host == DEEPLINK_HOST }
-    return when (val item = url?.parameters["item"]) {
+    return when (val item = url?.segments?.first()) {
       null -> listOf(Config.List)
       else -> listOf(Config.List, Config.Detail(item = item))
     }
