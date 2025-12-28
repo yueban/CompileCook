@@ -9,7 +9,6 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
-import com.yueban.compilecook.DEEPLINK_HOST
 import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
@@ -71,8 +70,8 @@ class DefaultRootComponent(
     }
 
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
-    val url = deepLinkUrl?.let { Url(it) }?.takeIf { it.host == DEEPLINK_HOST }
-    return when (val item = url?.segments?.first()) {
+    val url = deepLinkUrl?.let { Url(it) }
+    return when (val item = url?.segments?.firstOrNull()) {
       null -> listOf(Config.List)
       else -> listOf(Config.List, Config.Detail(item = item))
     }

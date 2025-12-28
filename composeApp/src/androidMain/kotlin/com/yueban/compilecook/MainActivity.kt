@@ -10,6 +10,9 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.yueban.compilecook.ui.root.DefaultRootComponent
 import com.yueban.compilecook.ui.root.RootComponent
 
+private const val DEEPLINK_SCHEME = "yueban"
+private const val DEEPLINK_HOST = "compilecook"
+
 class MainActivity : ComponentActivity() {
   private lateinit var root: RootComponent
 
@@ -19,7 +22,7 @@ class MainActivity : ComponentActivity() {
 
     root = DefaultRootComponent(
       componentContext = defaultComponentContext(),
-      deepLinkUrl = intent?.getUrl()
+      deepLinkUrl = intent?.getValidUrl()
     )
 
     setContent {
@@ -29,8 +32,12 @@ class MainActivity : ComponentActivity() {
 
   override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
     super.onNewIntent(intent, caller)
-    intent.getUrl()?.let { root.onDeepLink(it) }
+    intent.getValidUrl()?.let { root.onDeepLink(it) }
   }
 
-  private fun Intent.getUrl(): String? = takeIf { action == Intent.ACTION_VIEW }?.data?.toString()
+  private fun Intent.getValidUrl(): String? =
+    takeIf { action == Intent.ACTION_VIEW }
+      ?.data
+      ?.takeIf { it.scheme == DEEPLINK_SCHEME && it.host == DEEPLINK_HOST }
+      ?.toString()
 }

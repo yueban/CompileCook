@@ -10,6 +10,11 @@ struct iOSApp: App {
             RootView(root: appDelegate.root, backDispatcher: appDelegate.backDispatcher)
                 .ignoresSafeArea()
                 .onOpenURL { url in
+                    guard url.scheme == "yueban", url.host == "compilecook" else {
+                        print("Ignoring invalid url: \(url.absoluteString)")
+                        return
+                    }
+
                     appDelegate.root.onDeepLink(url: url.absoluteString)
                 }
         }
