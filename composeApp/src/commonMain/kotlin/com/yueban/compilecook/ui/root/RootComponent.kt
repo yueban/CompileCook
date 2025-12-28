@@ -17,9 +17,9 @@ import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
 import com.yueban.compilecook.ui.inbox.ListComponent
+import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
-import com.yueban.compilecook.ui.root.RootComponent.Config
 import io.ktor.http.Url
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -30,15 +30,6 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   fun onDeepLink(url: String)
 
   fun onBackClicked()
-
-  @Serializable
-  sealed interface Config {
-    @Serializable
-    data object List : Config
-
-    @Serializable
-    data class Detail(val item: String) : Config
-  }
 
   sealed class Child {
     class ListChild(val component: ListComponent) : Child()
@@ -107,5 +98,14 @@ class DefaultRootComponent(
 
   override fun onBackClicked() {
     navigation.pop()
+  }
+
+  @Serializable
+  sealed interface Config {
+    @Serializable
+    data object List : Config
+
+    @Serializable
+    data class Detail(val item: String) : Config
   }
 }
