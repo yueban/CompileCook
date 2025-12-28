@@ -5,6 +5,7 @@ package com.yueban.compilecook
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.router.webhistory.withWebHistory
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.essenty.lifecycle.stop
@@ -21,9 +22,15 @@ fun main() {
   AppInitializer.init()
 
   val lifecycle = LifecycleRegistry()
-  val root = DefaultRootComponent(
-    componentContext = DefaultComponentContext(lifecycle = lifecycle)
-  )
+  val root = withWebHistory { stateKeeper, deepLink ->
+    DefaultRootComponent(
+      componentContext = DefaultComponentContext(
+        lifecycle = lifecycle,
+        stateKeeper = stateKeeper,
+      ),
+      deepLinkUrl = deepLink
+    )
+  }
 
   lifecycle.attachToDocument()
 
