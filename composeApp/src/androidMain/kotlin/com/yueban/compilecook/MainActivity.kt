@@ -9,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import com.arkivanov.decompose.defaultComponentContext
 import com.yueban.compilecook.ui.root.DefaultRootComponent
 import com.yueban.compilecook.ui.root.RootComponent
-import com.yueban.compilecook.util.Url
 
 class MainActivity : ComponentActivity() {
   private lateinit var root: RootComponent
@@ -20,7 +19,7 @@ class MainActivity : ComponentActivity() {
 
     root = DefaultRootComponent(
       componentContext = defaultComponentContext(),
-      deepLinkUrl = intent?.toDeepLinkUrl()
+      deepLinkUrl = intent?.getUrl()
     )
 
     setContent {
@@ -30,13 +29,8 @@ class MainActivity : ComponentActivity() {
 
   override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
     super.onNewIntent(intent, caller)
-    intent.toDeepLinkUrl()?.let { root.onDeepLink(it) }
+    intent.getUrl()?.let { root.onDeepLink(it) }
   }
 
-  private fun Intent.toDeepLinkUrl(): Url? =
-    if (action == Intent.ACTION_VIEW && data != null) {
-      Url.parse(data.toString())
-    } else {
-      null
-    }
+  private fun Intent.getUrl(): String? = takeIf { action == Intent.ACTION_VIEW }?.data?.toString()
 }

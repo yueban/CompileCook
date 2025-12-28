@@ -9,20 +9,21 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
+import com.yueban.compilecook.DEEPLINK_HOST
 import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
 import com.yueban.compilecook.ui.inbox.ListComponent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
-import com.yueban.compilecook.util.Url
+import io.ktor.http.Url
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
 
 interface RootComponent : BackHandlerOwner {
   val stack: Value<ChildStack<*, Child>>
-  fun onDeepLink(url: Url)
+  fun onDeepLink(url: String)
 
   fun onBackClicked()
   sealed class Child {
@@ -33,7 +34,7 @@ interface RootComponent : BackHandlerOwner {
 
 class DefaultRootComponent(
   componentContext: ComponentContext,
-  deepLinkUrl: Url? = null,
+  deepLinkUrl: String? = null,
 ) : RootComponent, ComponentContext by componentContext {
   private val listEvents = Channel<ListComponent.Event>(Channel.BUFFERED)
   private val navigation = StackNavigation<Config>()
@@ -46,7 +47,7 @@ class DefaultRootComponent(
       childFactory = ::child
     )
 
-  override fun onDeepLink(url: Url) {
+  override fun onDeepLink(url: String) {
     navigation.navigate { getInitialStack(url) }
   }
 
@@ -69,9 +70,12 @@ class DefaultRootComponent(
       ).let { DetailChild(it) }
     }
 
-  private fun getInitialStack(deepLinkUrl: Url?): List<Config> {
-    val item = deepLinkUrl?.parameters["item"] ?: return listOf(Config.List)
-    return listOf(Config.List, Config.Detail(item = item))
+  private fun getInitialStack(deepLinkUrl: String?): List<Config> {
+    val url = deepLinkUrl?.let { Url(it) }?.takeIf { it.host == DEEPLINK_HOST }
+    return when (val item = url?.parameters["item"]) {
+      null -> listOf(Config.List)
+      else -> listOf(Config.List, Config.Detail(item = item))
+    }
   }
 
   override fun onBackClicked() {

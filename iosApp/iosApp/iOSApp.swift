@@ -10,8 +10,7 @@ struct iOSApp: App {
             RootView(root: appDelegate.root, backDispatcher: appDelegate.backDispatcher)
                 .ignoresSafeArea()
                 .onOpenURL { url in
-                    let kotlinUrl = Url.Companion.shared.parse(url: url.absoluteString)
-                    appDelegate.root.onDeepLink(url: kotlinUrl)
+                    appDelegate.root.onDeepLink(url: url.absoluteString)
                 }
         }
     }
