@@ -1,6 +1,7 @@
 package com.yueban.compilecook.ui.inbox
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -22,7 +23,10 @@ fun DetailContent(component: DetailComponent, modifier: Modifier = Modifier) {
     IconButton(onClick = { component.onBackClicked() }) {
       Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
     }
+    Text(
+      text = "Counter: ${model.counter}",
+      modifier = Modifier.clickable { component.onAddCount() }
+    )
     Text(text = model.dish?.name ?: "")
-    Text(text = model.instanceId)
   }
 }

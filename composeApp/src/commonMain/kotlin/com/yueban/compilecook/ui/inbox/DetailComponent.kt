@@ -7,17 +7,18 @@ import com.arkivanov.essenty.instancekeeper.retainedInstance
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.ui.ext.toValue
-import kotlinx.coroutines.flow.mapLatest
-import kotlin.random.Random
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 
 interface DetailComponent {
   val model: Value<Model>
-
+  fun onAddCount()
   fun onBackClicked()
 
   data class Model(
     val dish: Dish?,
-    val instanceId: String,
+    val counter: Int,
   )
 }
 
@@ -29,17 +30,24 @@ class DefaultDetailComponent(
 ) : DetailComponent, ComponentContext by componentContext {
   private val retainedInstance = retainedInstance { RetainedInstance() }
   override val model: Value<DetailComponent.Model> =
-    dishRepo.getDishByName(dishName).mapLatest {
-      DetailComponent.Model(dish = it, instanceId = "ID: ${retainedInstance.id}")
-    }.toValue(componentContext, DetailComponent.Model(null, ""))
+    combine(
+      dishRepo.getDishByName(dishName),
+      retainedInstance.counterFlow,
+    ) { dish, counter ->
+      DetailComponent.Model(dish = dish, counter = counter)
+    }.toValue(componentContext, DetailComponent.Model(null, 0))
+
+  override fun onAddCount() {
+    retainedInstance.counterFlow.update { it + 1 }
+  }
 
   override fun onBackClicked() = onFinished.invoke(model.value.dish?.name ?: "")
 
   private class RetainedInstance : InstanceKeeper.Instance {
-    val id: String = Random.nextInt().toString()
+    val counterFlow = MutableStateFlow(0)
 
     override fun onDestroy() {
-      println("RetainedInstance destroyed: $id")
+      println("RetainedInstance destroyed, counter: ${counterFlow.value}")
     }
   }
 }
