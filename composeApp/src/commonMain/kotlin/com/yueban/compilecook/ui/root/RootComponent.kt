@@ -24,6 +24,8 @@ import io.ktor.http.Url
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
 interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   val stack: Value<ChildStack<Config, Child>>
@@ -40,7 +42,7 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
 class DefaultRootComponent(
   componentContext: ComponentContext,
   deepLinkUrl: String? = null,
-) : RootComponent, ComponentContext by componentContext {
+) : RootComponent, ComponentContext by componentContext, KoinComponent {
   private val listEvents = Channel<ListComponent.Event>(Channel.BUFFERED)
   private val navigation = StackNavigation<Config>()
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
@@ -59,7 +61,7 @@ class DefaultRootComponent(
       Logger.d("config: $config, child: $child, any: $any")
       when (config) {
         Config.List -> "/"
-        is Config.Detail -> "/${config.item}"
+        is Config.Detail -> "/${config.dishName}"
       }
     }
   )
@@ -72,17 +74,19 @@ class DefaultRootComponent(
     when (config) {
       Config.List -> DefaultListComponent(
         componentContext = componentContext,
+        dishRepo = get(),
         eventFlow = listEvents.receiveAsFlow(),
         onItemSelected = {
-          navigation.push(Config.Detail(item = it))
+          navigation.push(Config.Detail(dishName = it))
         }
       ).let { ListChild(it) }
 
       is Config.Detail -> DefaultDetailComponent(
         componentContext = componentContext,
-        item = config.item,
-        onFinished = { item ->
-          navigation.pop { listEvents.trySend(ListComponent.Event.BackFromDetail(item)) }
+        dishRepo = get(),
+        dishName = config.dishName,
+        onFinished = { dishName ->
+          navigation.pop { listEvents.trySend(ListComponent.Event.BackFromDetail(dishName)) }
         },
       ).let { DetailChild(it) }
     }
@@ -90,9 +94,9 @@ class DefaultRootComponent(
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
     Logger.d("deepLinkUrl: $deepLinkUrl")
     val url = deepLinkUrl?.let { Url(it) }
-    return when (val item = url?.segments?.firstOrNull()) {
+    return when (val dishName = url?.segments?.firstOrNull()) {
       null -> listOf(Config.List)
-      else -> listOf(Config.List, Config.Detail(item = item))
+      else -> listOf(Config.List, Config.Detail(dishName = dishName))
     }
   }
 
@@ -106,6 +110,6 @@ class DefaultRootComponent(
     data object List : Config
 
     @Serializable
-    data class Detail(val item: String) : Config
+    data class Detail(val dishName: String) : Config
   }
 }

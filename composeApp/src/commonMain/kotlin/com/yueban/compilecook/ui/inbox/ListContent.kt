@@ -26,7 +26,7 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
   LaunchedEffect(component) {
     component.eventFlow.collect { event ->
       when (event) {
-        is BackFromDetail -> snackbarHostState.showSnackbar("Back From Detail: ${event.item}")
+        is BackFromDetail -> snackbarHostState.showSnackbar("Back From Detail: ${event.dishName}")
       }
     }
   }
@@ -41,10 +41,10 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
           modifier = Modifier.clickable { component.onAddCount() }
         )
       }
-      items(items = model.items) { item ->
+      items(items = model.dishes) {
         Text(
-          text = item,
-          modifier = Modifier.clickable { component.onItemClicked(item = item) },
+          text = it.name,
+          modifier = Modifier.clickable { component.onItemClicked(dishName = it.name) },
         )
       }
     }

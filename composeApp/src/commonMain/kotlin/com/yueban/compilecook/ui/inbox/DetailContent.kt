@@ -22,7 +22,7 @@ fun DetailContent(component: DetailComponent, modifier: Modifier = Modifier) {
     IconButton(onClick = { component.onBackClicked() }) {
       Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
     }
-    Text(text = model.item)
+    Text(text = model.dish?.name ?: "")
     Text(text = model.instanceId)
   }
 }
