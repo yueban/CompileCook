@@ -1,4 +1,4 @@
-package com.yueban.compilecook.util
+package com.yueban.compilecook.ui.util
 
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
