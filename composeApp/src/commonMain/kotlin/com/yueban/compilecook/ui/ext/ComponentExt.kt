@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.statekeeper.StateKeeperOwner
 import com.yueban.compilecook.logger.Logger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.KSerializer
+import kotlin.properties.PropertyDelegateProvider
+import kotlin.properties.ReadOnlyProperty
 
 fun <T : Any> Flow<T>.toValue(
   componentContext: ComponentContext,
@@ -37,3 +42,16 @@ fun ComponentContext.coroutineScope(): CoroutineScope {
   lifecycle.doOnDestroy { scope.cancel() }
   return scope
 }
+
+inline fun <reified T : Any> StateKeeperOwner.saveableFlow(
+  serializer: KSerializer<T>,
+  key: String? = null,
+  crossinline init: () -> T,
+): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, MutableStateFlow<T>>> =
+  PropertyDelegateProvider { _, property ->
+    val stateKey = key ?: "SAVEABLE_${property.name}"
+    val restored = stateKeeper.consume(stateKey, serializer) ?: init()
+    val flow = MutableStateFlow(restored)
+    stateKeeper.register(stateKey, serializer) { flow.value }
+    ReadOnlyProperty { _, _ -> flow }
+  }

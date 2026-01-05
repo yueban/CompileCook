@@ -2,13 +2,14 @@ package com.yueban.compilecook.ui.inbox
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.statekeeper.saveable
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.Dish
+import com.yueban.compilecook.ui.ext.saveableFlow
 import com.yueban.compilecook.ui.ext.toValue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 
 interface ListComponent {
@@ -36,20 +37,16 @@ class DefaultListComponent(
   @Serializable
   private data class State(val counter: Int)
 
-  private var state: State by saveable(serializer = State.serializer()) { State(0) }
-  private val counterFlow = MutableStateFlow(0)
+  private val stateFlow: MutableStateFlow<State> by saveableFlow(serializer = State.serializer()) { State(0) }
 
   override val model: Value<ListComponent.Model> =
-    combine(dishRepo.getAllDishes(), counterFlow) { dishes, counter ->
-      ListComponent.Model(dishes = dishes, counter = counter)
-    }.toValue(componentContext, ListComponent.Model(listOf(), state.counter))
+    combine(dishRepo.getAllDishes(), stateFlow) { dishes, state ->
+      ListComponent.Model(dishes = dishes, counter = state.counter)
+    }.toValue(componentContext, ListComponent.Model(listOf(), stateFlow.value.counter))
 
   override fun onItemClicked(dishName: String) = onItemSelected(dishName)
 
   override fun onAddCount() {
-    (state.counter + 1).let {
-      state = State(it)
-      counterFlow.value = it
-    }
+    stateFlow.update { it.copy(counter = it.counter + 1) }
   }
 }
