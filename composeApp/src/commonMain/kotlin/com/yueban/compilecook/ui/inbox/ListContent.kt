@@ -27,12 +27,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.ui.base.AsyncListContent
 import com.yueban.compilecook.ui.base.Fail
 import com.yueban.compilecook.ui.base.Loading
 import com.yueban.compilecook.ui.inbox.ListComponent.Event.BackFromDetail
 import com.yueban.compilecook.ui.widget.EmptyComposable
+import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.common_network_error
+import compilecook.composeapp.generated.resources.dish_list_empty
+import compilecook.composeapp.generated.resources.dish_list_item_difficulty
+import compilecook.composeapp.generated.resources.dish_list_title
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
@@ -42,8 +50,7 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
   LaunchedEffect(component) {
     component.eventFlow.collect { event ->
       when (event) {
-        // TODO: debug info
-        is BackFromDetail -> snackbarHostState.showSnackbar("Back From Detail: ${event.dishName}")
+        is BackFromDetail -> Logger.d("Back From Detail: ${event.dishName}")
       }
     }
   }
@@ -51,7 +58,7 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
   LaunchedEffect(state.loadingAsync) {
     (state.loadingAsync as? Fail)?.let {
       snackbarHostState.showSnackbar(
-        message = it.error.message ?: "Sync failed",
+        message = it.error.message ?: getString(Res.string.common_network_error),
         withDismissAction = true
       )
     }
@@ -61,7 +68,7 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
     snackbarHost = { SnackbarHost(snackbarHostState) },
     topBar = {
       Box {
-        TopAppBar(title = { Text("Dishes") })
+        TopAppBar(title = { Text(stringResource(Res.string.dish_list_title)) })
 
         if (state.loadingAsync is Loading) {
           LinearProgressIndicator(
@@ -75,7 +82,7 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
       async = state.dishesAsync,
       modifier = modifier.padding(padding),
       onRetry = component::onRetry,
-      emptyContent = { EmptyComposable(message = "No dishes found.") }
+      emptyContent = { EmptyComposable(message = stringResource(Res.string.dish_list_empty)) }
     ) { dishes ->
       DishList(
         dishes = dishes,
@@ -128,7 +135,7 @@ private fun DishItem(
           style = MaterialTheme.typography.labelSmall
         )
         Text(
-          text = "Difficulty: ${dish.difficulty}",
+          text = stringResource(Res.string.dish_list_item_difficulty, dish.difficulty),
           style = MaterialTheme.typography.labelSmall
         )
       }

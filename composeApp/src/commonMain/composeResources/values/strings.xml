@@ -1,0 +1,14 @@
+<resources>
+    <string name="common_empty_data">No data available</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_unknown_error">Unknown error</string>
+    <string name="common_network_error">Network error</string>
+
+    <string name="common_des_back">Back</string>
+
+    <string name="dish_list_title">Dishes</string>
+    <string name="dish_list_empty">Dishes not found</string>
+    <string name="dish_list_item_difficulty">Difficulty: %s</string>
+
+    <string name="dish_detail_empty">Dish not found</string>
+</resources>

@@ -20,6 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.widget.EmptyComposable
+import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.common_des_back
+import compilecook.composeapp.generated.resources.dish_detail_empty
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DetailContent(component: DetailComponent, modifier: Modifier = Modifier) {
@@ -29,10 +33,13 @@ fun DetailContent(component: DetailComponent, modifier: Modifier = Modifier) {
     modifier = modifier,
     topBar = {
       TopAppBar(
-        title = { Text("Detail") },
+        title = { Text(state.dishAsync.invoke()?.name ?: "") },
         navigationIcon = {
           IconButton(onClick = component::onBackClicked) {
-            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+            Icon(
+              imageVector = Icons.AutoMirrored.Default.ArrowBack,
+              contentDescription = stringResource(Res.string.common_des_back)
+            )
           }
         }
       )
@@ -41,7 +48,7 @@ fun DetailContent(component: DetailComponent, modifier: Modifier = Modifier) {
     AsyncContent(
       async = state.dishAsync,
       modifier = Modifier.padding(padding),
-      emptyContent = { EmptyComposable("Dish not found") }
+      emptyContent = { EmptyComposable(stringResource(Res.string.dish_detail_empty)) }
     ) { dish ->
       Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),

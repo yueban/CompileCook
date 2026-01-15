@@ -22,6 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.common_empty_data
+import compilecook.composeapp.generated.resources.common_retry
+import compilecook.composeapp.generated.resources.common_unknown_error
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoadingComposable(modifier: Modifier = Modifier) {
@@ -33,16 +38,23 @@ fun LoadingComposable(modifier: Modifier = Modifier) {
 @Composable
 fun ErrorComposable(
   error: Throwable,
+  message: String? = null,
   onRetry: (() -> Unit)?,
   modifier: Modifier = Modifier,
 ) {
+  val displayMessage = message
+    ?: error.message
+    ?: stringResource(Res.string.common_unknown_error)
+
+  val retryText = stringResource(Res.string.common_retry)
+
   InfoStateComposable(
     icon = Icons.Filled.ErrorOutline,
-    message = error.message ?: "Unknown Error",
+    message = displayMessage,
     color = MaterialTheme.colorScheme.error,
     modifier = modifier,
     action = if (onRetry != null) {
-      { Button(onClick = onRetry) { Text("Retry") } }
+      { Button(onClick = onRetry) { Text(retryText) } }
     } else {
       null
     }
@@ -51,14 +63,18 @@ fun ErrorComposable(
 
 @Composable
 fun EmptyComposable(
-  message: String = "No data available",
+  message: String? = null,
   modifier: Modifier = Modifier,
+  action: @Composable (() -> Unit)? = null,
 ) {
+  val displayMessage = message ?: stringResource(Res.string.common_empty_data)
+
   InfoStateComposable(
     icon = Icons.Outlined.Info,
-    message = message,
+    message = displayMessage,
     color = MaterialTheme.colorScheme.onSurfaceVariant,
-    modifier = modifier
+    modifier = modifier,
+    action = action
   )
 }
 
