@@ -33,9 +33,9 @@ import com.yueban.compilecook.ui.base.AsyncListContent
 import com.yueban.compilecook.ui.base.Fail
 import com.yueban.compilecook.ui.base.Loading
 import com.yueban.compilecook.ui.inbox.ListComponent.Event.BackFromDetail
+import com.yueban.compilecook.ui.util.stringRes
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import compilecook.composeapp.generated.resources.Res
-import compilecook.composeapp.generated.resources.common_network_error
 import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
 import compilecook.composeapp.generated.resources.dish_list_title
@@ -58,7 +58,7 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
   LaunchedEffect(state.loadingAsync) {
     (state.loadingAsync as? Fail)?.let {
       snackbarHostState.showSnackbar(
-        message = it.error.message ?: getString(Res.string.common_network_error),
+        message = getString(it.error.stringRes),
         withDismissAction = true
       )
     }

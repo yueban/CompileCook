@@ -22,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.yueban.compilecook.ui.util.stringRes
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_empty_data
 import compilecook.composeapp.generated.resources.common_retry
-import compilecook.composeapp.generated.resources.common_unknown_error
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -42,11 +42,7 @@ fun ErrorComposable(
   onRetry: (() -> Unit)?,
   modifier: Modifier = Modifier,
 ) {
-  val displayMessage = message
-    ?: error.message
-    ?: stringResource(Res.string.common_unknown_error)
-
-  val retryText = stringResource(Res.string.common_retry)
+  val displayMessage = message ?: stringResource(error.stringRes)
 
   InfoStateComposable(
     icon = Icons.Filled.ErrorOutline,
@@ -54,7 +50,7 @@ fun ErrorComposable(
     color = MaterialTheme.colorScheme.error,
     modifier = modifier,
     action = if (onRetry != null) {
-      { Button(onClick = onRetry) { Text(retryText) } }
+      { Button(onClick = onRetry) { Text(stringResource(Res.string.common_retry)) } }
     } else {
       null
     }
