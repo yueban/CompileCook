@@ -1,28 +1,58 @@
 package com.yueban.compilecook.ui.root
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.StackAnimation
 import com.arkivanov.essenty.backhandler.BackHandler
+import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.inbox.DetailContent
 import com.yueban.compilecook.ui.inbox.ListContent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
+import com.yueban.compilecook.ui.util.stringRes
+import org.jetbrains.compose.resources.getString
 
 @Composable
 fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
-  ChildStack(
-    stack = component.stack,
-    modifier = modifier,
-    animation = backAnimation(
-      backHandler = component.backHandler,
-      onBack = component::onBackClicked,
-    ),
-  ) {
-    when (val child = it.instance) {
-      is ListChild -> ListContent(component = child.component)
-      is DetailChild -> DetailContent(component = child.component)
+  val snackbarHostState = remember { SnackbarHostState() }
+
+  LaunchedEffect(component) {
+    component.messages.collect { message ->
+      val text = when (message) {
+        is UiMessage.Text -> message.value
+
+        is UiMessage.Resource -> {
+          @Suppress("SpreadOperator")
+          getString(message.res, *message.args.toTypedArray())
+        }
+        is UiMessage.Error -> getString(message.error.stringRes)
+      }
+      snackbarHostState.showSnackbar(text)
+    }
+  }
+
+  Scaffold(
+    snackbarHost = { SnackbarHost(snackbarHostState) }
+  ) { padding ->
+    ChildStack(
+      stack = component.stack,
+      modifier = modifier.padding(padding),
+      animation = backAnimation(
+        backHandler = component.backHandler,
+        onBack = component::onBackClicked,
+      ),
+    ) {
+      when (val child = it.instance) {
+        is ListChild -> ListContent(component = child.component)
+        is DetailChild -> DetailContent(component = child.component)
+      }
     }
   }
 }

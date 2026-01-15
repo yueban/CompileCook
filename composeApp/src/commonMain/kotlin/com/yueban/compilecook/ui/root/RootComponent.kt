@@ -13,6 +13,8 @@ import com.arkivanov.decompose.router.webhistory.WebNavigationOwner
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.yueban.compilecook.logger.Logger
+import com.yueban.compilecook.service.MessageService
+import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
@@ -22,6 +24,7 @@ import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
 import io.ktor.http.Url
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
@@ -29,8 +32,8 @@ import org.koin.core.component.get
 
 interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   val stack: Value<ChildStack<Config, Child>>
+  val messages: Flow<UiMessage>
   fun onDeepLink(url: String)
-
   fun onBackClicked()
 
   sealed class Child {
@@ -65,6 +68,7 @@ class DefaultRootComponent(
       }
     }
   )
+  override val messages: Flow<UiMessage> = get<MessageService>().messageFlow
 
   override fun onDeepLink(url: String) {
     navigation.navigate { getInitialStack(url) }

@@ -3,6 +3,7 @@ package com.yueban.compilecook.ui.base
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.yueban.compilecook.logger.Logger
+import com.yueban.compilecook.service.MessageService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -21,11 +22,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.serialization.KSerializer
+import org.koin.mp.KoinPlatform
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
 interface UiStateComponent<S : Any> {
   val uiState: StateFlow<S>
+  fun showMessage(text: String)
+  fun showGlobalError(error: Throwable)
 }
 
 /**
@@ -42,6 +46,7 @@ abstract class BaseComponent<S : Any>(
   protected val scope: CoroutineScope = coroutineScope()
   private val _uiState = createStateFlow(initialState, serializer)
   override val uiState: StateFlow<S> = _uiState.asStateFlow()
+  private val messageService = KoinPlatform.getKoin().get<MessageService>()
 
   protected fun setState(reducer: S.() -> S) {
     _uiState.update(reducer)
@@ -77,6 +82,14 @@ abstract class BaseComponent<S : Any>(
     return catch { e -> setState { reducer(Fail(e, value = retainValue?.invoke(this)?.invoke())) } }
       .onEach { data -> setState { reducer(Success(data)) } }
       .launchIn(scope + (dispatcher ?: EmptyCoroutineContext))
+  }
+
+  override fun showMessage(text: String) {
+    messageService.showMessage(text)
+  }
+
+  override fun showGlobalError(error: Throwable) {
+    messageService.showError(error)
   }
 
   private fun createStateFlow(
