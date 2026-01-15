@@ -1,50 +1,135 @@
 package com.yueban.compilecook.ui.inbox
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yueban.compilecook.repo.entity.Dish
+import com.yueban.compilecook.ui.base.AsyncListContent
+import com.yueban.compilecook.ui.base.Fail
+import com.yueban.compilecook.ui.base.Loading
 import com.yueban.compilecook.ui.inbox.ListComponent.Event.BackFromDetail
+import com.yueban.compilecook.ui.widget.EmptyComposable
 
 @Composable
 fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
-  val model by component.model.subscribeAsState()
+  val state by component.uiState.collectAsStateWithLifecycle()
   val snackbarHostState = remember { SnackbarHostState() }
 
   LaunchedEffect(component) {
     component.eventFlow.collect { event ->
       when (event) {
+        // TODO: debug info
         is BackFromDetail -> snackbarHostState.showSnackbar("Back From Detail: ${event.dishName}")
       }
     }
   }
 
+  LaunchedEffect(state.loadingAsync) {
+    (state.loadingAsync as? Fail)?.let {
+      snackbarHostState.showSnackbar(
+        message = it.error.message ?: "Sync failed",
+        withDismissAction = true
+      )
+    }
+  }
+
   Scaffold(
-    snackbarHost = { SnackbarHost(snackbarHostState) }
-  ) {
-    LazyColumn(modifier.fillMaxSize().background(Color.Red)) {
-      item {
-        Text(
-          text = "Counter: ${model.counter}",
-          modifier = Modifier.clickable { component.onAddCount() }
-        )
+    snackbarHost = { SnackbarHost(snackbarHostState) },
+    topBar = {
+      Box {
+        TopAppBar(title = { Text("Dishes") })
+
+        if (state.loadingAsync is Loading) {
+          LinearProgressIndicator(
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)
+          )
+        }
       }
-      items(items = model.dishes) {
+    },
+  ) { padding ->
+    AsyncListContent(
+      async = state.dishesAsync,
+      modifier = modifier.padding(padding),
+      onRetry = component::onRetry,
+      emptyContent = { EmptyComposable(message = "No dishes found.") }
+    ) { dishes ->
+      DishList(
+        dishes = dishes,
+        onItemClicked = component::onItemClicked
+      )
+    }
+  }
+}
+
+@Composable
+private fun DishList(
+  dishes: List<Dish>,
+  onItemClicked: (String) -> Unit,
+) {
+  LazyColumn(
+    contentPadding = PaddingValues(16.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp)
+  ) {
+    items(dishes, key = { it.name }) { dish ->
+      DishItem(dish = dish, onClick = { onItemClicked(dish.name) })
+    }
+  }
+}
+
+@Composable
+private fun DishItem(
+  dish: Dish,
+  onClick: () -> Unit,
+) {
+  Card(
+    modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+  ) {
+    Column(modifier = Modifier.padding(16.dp)) {
+      Text(
+        text = dish.name,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold
+      )
+      Text(
+        text = dish.description,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+      )
+      Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
         Text(
-          text = it.name,
-          modifier = Modifier.clickable { component.onItemClicked(dishName = it.name) },
+          text = dish.category.name,
+          style = MaterialTheme.typography.labelSmall
+        )
+        Text(
+          text = "Difficulty: ${dish.difficulty}",
+          style = MaterialTheme.typography.labelSmall
         )
       }
     }

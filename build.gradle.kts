@@ -75,6 +75,7 @@ subprojects {
         optIn.add("com.arkivanov.decompose.ExperimentalDecomposeApi")
         optIn.add("com.arkivanov.essenty.statekeeper.ExperimentalStateKeeperApi")
         optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
+        optIn.add("androidx.compose.material3.ExperimentalMaterial3Api")
       }
     }
   }

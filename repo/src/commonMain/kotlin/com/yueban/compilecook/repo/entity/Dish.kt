@@ -1,7 +1,10 @@
 package com.yueban.compilecook.repo.entity
 
 import com.yueban.compilecook.data.db.entity.DishLocalEntity
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Dish(
   val name: String,
   val description: String,
@@ -14,34 +17,44 @@ data class Dish(
   val addition: String,
 )
 
+@Serializable
 enum class DishCategory {
+  @SerialName("aquatic")
   AQUATIC,
+
+  @SerialName("breakfast")
   BREAKFAST,
+
+  @SerialName("condiment")
   CONDIMENT,
+
+  @SerialName("dessert")
   DESSERT,
+
+  @SerialName("drink")
   DRINK,
+
+  @SerialName("meat_dish")
   MEAT_DISH,
+
+  @SerialName("semi_finished")
   SEMI_FINISHED,
+
+  @SerialName("soup")
   SOUP,
+
+  @SerialName("staple")
   STAPLE,
+
+  @SerialName("vegetable_dish")
   VEGETABLE_DISH,
+
+  @SerialName("unknown")
   UNKNOWN;
 
   companion object {
     fun fromValue(value: String): DishCategory =
-      when (value) {
-        "aquatic" -> AQUATIC
-        "breakfast" -> BREAKFAST
-        "condiment" -> CONDIMENT
-        "dessert" -> DESSERT
-        "drink" -> DRINK
-        "meat_dish" -> MEAT_DISH
-        "semi_finished" -> SEMI_FINISHED
-        "soup" -> SOUP
-        "staple" -> STAPLE
-        "vegetable_dish" -> VEGETABLE_DISH
-        else -> UNKNOWN
-      }
+      entries.find { it.name.equals(value, ignoreCase = true) } ?: UNKNOWN
   }
 }
 

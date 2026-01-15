@@ -17,6 +17,8 @@ interface DishRepo {
   fun getAllDishes(): Flow<List<Dish>>
   fun getDishByName(name: String): Flow<Dish?>
   fun getAllTips(): Flow<List<Tip>>
+  suspend fun updateDishes()
+  suspend fun updateTips()
   suspend fun deleteDishByName(name: String)
   suspend fun clearAllDishes()
 }
@@ -31,18 +33,6 @@ internal class DishRepoImpl(
     coroutineScope.launch { updateTips() }
   }
 
-  private suspend fun updateDishes() {
-    val dishes = dishRemoteDataSource.getDishes().map { it.toLocalEntity() }
-    dishLocalDataSource.upsertDishes(dishes)
-    Logger.d("updated dishes: ${dishes.size}")
-  }
-
-  private suspend fun updateTips() {
-    val tips = dishRemoteDataSource.getTips().map { it.toLocalEntity() }
-    dishLocalDataSource.upsertTips(tips)
-    Logger.d("updated tips: ${tips.size}")
-  }
-
   override fun getAllDishes(): Flow<List<Dish>> =
     dishLocalDataSource.getAllDishes().map { entities -> entities.map { it.toDish() } }
 
@@ -51,6 +41,18 @@ internal class DishRepoImpl(
 
   override fun getAllTips(): Flow<List<Tip>> =
     dishLocalDataSource.getAllTips().map { entities -> entities.map { it.toTip() } }
+
+  override suspend fun updateDishes() {
+    val dishes = dishRemoteDataSource.getDishes().map { it.toLocalEntity() }
+    dishLocalDataSource.upsertDishes(dishes)
+    Logger.d("updated dishes: ${dishes.size}")
+  }
+
+  override suspend fun updateTips() {
+    val tips = dishRemoteDataSource.getTips().map { it.toLocalEntity() }
+    dishLocalDataSource.upsertTips(tips)
+    Logger.d("updated tips: ${tips.size}")
+  }
 
   override suspend fun deleteDishByName(name: String) = dishLocalDataSource.deleteDishByName(name)
 

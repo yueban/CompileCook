@@ -54,6 +54,7 @@ kotlin {
       implementation(compose.ui)
       implementation(compose.components.resources)
       implementation(compose.components.uiToolingPreview)
+      implementation(compose.materialIconsExtended)
       implementation(libs.androidx.lifecycle.viewmodelCompose)
       implementation(libs.androidx.lifecycle.runtimeCompose)
       implementation(project.dependencies.platform(libs.koin.bom))
@@ -65,7 +66,6 @@ kotlin {
       implementation(libs.markdown.renderer.coil3)
       implementation(libs.decompose.extensions.compose)
       implementation(libs.decompose.extensions.compose.experimental)
-      implementation(libs.compose.material.icons)
     }
     androidMain.dependencies {
       implementation(compose.preview)
