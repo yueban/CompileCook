@@ -1,6 +1,7 @@
 import buildsrc.Configs
 import buildsrc.NpmDeps
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.kotlinMultiplatform)
@@ -14,6 +15,10 @@ kotlin {
     namespace = "com.yueban.compilecook.data"
     compileSdk = Configs.compileSdk
     minSdk = Configs.minSdk
+
+    compilerOptions {
+      jvmTarget.set(JvmTarget.fromTarget(Configs.jvmTarget))
+    }
 
     withHostTestBuilder {
     }
@@ -44,7 +49,7 @@ kotlin {
 
   sourceSets {
     commonMain.dependencies {
-      implementation(project(":base"))
+      implementation(projects.base)
       implementation(libs.sqldelight.coroutines.extensions)
       implementation(project.dependencies.platform(libs.ktor.bom))
       implementation(libs.ktor.client.core)

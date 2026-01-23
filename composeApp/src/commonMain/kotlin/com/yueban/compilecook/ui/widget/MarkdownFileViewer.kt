@@ -2,13 +2,13 @@ package com.yueban.compilecook.ui.widget
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.tooling.preview.Preview
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.m3.Markdown
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.EdgeToEdgeScreen
 import compilecook.composeapp.generated.resources.Res
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable

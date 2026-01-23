@@ -1,3 +1,5 @@
+@file:Suppress("Incubating", "UnstableApiUsage")
+
 rootProject.name = "CompileCook"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -41,6 +43,7 @@ refreshVersions {
   versionsPropertiesFile = file("build/tmp/refreshVersions/versions.properties")
 }
 
+include(":androidApp")
 include(":composeApp")
 include(":base")
 include(":data")

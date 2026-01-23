@@ -14,7 +14,6 @@ object Configs {
   const val applicationId = "com.yueban.compilecook"
   const val compileSdk = 36
   const val minSdk = 29
-  const val targetSdk = 36
   val versionCode: Int =
     LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.CHINA)).toInt()
   const val versionName = "0.0.1"
@@ -23,5 +22,6 @@ object Configs {
 
   val sourceCompatibility = JavaVersion.VERSION_17
   val targetCompatibility = JavaVersion.VERSION_17
+  const val jvmTarget = "17"
   const val jvmToolchain = 21
 }

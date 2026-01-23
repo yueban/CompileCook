@@ -1,5 +1,6 @@
 import buildsrc.Configs
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.kotlinMultiplatform)
@@ -25,6 +26,10 @@ kotlin {
     namespace = "com.yueban.compilecook.base"
     compileSdk = Configs.compileSdk
     minSdk = Configs.minSdk
+
+    compilerOptions {
+      jvmTarget.set(JvmTarget.fromTarget(Configs.jvmTarget))
+    }
 
     withHostTestBuilder {
     }

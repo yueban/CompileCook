@@ -1,10 +1,11 @@
 import buildsrc.Configs
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.kotlinMultiplatform)
-  alias(libs.plugins.androidApplication)
+  alias(libs.plugins.androidKotlinMultiplatformLibrary)
   alias(libs.plugins.composeMultiplatform)
   alias(libs.plugins.composeCompiler)
   alias(libs.plugins.composeHotReload)
@@ -12,7 +13,28 @@ plugins {
 }
 
 kotlin {
-  androidTarget {}
+  androidLibrary {
+    namespace = "com.yueban.compilecook.app"
+    compileSdk = Configs.compileSdk
+    minSdk = Configs.minSdk
+
+    compilerOptions {
+      jvmTarget.set(JvmTarget.fromTarget(Configs.jvmTarget))
+    }
+
+    androidResources {
+      enable = true
+    }
+
+    withHostTestBuilder {
+    }
+
+    withDeviceTestBuilder {
+      sourceSetTreeName = "test"
+    }.configure {
+      instrumentationRunner = Configs.testInstrumentationRunner
+    }
+  }
 
   listOf(
     iosArm64(),
@@ -39,8 +61,8 @@ kotlin {
 
   sourceSets {
     commonMain.dependencies {
-      implementation(project(":repo"))
-      implementation(project(":base"))
+      implementation(projects.repo)
+      implementation(projects.base)
 
       // for iOS export
       api(libs.decompose.decompose)
@@ -48,13 +70,13 @@ kotlin {
       api(libs.essenty.backHandler)
       api(libs.essenty.stateKeeper)
 
-      implementation(compose.runtime)
-      implementation(compose.foundation)
-      implementation(compose.material3)
-      implementation(compose.ui)
-      implementation(compose.components.resources)
-      implementation(compose.components.uiToolingPreview)
-      implementation(compose.materialIconsExtended)
+      implementation(libs.compose.runtime)
+      implementation(libs.compose.foundation)
+      implementation(libs.compose.material3)
+      implementation(libs.compose.ui)
+      implementation(libs.compose.components.resources)
+      implementation(libs.compose.uiToolingPreview)
+      implementation(libs.compose.materialIconsExtended)
       implementation(libs.androidx.lifecycle.viewmodelCompose)
       implementation(libs.androidx.lifecycle.runtimeCompose)
       implementation(project.dependencies.platform(libs.koin.bom))
@@ -68,7 +90,7 @@ kotlin {
       implementation(libs.decompose.extensions.compose.experimental)
     }
     androidMain.dependencies {
-      implementation(compose.preview)
+      implementation(libs.compose.uiToolingPreview)
       implementation(libs.androidx.activity.compose)
       implementation(project.dependencies.platform(libs.ktor.bom))
       implementation(libs.ktor.client.okhttp)
@@ -95,35 +117,8 @@ kotlin {
   }
 }
 
-android {
-  namespace = "com.yueban.compilecook"
-  compileSdk = Configs.compileSdk
-
-  defaultConfig {
-    applicationId = Configs.applicationId
-    minSdk = Configs.minSdk
-    targetSdk = Configs.targetSdk
-    versionCode = Configs.versionCode
-    versionName = Configs.versionName
-  }
-  packaging {
-    resources {
-      excludes += "/META-INF/{AL2.0,LGPL2.1}"
-    }
-  }
-  buildTypes {
-    getByName("release") {
-      isMinifyEnabled = false
-    }
-  }
-  compileOptions {
-    sourceCompatibility = Configs.sourceCompatibility
-    targetCompatibility = Configs.targetCompatibility
-  }
-}
-
 dependencies {
-  debugImplementation(compose.uiTooling)
+  androidRuntimeClasspath(libs.compose.uiTooling)
 }
 
 compose.desktop {
