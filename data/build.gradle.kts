@@ -78,6 +78,7 @@ kotlin {
       implementation(devNpm(NpmDeps.webpack, libs.versions.webpack.get()))
       implementation(project.dependencies.platform(libs.ktor.bom))
       implementation(libs.ktor.client.js)
+      implementation(libs.kotlin.browser)
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)

@@ -10,14 +10,20 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+internal const val PROD_DOMAIN = "https://static.yueban.site"
+internal const val API_PATH = "/api/compilecook"
+internal const val BASE_URL = "$PROD_DOMAIN$API_PATH"
+
 val remoteDataSourceModule = module {
   single {
     HttpClient {
       install(ContentNegotiation) { json(json) }
     }
   }
-  single { NetClient(get(), BASE_URL) }
+  single {
+    NetClient(get(), resolveBaseUrl())
+  }
   singleOf(::DishRemoteDataSourceImpl) bind DishRemoteDataSource::class
 }
 
-private const val BASE_URL = "https://static.yueban.site/api/compilecook"
+expect fun resolveBaseUrl(): String
