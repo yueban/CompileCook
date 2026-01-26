@@ -10,11 +10,15 @@ import androidx.compose.runtime.remember
 import com.arkivanov.decompose.defaultComponentContext
 import com.yueban.compilecook.App
 import com.yueban.compilecook.ui.root.DefaultRootComponent
+import com.yueban.compilecook.ui.service.DeepLinkHandler
+import org.koin.android.ext.android.inject
 
 private const val DEEPLINK_SCHEME = "yueban"
 private const val DEEPLINK_HOST = "compilecook"
 
 class MainActivity : ComponentActivity() {
+  private val deepLinkHandler: DeepLinkHandler by inject()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
@@ -36,8 +40,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
     super.onNewIntent(intent, caller)
-    // TODO: handle deep link in RootComponent by event flow
-//    intent.getValidUrl()?.let { root.onDeepLink(it) }
+    intent.getValidUrl()?.let { deepLinkHandler.handleDeepLink(it) }
   }
 
   private fun Intent.getValidUrl(): String? =

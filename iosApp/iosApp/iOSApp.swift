@@ -17,8 +17,8 @@ struct iOSApp: App {
                         print("Ignoring invalid url: \(url.absoluteString)")
                         return
                     }
-                    // TODO: handle deep link in RootComponent by event flow
-                    // appDelegate.root.onDeepLink(url: url.absoluteString)
+
+                    IosDeepLinkHandler.shared.handle(url: url.absoluteString)
                 }
         }
     }

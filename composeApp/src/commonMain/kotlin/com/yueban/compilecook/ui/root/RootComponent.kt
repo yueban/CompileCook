@@ -12,6 +12,8 @@ import com.arkivanov.decompose.router.webhistory.WebNavigation
 import com.arkivanov.decompose.router.webhistory.WebNavigationOwner
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
+import com.arkivanov.essenty.lifecycle.doOnCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
@@ -22,10 +24,17 @@ import com.yueban.compilecook.ui.inbox.ListComponent
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
+import com.yueban.compilecook.ui.service.DeepLinkHandler
 import io.ktor.http.Url
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -46,6 +55,8 @@ class DefaultRootComponent(
   componentContext: ComponentContext,
   deepLinkUrl: String? = null,
 ) : RootComponent, ComponentContext by componentContext, KoinComponent {
+  private val scope: CoroutineScope = coroutineScope()
+  private val deepLinkHandler: DeepLinkHandler = get()
   private val listEvents = Channel<ListComponent.Event>(Channel.BUFFERED)
   private val navigation = StackNavigation<Config>()
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
@@ -69,6 +80,16 @@ class DefaultRootComponent(
     }
   )
   override val messages: Flow<UiMessage> = get<MessageService>().messageFlow
+
+  init {
+    lifecycle.doOnCreate {
+      scope.launch {
+        deepLinkHandler.deepLinkFlow.collect { url ->
+          onDeepLink(url)
+        }
+      }
+    }
+  }
 
   override fun onDeepLink(url: String) {
     navigation.navigate { getInitialStack(url) }
@@ -116,4 +137,17 @@ class DefaultRootComponent(
     @Serializable
     data class Detail(val dishName: String) : Config
   }
+}
+
+private fun ComponentContext.coroutineScope(): CoroutineScope {
+  val scope = CoroutineScope(
+    Dispatchers.Main.immediate +
+      SupervisorJob() +
+      CoroutineExceptionHandler { _, throwable ->
+        Logger.e(throwable)
+        throw throwable
+      }
+  )
+  lifecycle.doOnDestroy { scope.cancel() }
+  return scope
 }
