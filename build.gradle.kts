@@ -58,23 +58,33 @@ subprojects {
     }
   }
 
-  plugins.withId("org.jetbrains.kotlin.multiplatform") {
-    extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+  pluginManager.withPlugin(rootProject.libs.plugins.kotlinMultiplatform.get().pluginId) {
+    configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
       jvmToolchain(Configs.jvmToolchain)
-
-      sourceSets.all {
-        languageSettings.optIn("kotlin.time.ExperimentalTime")
-      }
 
       compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
-        optIn.add("org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi")
-        optIn.add("coil3.annotation.ExperimentalCoilApi")
-        optIn.add("com.arkivanov.decompose.DelicateDecomposeApi")
-        optIn.add("com.arkivanov.decompose.ExperimentalDecomposeApi")
-        optIn.add("com.arkivanov.essenty.statekeeper.ExperimentalStateKeeperApi")
-        optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
-        optIn.add("androidx.compose.material3.ExperimentalMaterial3Api")
+      }
+
+      sourceSets.all {
+        languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+        languageSettings.optIn("kotlin.time.ExperimentalTime")
+      }
+
+      if (project.name == projects.composeApp.name) {
+        sourceSets.all {
+          languageSettings.optIn("coil3.annotation.ExperimentalCoilApi")
+          languageSettings.optIn("com.arkivanov.decompose.DelicateDecomposeApi")
+          languageSettings.optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
+          languageSettings.optIn("com.arkivanov.essenty.statekeeper.ExperimentalStateKeeperApi")
+        }
+      }
+    }
+  }
+  pluginManager.withPlugin(rootProject.libs.plugins.composeMultiplatform.get().pluginId) {
+    configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+      sourceSets.all {
+        languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
       }
     }
   }
