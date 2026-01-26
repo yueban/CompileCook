@@ -2,6 +2,7 @@
 
 package com.yueban.compilecook
 
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.arkivanov.decompose.DefaultComponentContext
@@ -22,21 +23,23 @@ fun main() {
   AppInitializer.init()
 
   val lifecycle = LifecycleRegistry()
-  val root = withWebHistory { stateKeeper, deepLink ->
-    DefaultRootComponent(
-      componentContext = DefaultComponentContext(
-        lifecycle = lifecycle,
-        stateKeeper = stateKeeper,
-      ),
-      deepLinkUrl = deepLink
-    )
-  }
-
   lifecycle.attachToDocument()
 
   onWasmReady {
     ComposeViewport {
-      App(root)
+      App {
+        remember {
+          withWebHistory { stateKeeper, deepLink ->
+            DefaultRootComponent(
+              componentContext = DefaultComponentContext(
+                lifecycle = lifecycle,
+                stateKeeper = stateKeeper,
+              ),
+              deepLinkUrl = deepLink
+            )
+          }
+        }
+      }
     }
   }
 }

@@ -5,6 +5,7 @@ package com.yueban.compilecook
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.PredictiveBackGestureIcon
@@ -13,7 +14,7 @@ import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.yueban.compilecook.ui.root.RootComponent
 import platform.UIKit.UIViewController
 
-fun RootViewController(root: RootComponent, backDispatcher: BackDispatcher): UIViewController =
+fun RootViewController(rootFactory: () -> RootComponent, backDispatcher: BackDispatcher): UIViewController =
   ComposeUIViewController {
     PredictiveBackGestureOverlay(
       backDispatcher = backDispatcher,
@@ -25,6 +26,8 @@ fun RootViewController(root: RootComponent, backDispatcher: BackDispatcher): UIV
       },
       modifier = Modifier.fillMaxSize(),
     ) {
-      App(root)
+      App {
+        remember { rootFactory() }
+      }
     }
   }

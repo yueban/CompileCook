@@ -11,12 +11,12 @@ import com.yueban.compilecook.ui.theme.AppTheme
 import org.koin.compose.koinInject
 
 @Composable
-fun App(root: RootComponent) {
+fun App(rootFactory: @Composable () -> RootComponent) {
   AppTheme {
     val appInitializerSignal: AppInitializerSignal = koinInject()
     val isReady by appInitializerSignal.isReady.collectAsState()
     if (!isReady) return@AppTheme
-
+    val root = rootFactory()
     RootContent(component = root, modifier = Modifier.fillMaxSize())
   }
 }

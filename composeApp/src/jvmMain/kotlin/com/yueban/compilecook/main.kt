@@ -2,6 +2,7 @@
 
 package com.yueban.compilecook
 
+import androidx.compose.runtime.remember
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -42,16 +43,6 @@ fun main() {
     }
   val stateKeeper = StateKeeperDispatcher(stateKeeperFile.readSerializableContainer())
 
-  val root = runOnUiThread {
-    DefaultRootComponent(
-      componentContext = DefaultComponentContext(
-        lifecycle = LifecycleRegistry(),
-        stateKeeper = stateKeeper,
-        backHandler = backDispatcher,
-      )
-    )
-  }
-
   application {
     val windowState = rememberWindowState()
 
@@ -76,7 +67,19 @@ fun main() {
         windowInfo = LocalWindowInfo.current,
       )
 
-      App(root)
+      App {
+        remember {
+          runOnUiThread {
+            DefaultRootComponent(
+              componentContext = DefaultComponentContext(
+                lifecycle = LifecycleRegistry(),
+                stateKeeper = stateKeeper,
+                backHandler = backDispatcher,
+              )
+            )
+          }
+        }
+      }
     }
   }
 }

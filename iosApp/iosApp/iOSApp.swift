@@ -7,15 +7,18 @@ struct iOSApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(root: appDelegate.root, backDispatcher: appDelegate.backDispatcher)
+            RootView(
+                rootFactory: { appDelegate.createRootComponent() },
+                backDispatcher: appDelegate.backDispatcher
+            )
                 .ignoresSafeArea()
                 .onOpenURL { url in
                     guard url.scheme == "yueban", url.host == "compilecook" else {
                         print("Ignoring invalid url: \(url.absoluteString)")
                         return
                     }
-
-                    appDelegate.root.onDeepLink(url: url.absoluteString)
+                    // TODO: handle deep link in RootComponent by event flow
+                    // appDelegate.root.onDeepLink(url: url.absoluteString)
                 }
         }
     }
@@ -25,15 +28,17 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     private var stateKeeper = StateKeeperDispatcherKt.StateKeeperDispatcher(savedState: nil)
     var backDispatcher: BackDispatcher = BackDispatcherKt.BackDispatcher()
 
-    lazy var root: RootComponent = DefaultRootComponent(
-        componentContext: DefaultComponentContext(
-            lifecycle: ApplicationLifecycle(),
-            stateKeeper: stateKeeper,
-            instanceKeeper: nil,
-            backHandler: backDispatcher
-        ),
-        deepLinkUrl: nil
-    )
+    func createRootComponent() -> RootComponent {
+        return DefaultRootComponent(
+            componentContext: DefaultComponentContext(
+                lifecycle: ApplicationLifecycle(),
+                stateKeeper: stateKeeper,
+                instanceKeeper: nil,
+                backHandler: backDispatcher
+            ),
+            deepLinkUrl: nil
+        )
+    }
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
