@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS TipLocalEntity (
     name TEXT PRIMARY KEY NOT NULL,
+    pinyin TEXT NOT NULL,
     type TEXT NOT NULL,
     content TEXT NOT NULL
 );
@@ -7,19 +8,19 @@ CREATE TABLE IF NOT EXISTS TipLocalEntity (
 
 -- Read Operations
 getAll:
-SELECT * FROM TipLocalEntity;
+SELECT * FROM TipLocalEntity ORDER BY pinyin;
 
 getByName:
 SELECT * FROM TipLocalEntity WHERE name = ?;
 
 getByType:
-SELECT * FROM TipLocalEntity WHERE type = ?;
+SELECT * FROM TipLocalEntity WHERE type = ? ORDER BY pinyin;
 
 
 -- Upsert Operation
 upsertTip:
-INSERT OR REPLACE INTO TipLocalEntity(name,type,content)
-VALUES (?,?,?);
+INSERT OR REPLACE INTO TipLocalEntity(name,pinyin,type,content)
+VALUES (?,?,?,?);
 
 -- Delete Operations
 deleteByName:

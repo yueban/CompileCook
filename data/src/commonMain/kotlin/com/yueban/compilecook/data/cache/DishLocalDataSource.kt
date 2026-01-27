@@ -46,6 +46,7 @@ class DishLocalDataSourceImpl(
   override suspend fun upsertDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
     dishQueries.upsertDish(
       name = dish.name,
+      pinyin = dish.pinyin,
       description = dish.description,
       category = dish.category,
       difficulty = dish.difficulty,
@@ -62,6 +63,7 @@ class DishLocalDataSourceImpl(
       dishes.forEach { dish ->
         dishQueries.upsertDish(
           name = dish.name,
+          pinyin = dish.pinyin,
           description = dish.description,
           category = dish.category,
           difficulty = dish.difficulty,
@@ -86,6 +88,7 @@ class DishLocalDataSourceImpl(
   override suspend fun upsertTip(tip: TipLocalEntity) {
     tipQueries.upsertTip(
       name = tip.name,
+      pinyin = tip.pinyin,
       type = tip.type,
       content = tip.content,
     )
@@ -96,6 +99,7 @@ class DishLocalDataSourceImpl(
       tips.forEach { tip ->
         tipQueries.upsertTip(
           name = tip.name,
+          pinyin = tip.pinyin,
           type = tip.type,
           content = tip.content,
         )

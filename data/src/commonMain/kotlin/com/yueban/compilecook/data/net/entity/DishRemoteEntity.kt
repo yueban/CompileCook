@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DishRemoteEntity(
   val name: String,
+  val pinyin: String,
   val description: String,
   val category: String,
   val difficulty: Long,
@@ -19,6 +20,7 @@ data class DishRemoteEntity(
 fun DishRemoteEntity.toLocalEntity(): DishLocalEntity =
   DishLocalEntity(
     name = this.name,
+    pinyin = this.pinyin,
     description = this.description,
     category = category,
     difficulty = this.difficulty,

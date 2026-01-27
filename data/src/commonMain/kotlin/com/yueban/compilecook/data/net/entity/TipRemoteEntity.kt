@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TipRemoteEntity(
   val name: String,
+  val pinyin: String,
   val type: String,
   val content: String,
 )
@@ -13,6 +14,7 @@ data class TipRemoteEntity(
 fun TipRemoteEntity.toLocalEntity(): TipLocalEntity =
   TipLocalEntity(
     name = this.name,
+    pinyin = this.pinyin,
     type = this.type,
     content = this.content,
   )

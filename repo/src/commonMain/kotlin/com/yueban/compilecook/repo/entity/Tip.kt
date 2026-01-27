@@ -4,6 +4,7 @@ import com.yueban.compilecook.data.db.entity.TipLocalEntity
 
 data class Tip(
   val name: String,
+  val pinyin: String,
   val type: TipType,
   val content: String,
 )
@@ -28,6 +29,7 @@ enum class TipType {
 fun TipLocalEntity.toTip(): Tip =
   Tip(
     name = this.name,
+    pinyin = this.pinyin,
     type = TipType.fromValue(this.type),
     content = this.content,
   )

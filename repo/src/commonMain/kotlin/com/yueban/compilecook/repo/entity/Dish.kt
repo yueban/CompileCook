@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Dish(
   val name: String,
+  val pinyin: String,
   val description: String,
   val category: DishCategory,
   val difficulty: Long,
@@ -61,6 +62,7 @@ enum class DishCategory {
 fun DishLocalEntity.toDish(): Dish =
   Dish(
     name = this.name,
+    pinyin = this.pinyin,
     description = this.description,
     category = DishCategory.fromValue(this.category),
     difficulty = this.difficulty,
