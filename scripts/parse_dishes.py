@@ -4,6 +4,7 @@ import re
 import requests
 import zipfile
 import shutil
+from pypinyin import lazy_pinyin
 
 def contains_chinese(text):
     """Checks if a string contains any Chinese characters."""
@@ -61,6 +62,9 @@ def convert_md_to_json(repo_url, output_file):
                     content = f.read()
 
                 name_without_ext = os.path.splitext(file)[0]
+                # lazy_pinyin returns a list (e.g. ['qi', 'yi', 'guo']), we join them to get 'qiyiguo'
+                # We also ensure it's lowercase and remove any spaces just in case
+                pinyin_value = "".join(lazy_pinyin(name_without_ext)).lower().replace(" ", "")
 
                 # Category Rule
                 parent_dir_name = os.path.basename(root)
@@ -104,6 +108,7 @@ def convert_md_to_json(repo_url, output_file):
 
                 dish_data = {
                     "name": name_without_ext,
+                    "pinyin": pinyin_value,
                     "description": description,
                     "category": category,
                     "difficulty": difficulty,
