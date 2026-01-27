@@ -21,9 +21,12 @@ import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
 import com.yueban.compilecook.ui.inbox.ListComponent
+import com.yueban.compilecook.ui.main.DefaultMainComponent
+import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
 import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -46,6 +49,7 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   fun onBackClicked()
 
   sealed class Child {
+    class MainChild(val component: MainComponent) : Child()
     class ListChild(val component: ListComponent) : Child()
     class DetailChild(val component: DetailComponent) : Child()
   }
@@ -74,8 +78,9 @@ class DefaultRootComponent(
     pathMapper = { (config, child, any) ->
       Logger.d("config: $config, child: $child, any: $any")
       when (config) {
-        Config.List -> "/"
-        is Config.Detail -> "/${config.dishName}"
+        Config.Main -> "/"
+        Config.List -> "/dishes"
+        is Config.Detail -> "/dishes/${config.dishName}"
       }
     }
   )
@@ -97,6 +102,10 @@ class DefaultRootComponent(
 
   private fun child(config: Config, componentContext: ComponentContext): RootComponent.Child =
     when (config) {
+      Config.Main -> DefaultMainComponent(
+        componentContext = componentContext
+      ).let { MainChild(it) }
+
       Config.List -> DefaultListComponent(
         componentContext = componentContext,
         dishRepo = get(),
@@ -120,8 +129,8 @@ class DefaultRootComponent(
     Logger.d("deepLinkUrl: $deepLinkUrl")
     val url = deepLinkUrl?.let { Url(it) }
     return when (val dishName = url?.segments?.firstOrNull()) {
-      null -> listOf(Config.List)
-      else -> listOf(Config.List, Config.Detail(dishName = dishName))
+      null -> listOf(Config.Main)
+      else -> listOf(Config.Main, Config.Detail(dishName = dishName))
     }
   }
 
@@ -131,11 +140,11 @@ class DefaultRootComponent(
 
   @Serializable
   sealed interface Config {
-    @Serializable
-    data object List : Config
+    @Serializable data object Main : Config
 
-    @Serializable
-    data class Detail(val dishName: String) : Config
+    @Serializable data object List : Config
+
+    @Serializable data class Detail(val dishName: String) : Config
   }
 }
 

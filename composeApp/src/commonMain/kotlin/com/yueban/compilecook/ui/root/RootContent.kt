@@ -14,8 +14,10 @@ import com.arkivanov.essenty.backhandler.BackHandler
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.inbox.DetailContent
 import com.yueban.compilecook.ui.inbox.ListContent
+import com.yueban.compilecook.ui.main.MainContent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.util.stringRes
 import org.jetbrains.compose.resources.getString
 
@@ -50,6 +52,7 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
       ),
     ) {
       when (val child = it.instance) {
+        is MainChild -> MainContent(component = child.component)
         is ListChild -> ListContent(component = child.component)
         is DetailChild -> DetailContent(component = child.component)
       }
