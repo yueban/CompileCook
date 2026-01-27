@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.Dish
-import com.yueban.compilecook.ui.base.AsyncListContent
+import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.base.Fail
 import com.yueban.compilecook.ui.base.Loading
 import com.yueban.compilecook.ui.inbox.ListComponent.Event.BackFromDetail
@@ -68,7 +68,7 @@ fun ListContent(component: ListComponent, modifier: Modifier = Modifier) {
       }
     },
   ) { padding ->
-    AsyncListContent(
+    AsyncContent(
       async = state.dishesAsync,
       modifier = modifier.padding(padding),
       onRetry = component::onRetry,
