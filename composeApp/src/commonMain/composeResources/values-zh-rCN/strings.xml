@@ -1,0 +1,33 @@
+<resources>
+    <string name="common_empty_data">暂无内容</string>
+    <string name="common_retry">重试</string>
+    <string name="common_unknown_error">未知错误</string>
+    <string name="common_network_error">网络错误</string>
+
+    <string name="common_des_back">返回</string>
+
+    <string name="dish_list_title">菜品列表</string>
+    <string name="dish_list_empty">未找到菜谱</string>
+    <string name="dish_list_item_difficulty">难度：%s</string>
+
+    <string name="dish_detail_empty">菜品不存在</string>
+
+    <string name="main_tab_tips">教程</string>
+    <string name="main_tab_dishes">菜谱</string>
+
+    <string name="main_tip_empty">暂无教程</string>
+    <string name="main_tip_basic">做菜之前</string>
+    <string name="main_tip_learn">基础知识</string>
+    <string name="main_tip_advanced">进阶技巧</string>
+
+    <string name="main_dish_category_vegetable_dish">素菜</string>
+    <string name="main_dish_category_meat_dish">荤菜</string>
+    <string name="main_dish_category_aquatic">水产</string>
+    <string name="main_dish_category_breakfast">早餐</string>
+    <string name="main_dish_category_staple">主食</string>
+    <string name="main_dish_category_semi_finished">半成品加工</string>
+    <string name="main_dish_category_soup">汤与粥</string>
+    <string name="main_dish_category_drink">饮料</string>
+    <string name="main_dish_category_condiment">酱料和其它材料</string>
+    <string name="main_dish_category_dessert">甜品</string>
+</resources>
