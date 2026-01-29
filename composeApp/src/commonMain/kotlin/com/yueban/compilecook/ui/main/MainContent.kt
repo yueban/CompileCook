@@ -16,7 +16,9 @@ import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.yueban.compilecook.ui.widget.CommonTopBar
 import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.app_name
 import compilecook.composeapp.generated.resources.main_tab_dishes
 import compilecook.composeapp.generated.resources.main_tab_tips
 import org.jetbrains.compose.resources.stringResource
@@ -24,10 +26,10 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun MainContent(component: MainComponent) {
   val stack by component.stack.subscribeAsState()
-
   val activeChild = stack.active.instance
 
   Scaffold(
+    topBar = { CommonTopBar(title = stringResource(Res.string.app_name)) },
     bottomBar = {
       NavigationBar {
         NavigationBarItem(
