@@ -1,7 +1,10 @@
 package com.yueban.compilecook.repo.entity
 
 import com.yueban.compilecook.data.db.entity.TipLocalEntity
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Tip(
   val name: String,
   val pinyin: String,
@@ -9,20 +12,23 @@ data class Tip(
   val content: String,
 )
 
+@Serializable
 enum class TipType {
+  @SerialName("basic")
   BASIC,
+
+  @SerialName("learn")
   LEARN,
+
+  @SerialName("advanced")
   ADVANCED,
+
+  @SerialName("unknown")
   UNKNOWN;
 
   companion object {
     fun fromValue(value: String): TipType =
-      when (value) {
-        "basic" -> BASIC
-        "learn" -> LEARN
-        "advanced" -> ADVANCED
-        else -> UNKNOWN
-      }
+      TipType.entries.find { it.name.equals(value, ignoreCase = true) } ?: UNKNOWN
   }
 }
 

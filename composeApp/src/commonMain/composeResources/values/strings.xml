@@ -14,4 +14,9 @@
 
     <string name="main_tab_tips">Tips</string>
     <string name="main_tab_dishes">Dishes</string>
+
+    <string name="main_tip_empty">Tips not found</string>
+    <string name="main_tip_basic">Getting Started</string>
+    <string name="main_tip_learn">Fundamentals</string>
+    <string name="main_tip_advanced">Mastery</string>
 </resources>

@@ -6,6 +6,7 @@ import com.yueban.compilecook.data.net.service.DishRemoteDataSource
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.repo.entity.Tip
+import com.yueban.compilecook.repo.entity.TipType
 import com.yueban.compilecook.repo.entity.toDish
 import com.yueban.compilecook.repo.entity.toTip
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 interface DishRepo {
   fun getAllDishes(): Flow<List<Dish>>
   fun getDishByName(name: String): Flow<Dish?>
-  fun getAllTips(): Flow<List<Tip>>
+  fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>>
   suspend fun updateDishes()
   suspend fun updateTips()
   suspend fun deleteDishByName(name: String)
@@ -39,8 +40,14 @@ internal class DishRepoImpl(
   override fun getDishByName(name: String): Flow<Dish?> =
     dishLocalDataSource.getDishByName(name).map { it?.toDish() }
 
-  override fun getAllTips(): Flow<List<Tip>> =
-    dishLocalDataSource.getAllTips().map { entities -> entities.map { it.toTip() } }
+  override fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>> =
+    dishLocalDataSource.getAllTips().map { tipLocalEntities ->
+      tipLocalEntities.map { it.toTip() }
+        .filter { it.type != TipType.UNKNOWN }
+        .groupBy { it.type }
+        .toList()
+        .sortedBy { it.first.ordinal }
+    }
 
   override suspend fun updateDishes() {
     val dishes = dishRemoteDataSource.getDishes().map { it.toLocalEntity() }

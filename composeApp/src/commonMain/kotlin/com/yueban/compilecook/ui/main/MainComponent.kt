@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
 interface MainComponent {
   val stack: Value<ChildStack<*, Child>>
@@ -47,6 +48,7 @@ class DefaultMainComponent(
       Config.Tips -> MainComponent.Child.Tips(
         DefaultMainTipComponent(
           componentContext = ctx,
+          dishRepo = get(),
         )
       )
       Config.Dishes -> MainComponent.Child.Dishes(
