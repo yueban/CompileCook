@@ -1,6 +1,5 @@
 package com.yueban.compilecook.ui.root
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -42,10 +41,10 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
 
   Scaffold(
     snackbarHost = { SnackbarHost(snackbarHostState) }
-  ) { padding ->
+  ) { _ ->
     ChildStack(
       stack = component.stack,
-      modifier = modifier.padding(padding),
+      modifier = modifier,
       animation = backAnimation(
         backHandler = component.backHandler,
         onBack = component::onBackClicked,
