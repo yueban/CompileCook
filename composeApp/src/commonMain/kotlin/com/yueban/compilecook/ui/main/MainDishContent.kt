@@ -1,9 +1,7 @@
 package com.yueban.compilecook.ui.main
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,6 +60,7 @@ fun MainDishContent(component: MainDishComponent) {
         getCategoryName(category)?.let { name ->
           DishCategoryCard(
             name = name,
+            emoji = getCategoryEmoji(category),
             onClick = {
               // TODO: handle click event, goto dish list page
             }
@@ -78,6 +75,7 @@ fun MainDishContent(component: MainDishComponent) {
 @Suppress("MagicNumber")
 private fun DishCategoryCard(
   name: String,
+  emoji: String,
   onClick: () -> Unit,
 ) {
   Card(
@@ -98,21 +96,9 @@ private fun DishCategoryCard(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
-      Box(
-        modifier = Modifier
-          .size(48.dp)
-          .clip(CircleShape)
-          .background(MaterialTheme.colorScheme.primaryContainer),
-        contentAlignment = Alignment.Center
-      ) {
-        Text(
-          text = name.take(1),
-          style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-          color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-      }
+      Text(text = emoji, fontSize = 48.sp)
 
-      Spacer(modifier = Modifier.size(12.dp))
+      Spacer(modifier = Modifier.size(8.dp))
 
       Text(
         text = name,
@@ -121,9 +107,27 @@ private fun DishCategoryCard(
           fontSize = 16.sp
         ),
         color = ExtendedTheme.colors.titleText,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        maxLines = 1
       )
     }
+  }
+}
+
+@Composable
+private fun getCategoryEmoji(category: DishCategory): String {
+  return when (category) {
+    DishCategory.VEGETABLE_DISH -> "🥬"
+    DishCategory.MEAT_DISH -> "🥩"
+    DishCategory.AQUATIC -> "🐟"
+    DishCategory.BREAKFAST -> "🍳"
+    DishCategory.STAPLE -> "🍚"
+    DishCategory.SEMI_FINISHED -> "🍱"
+    DishCategory.SOUP -> "🥣"
+    DishCategory.DRINK -> "🍹"
+    DishCategory.CONDIMENT -> "🧂"
+    DishCategory.DESSERT -> "🍰"
+    DishCategory.UNKNOWN -> "❓"
   }
 }
 
