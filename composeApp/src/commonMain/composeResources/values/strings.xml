@@ -19,4 +19,15 @@
     <string name="main_tip_basic">Getting Started</string>
     <string name="main_tip_learn">Fundamentals</string>
     <string name="main_tip_advanced">Mastery</string>
+
+    <string name="main_dish_category_vegetable_dish">Vegetables</string>
+    <string name="main_dish_category_meat_dish">Meat</string>
+    <string name="main_dish_category_aquatic">Seafood</string>
+    <string name="main_dish_category_breakfast">Breakfast</string>
+    <string name="main_dish_category_staple">Staples</string>
+    <string name="main_dish_category_semi_finished">Semi-prepared</string>
+    <string name="main_dish_category_soup">Soup &amp; Porridge</string>
+    <string name="main_dish_category_drink">Drinks</string>
+    <string name="main_dish_category_condiment">Sauces &amp; Others</string>
+    <string name="main_dish_category_dessert">Dessert</string>
 </resources>

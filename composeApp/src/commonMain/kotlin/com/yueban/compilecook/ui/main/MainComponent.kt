@@ -54,6 +54,7 @@ class DefaultMainComponent(
       Config.Dishes -> MainComponent.Child.Dishes(
         DefaultMainDishComponent(
           componentContext = ctx,
+          dishRepo = get(),
         )
       )
     }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 
 interface DishLocalDataSource {
   fun getAllDishes(): Flow<List<DishLocalEntity>>
+  fun getDishCategories(): Flow<List<String>>
   fun getDishByName(name: String): Flow<DishLocalEntity?>
   fun getAllTips(): Flow<List<TipLocalEntity>>
   fun getTipByName(name: String): Flow<TipLocalEntity?>
@@ -33,6 +34,9 @@ class DishLocalDataSourceImpl(
 ) : DishLocalDataSource {
   override fun getAllDishes(): Flow<List<DishLocalEntity>> =
     dishQueries.getAll().asFlow().mapToList(dispatcher)
+
+  override fun getDishCategories(): Flow<List<String>> =
+    dishQueries.getDishCategories().asFlow().mapToList(dispatcher)
 
   override fun getDishByName(name: String): Flow<DishLocalEntity?> =
     dishQueries.getByName(name).asFlow().mapToOneOrNull(dispatcher)

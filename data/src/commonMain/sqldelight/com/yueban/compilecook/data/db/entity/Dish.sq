@@ -19,6 +19,9 @@ CREATE INDEX IF NOT EXISTS Dish_difficulty ON DishLocalEntity(difficulty);
 getAll:
 SELECT * FROM DishLocalEntity ORDER BY pinyin;
 
+getDishCategories:
+SELECT DISTINCT category FROM DishLocalEntity;
+
 getByName:
 SELECT * FROM DishLocalEntity WHERE name = ?;
 

@@ -20,23 +20,20 @@ data class Dish(
 
 @Serializable
 enum class DishCategory {
+  @SerialName("vegetable_dish")
+  VEGETABLE_DISH,
+
+  @SerialName("meat_dish")
+  MEAT_DISH,
+
   @SerialName("aquatic")
   AQUATIC,
 
   @SerialName("breakfast")
   BREAKFAST,
 
-  @SerialName("condiment")
-  CONDIMENT,
-
-  @SerialName("dessert")
-  DESSERT,
-
-  @SerialName("drink")
-  DRINK,
-
-  @SerialName("meat_dish")
-  MEAT_DISH,
+  @SerialName("staple")
+  STAPLE,
 
   @SerialName("semi_finished")
   SEMI_FINISHED,
@@ -44,11 +41,14 @@ enum class DishCategory {
   @SerialName("soup")
   SOUP,
 
-  @SerialName("staple")
-  STAPLE,
+  @SerialName("drink")
+  DRINK,
 
-  @SerialName("vegetable_dish")
-  VEGETABLE_DISH,
+  @SerialName("condiment")
+  CONDIMENT,
+
+  @SerialName("dessert")
+  DESSERT,
 
   @SerialName("unknown")
   UNKNOWN;
