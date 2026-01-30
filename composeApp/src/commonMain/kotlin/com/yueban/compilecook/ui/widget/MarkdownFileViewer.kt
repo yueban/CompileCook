@@ -4,15 +4,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.m3.Markdown
-import com.yueban.compilecook.logger.Logger
+import com.mikepenz.markdown.model.State
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.EdgeToEdgeScreen
-import compilecook.composeapp.generated.resources.Res
 
 @Preview
 @Composable
@@ -50,27 +48,23 @@ private fun MarkdownViewerPreview() = AppTheme {
 }
 
 @Composable
-@Suppress("TooGenericExceptionCaught")
-fun MarkdownFileViewer(filePath: String) {
-  val markdownContent = produceState<String?>(initialValue = null, filePath) {
-    try {
-      val bytes = Res.readBytes("files/$filePath")
-      value = bytes.decodeToString()
-    } catch (e: Exception) {
-      Logger.e(e)
-      value = "Error: Could not load file.\n${e.message}"
-    }
-  }.value ?: return
-  MarkdownViewer(markdownContent)
-}
-
-@Composable
 fun MarkdownViewer(content: String, modifier: Modifier = Modifier) {
   Markdown(
     modifier = modifier
       .fillMaxSize()
       .verticalScroll(rememberScrollState()),
     content = content,
+    imageTransformer = Coil3ImageTransformerImpl
+  )
+}
+
+@Composable
+fun MarkdownViewer(state: State, modifier: Modifier = Modifier) {
+  Markdown(
+    modifier = modifier
+      .fillMaxSize()
+      .verticalScroll(rememberScrollState()),
+    state = state,
     imageTransformer = Coil3ImageTransformerImpl
   )
 }

@@ -24,8 +24,8 @@ fun TipContent(component: TipComponent) {
       )
     },
   ) { padding ->
-    AsyncContent(async = state.tipAsync, modifier = Modifier.padding(padding)) {
-      MarkdownViewer(content = it.content, modifier = Modifier.padding(16.dp))
+    AsyncContent(async = state.contentAsync, modifier = Modifier.padding(padding)) {
+      MarkdownViewer(state = it, modifier = Modifier.padding(16.dp))
     }
   }
 }

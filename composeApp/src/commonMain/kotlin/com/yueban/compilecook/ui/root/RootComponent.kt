@@ -14,6 +14,7 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.yueban.compilecook.di.DispatcherType
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
@@ -45,6 +46,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.qualifier.named
 
 interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   val stack: Value<ChildStack<Config, Child>>
@@ -126,6 +128,7 @@ class DefaultRootComponent(
           }
         },
         dishRepo = get(),
+        defaultDispatcher = get(named(DispatcherType.Default)),
       ).let { TipChild(it) }
 
       Config.List -> DefaultListComponent(
