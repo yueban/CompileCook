@@ -16,8 +16,11 @@ import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.yueban.compilecook.di.DispatcherType
 import com.yueban.compilecook.logger.Logger
+import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
+import com.yueban.compilecook.ui.dish.DefaultDishListComponent
+import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
@@ -27,6 +30,7 @@ import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
@@ -57,6 +61,7 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   sealed class Child {
     class MainChild(val component: MainComponent) : Child()
     class TipChild(val component: TipComponent) : Child()
+    class DishListChild(val component: DishListComponent) : Child()
     class ListChild(val component: ListComponent) : Child()
     class DetailChild(val component: DetailComponent) : Child()
   }
@@ -87,6 +92,13 @@ class DefaultRootComponent(
       when (config) {
         Config.Main -> "/"
         is Config.Tip -> "/tips/${config.tipName}"
+        is Config.DishList ->
+          if (config.dishCategory == null) {
+            "/dishes"
+          } else {
+            "/dishes/category=${config.dishCategory.name.lowercase()}"
+          }
+
         Config.List -> "/dishes"
         is Config.Detail -> "/dishes/${config.dishName}"
       }
@@ -115,6 +127,7 @@ class DefaultRootComponent(
         onOutput = { output ->
           when (output) {
             is MainComponent.Output.TipClicked -> navigation.push(Config.Tip(output.tipName))
+            is MainComponent.Output.DishCategoryClicked -> navigation.push(Config.DishList(output.dishCategory))
           }
         }
       ).let { MainChild(it) }
@@ -130,6 +143,17 @@ class DefaultRootComponent(
         dishRepo = get(),
         defaultDispatcher = get(named(DispatcherType.Default)),
       ).let { TipChild(it) }
+
+      is Config.DishList -> DefaultDishListComponent(
+        componentContext = componentContext,
+        dishCategory = config.dishCategory,
+        dishRepo = get(),
+        onOutput = { output ->
+          when (output) {
+            DishListComponent.Output.BackClicked -> onBackClicked()
+          }
+        }
+      ).let { DishListChild(it) }
 
       Config.List -> DefaultListComponent(
         componentContext = componentContext,
@@ -168,6 +192,8 @@ class DefaultRootComponent(
     @Serializable data object Main : Config
 
     @Serializable data class Tip(val tipName: String) : Config
+
+    @Serializable data class DishList(val dishCategory: DishCategory?) : Config
 
     @Serializable data object List : Config
 

@@ -8,12 +8,6 @@
 
     <string name="common_des_back">Back</string>
 
-    <string name="dish_list_title">Dishes</string>
-    <string name="dish_list_empty">Dishes not found</string>
-    <string name="dish_list_item_difficulty">Difficulty: %s</string>
-
-    <string name="dish_detail_empty">Dish not found</string>
-
     <string name="main_tab_tips">Tips</string>
     <string name="main_tab_dishes">Dishes</string>
 
@@ -32,4 +26,10 @@
     <string name="main_dish_category_drink">Drinks</string>
     <string name="main_dish_category_condiment">Sauces &amp; Others</string>
     <string name="main_dish_category_dessert">Dessert</string>
+
+    <string name="dish_list_title">Dishes</string>
+    <string name="dish_list_empty">Dishes not found</string>
+    <string name="dish_list_item_difficulty">Difficulty: </string>
+
+    <string name="dish_detail_empty">Dish not found</string>
 </resources>

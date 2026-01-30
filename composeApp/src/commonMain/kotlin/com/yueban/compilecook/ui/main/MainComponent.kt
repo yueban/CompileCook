@@ -6,6 +6,7 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
+import com.yueban.compilecook.repo.entity.DishCategory
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -23,6 +24,7 @@ interface MainComponent {
 
   sealed interface Output {
     data class TipClicked(val tipName: String) : Output
+    data class DishCategoryClicked(val dishCategory: DishCategory) : Output
   }
 }
 
@@ -66,6 +68,12 @@ class DefaultMainComponent(
         DefaultMainDishComponent(
           componentContext = ctx,
           dishRepo = get(),
+          onOutput = { output ->
+            when (output) {
+              is MainDishComponent.Output.DishCategoryClicked ->
+                onOutput(MainComponent.Output.DishCategoryClicked(output.dishCategory))
+            }
+          }
         )
       )
     }

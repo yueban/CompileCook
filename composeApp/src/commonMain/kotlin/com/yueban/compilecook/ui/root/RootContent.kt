@@ -11,10 +11,12 @@ import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.StackAnimation
 import com.arkivanov.essenty.backhandler.BackHandler
 import com.yueban.compilecook.service.UiMessage
+import com.yueban.compilecook.ui.dish.DishListContent
 import com.yueban.compilecook.ui.inbox.DetailContent
 import com.yueban.compilecook.ui.inbox.ListContent
 import com.yueban.compilecook.ui.main.MainContent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
@@ -57,6 +59,7 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
         is TipChild -> TipContent(component = child.component)
         is ListChild -> ListContent(component = child.component)
         is DetailChild -> DetailContent(component = child.component)
+        is DishListChild -> DishListContent(component = child.component)
       }
     }
   }

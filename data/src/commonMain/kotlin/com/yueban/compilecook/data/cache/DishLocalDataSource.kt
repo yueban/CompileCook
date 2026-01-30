@@ -15,6 +15,7 @@ interface DishLocalDataSource {
   fun getAllDishes(): Flow<List<DishLocalEntity>>
   fun getDishCategories(): Flow<List<String>>
   fun getDishByName(name: String): Flow<DishLocalEntity?>
+  fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>>
   fun getAllTips(): Flow<List<TipLocalEntity>>
   fun getTipByName(name: String): Flow<TipLocalEntity?>
   suspend fun upsertDish(dish: DishLocalEntity)
@@ -40,6 +41,9 @@ class DishLocalDataSourceImpl(
 
   override fun getDishByName(name: String): Flow<DishLocalEntity?> =
     dishQueries.getByName(name).asFlow().mapToOneOrNull(dispatcher)
+
+  override fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>> =
+    dishQueries.getByCategory(category).asFlow().mapToList(dispatcher)
 
   override fun getAllTips(): Flow<List<TipLocalEntity>> =
     tipQueries.getAll().asFlow().mapToList(dispatcher)

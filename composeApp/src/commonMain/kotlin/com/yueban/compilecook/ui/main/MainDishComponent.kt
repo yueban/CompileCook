@@ -17,10 +17,16 @@ data class MainDishState(
 
 interface MainDishComponent : UiStateComponent<MainDishState> {
   fun onRetry()
+  fun onDishCategoryClicked(dishCategory: DishCategory)
+
+  sealed interface Output {
+    data class DishCategoryClicked(val dishCategory: DishCategory) : Output
+  }
 }
 
 class DefaultMainDishComponent(
   componentContext: ComponentContext,
+  private val onOutput: (MainDishComponent.Output) -> Unit,
   private val dishRepo: DishRepo,
 ) : MainDishComponent, BaseComponent<MainDishState>(
   componentContext = componentContext,
@@ -38,4 +44,7 @@ class DefaultMainDishComponent(
     suspend { dishRepo.updateDishes() }
       .execute { copy(loadingAsync = it) }
   }
+
+  override fun onDishCategoryClicked(dishCategory: DishCategory) =
+    onOutput(MainDishComponent.Output.DishCategoryClicked(dishCategory))
 }
