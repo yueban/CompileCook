@@ -10,16 +10,38 @@ def contains_chinese(text):
     """Checks if a string contains any Chinese characters."""
     return re.search(r'[\u4e00-\u9fa5]', text)
 
+def clean_description(text):
+    """
+    Cleans the description text by removing images, difficulty ratings,
+    quotes, HTML comments, and markdown formatting markers.
+    """
+    # 1. Remove HTML comments
+    text = re.sub(r'<!--[\s\S]*?-->', '', text)
+
+    # 2. Remove Markdown images: ![alt](url)
+    text = re.sub(r'!\[.*?\]\(.*?\)', '', text)
+
+    # 3. Remove Blockquotes: lines starting with >
+    text = re.sub(r'^>.*$', '', text, flags=re.MULTILINE)
+
+    # 4. Remove Difficulty line: 预估烹饪难度：★
+    text = re.sub(r'预估烹饪难度：.*', '', text)
+
+    # 5. Remove Markdown bold and italic markers but keep the text inside
+    # Remove ***bold italic***, **bold**, *italic*
+    text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
+    text = re.sub(r'_{1,3}(.*?)_{1,3}', r'\1', text)
+
+    # 6. Cleanup: Remove extra whitespace and newlines
+    # Split into lines, strip them, and join back with double newlines
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+
+    # Note: If you only want the VERY first paragraph (to match your example 2 exactly),
+    # you could return lines[0] if lines else "".
+    # Otherwise, joining them is safer for multi-paragraph descriptions.
+    return '\n\n'.join(lines)
+
 def convert_md_to_json(repo_url, output_file):
-    """
-    Downloads a Git repository, converts all Markdown files in the 'dishes'
-    directory (excluding 'template') to a JSON list with all final optimizations.
-
-    Args:
-        repo_url (str): The URL of the Git repository.
-        output_file (str): The path to the output JSON file.
-    """
-
     repo_owner = "Anduin2017"
     repo_name = "HowToCook"
     branch = "master"
@@ -27,7 +49,6 @@ def convert_md_to_json(repo_url, output_file):
     zip_file = f"{repo_name}.zip"
     repo_dir = f"{repo_name}-{branch}"
 
-    # Download the repository zip file if it doesn't exist
     if not os.path.exists(zip_file):
         print(f"Downloading repository from {zip_url}...")
         try:
@@ -41,7 +62,6 @@ def convert_md_to_json(repo_url, output_file):
             print(f"Error downloading repository: {e}")
             return
 
-    # Extract the zip file, removing old extractions first
     if os.path.exists(repo_dir):
         shutil.rmtree(repo_dir)
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
@@ -62,33 +82,33 @@ def convert_md_to_json(repo_url, output_file):
                     content = f.read()
 
                 name_without_ext = os.path.splitext(file)[0]
-                # lazy_pinyin returns a list (e.g. ['qi', 'yi', 'guo']), we join them to get 'qiyiguo'
-                # We also ensure it's lowercase and remove any spaces just in case
                 pinyin_value = "".join(lazy_pinyin(name_without_ext)).lower().replace(" ", "")
 
-                # Category Rule
                 parent_dir_name = os.path.basename(root)
                 category = os.path.basename(os.path.dirname(root)) if contains_chinese(parent_dir_name) else parent_dir_name
-                
-                # Create a version of content with ALL image links fixed
+
+                # Create version with fixed images
                 def replace_image_path(match):
                     image_alt, image_path = match.groups()
                     md_dir_rel_path = os.path.relpath(root, dishes_dir).replace(os.path.sep, '/')
                     full_image_path = os.path.normpath(f"{md_dir_rel_path}/{image_path}").replace(os.path.sep, '/')
                     base_url = "https://media.githubusercontent.com/media/Anduin2017/HowToCook/master/dishes/"
                     return f"![{image_alt}]({base_url}{full_image_path})"
-                
+
                 content_with_fixed_images = re.sub(r"!\[(.*?)\]\((?!https?://)(.*?)\)", replace_image_path, content, flags=re.IGNORECASE)
 
-                # Updated Description Logic with the new regex
+                # Extract raw description
                 description_match = re.search(r'#\s*.*?\n([\s\S]*?)(?=\n##)', content_with_fixed_images)
-                description = description_match.group(1).strip() if description_match else ""
+                raw_description = description_match.group(1).strip() if description_match else ""
+
+                # OPTIMIZATION: Clean the description
+                description = clean_description(raw_description)
 
                 difficulty_match = re.search(r"预估烹饪难度：(★+)", content)
                 difficulty = len(difficulty_match.group(1)) if difficulty_match else 0
 
-                # Extract the primary image URL from the content with fixed links
-                image_match = re.search(r"!\[.*?\]\((.*?)\)", description) # Search in description first
+                # Extract primary image (before cleaning markers)
+                image_match = re.search(r"!\[.*?\]\((.*?)\)", raw_description)
                 if not image_match:
                      image_match = re.search(r"!\[.*?\]\((.*?)\)", content_with_fixed_images)
                 image = image_match.group(1) if image_match else ""
@@ -97,12 +117,11 @@ def convert_md_to_json(repo_url, output_file):
                     match = re.search(fr"## {heading}\n\n(.*?)(?=\n##|\Z)", source_content, re.DOTALL)
                     return match.group(1).strip() if match else ""
 
-                # Use the content with fixed image links to extract all sections
                 ingredient = get_section_content("必备原料和工具", content_with_fixed_images)
                 calculation = get_section_content("计算", content_with_fixed_images)
                 operation = get_section_content("操作", content_with_fixed_images)
                 addition = get_section_content("附加内容", content_with_fixed_images)
-                
+
                 addition_to_remove = "如果您遵循本指南的制作流程而发现有问题或可以改进的流程，请提出 Issue 或 Pull request 。"
                 addition = addition.replace(addition_to_remove, "").strip()
 
@@ -120,19 +139,13 @@ def convert_md_to_json(repo_url, output_file):
                 }
                 all_dishes.append(dish_data)
 
-    # Write the JSON output
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(all_dishes, f, ensure_ascii=False, indent=4)
     print(f"Successfully converted all markdown files to {output_file}")
-    
-    # Clean up downloaded files
-    if os.path.exists(zip_file):
-        os.remove(zip_file)
-    if os.path.exists(repo_dir):
-        shutil.rmtree(repo_dir)
-    print("Cleaned up temporary files.")
 
-# To run the conversion
+    if os.path.exists(zip_file): os.remove(zip_file)
+    if os.path.exists(repo_dir): shutil.rmtree(repo_dir)
+
 if __name__ == "__main__":
     repo_url = "https://github.com/Anduin2017/HowToCook"
     output_file = "dishes.json"
