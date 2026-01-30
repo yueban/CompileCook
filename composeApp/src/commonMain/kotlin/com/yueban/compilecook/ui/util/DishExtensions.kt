@@ -2,6 +2,17 @@ package com.yueban.compilecook.ui.util
 
 import androidx.compose.runtime.Composable
 import com.yueban.compilecook.repo.entity.DishCategory
+import com.yueban.compilecook.repo.entity.DishCategory.AQUATIC
+import com.yueban.compilecook.repo.entity.DishCategory.BREAKFAST
+import com.yueban.compilecook.repo.entity.DishCategory.CONDIMENT
+import com.yueban.compilecook.repo.entity.DishCategory.DESSERT
+import com.yueban.compilecook.repo.entity.DishCategory.DRINK
+import com.yueban.compilecook.repo.entity.DishCategory.MEAT_DISH
+import com.yueban.compilecook.repo.entity.DishCategory.SEMI_FINISHED
+import com.yueban.compilecook.repo.entity.DishCategory.SOUP
+import com.yueban.compilecook.repo.entity.DishCategory.STAPLE
+import com.yueban.compilecook.repo.entity.DishCategory.UNKNOWN
+import com.yueban.compilecook.repo.entity.DishCategory.VEGETABLE_DISH
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.main_dish_category_aquatic
 import compilecook.composeapp.generated.resources.main_dish_category_breakfast
@@ -17,31 +28,31 @@ import org.jetbrains.compose.resources.stringResource
 
 val DishCategory.emoji: String
   get() = when (this) {
-    DishCategory.VEGETABLE_DISH -> "🥬"
-    DishCategory.MEAT_DISH -> "🥩"
-    DishCategory.AQUATIC -> "🐟"
-    DishCategory.BREAKFAST -> "🍳"
-    DishCategory.STAPLE -> "🍚"
-    DishCategory.SEMI_FINISHED -> "🍱"
-    DishCategory.SOUP -> "🥣"
-    DishCategory.DRINK -> "🍹"
-    DishCategory.CONDIMENT -> "🧂"
-    DishCategory.DESSERT -> "🍰"
-    DishCategory.UNKNOWN -> "❓"
+    VEGETABLE_DISH -> "🥬"
+    MEAT_DISH -> "🥩"
+    AQUATIC -> "🐟"
+    BREAKFAST -> "🍳"
+    STAPLE -> "🍚"
+    SEMI_FINISHED -> "🍱"
+    SOUP -> "🥣"
+    DRINK -> "🍹"
+    CONDIMENT -> "🧂"
+    DESSERT -> "🍰"
+    UNKNOWN -> "❓"
   }
 
 val DishCategory.displayName: String?
   @Composable
   get() = when (this) {
-    DishCategory.VEGETABLE_DISH -> Res.string.main_dish_category_vegetable_dish
-    DishCategory.MEAT_DISH -> Res.string.main_dish_category_meat_dish
-    DishCategory.AQUATIC -> Res.string.main_dish_category_aquatic
-    DishCategory.BREAKFAST -> Res.string.main_dish_category_breakfast
-    DishCategory.STAPLE -> Res.string.main_dish_category_staple
-    DishCategory.SEMI_FINISHED -> Res.string.main_dish_category_semi_finished
-    DishCategory.SOUP -> Res.string.main_dish_category_soup
-    DishCategory.DRINK -> Res.string.main_dish_category_drink
-    DishCategory.CONDIMENT -> Res.string.main_dish_category_condiment
-    DishCategory.DESSERT -> Res.string.main_dish_category_dessert
-    DishCategory.UNKNOWN -> null
+    VEGETABLE_DISH -> Res.string.main_dish_category_vegetable_dish
+    MEAT_DISH -> Res.string.main_dish_category_meat_dish
+    AQUATIC -> Res.string.main_dish_category_aquatic
+    BREAKFAST -> Res.string.main_dish_category_breakfast
+    STAPLE -> Res.string.main_dish_category_staple
+    SEMI_FINISHED -> Res.string.main_dish_category_semi_finished
+    SOUP -> Res.string.main_dish_category_soup
+    DRINK -> Res.string.main_dish_category_drink
+    CONDIMENT -> Res.string.main_dish_category_condiment
+    DESSERT -> Res.string.main_dish_category_dessert
+    UNKNOWN -> null
   }?.let { stringResource(it) }

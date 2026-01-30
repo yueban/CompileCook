@@ -32,6 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.Tip
 import com.yueban.compilecook.repo.entity.TipType
+import com.yueban.compilecook.repo.entity.TipType.ADVANCED
+import com.yueban.compilecook.repo.entity.TipType.BASIC
+import com.yueban.compilecook.repo.entity.TipType.LEARN
+import com.yueban.compilecook.repo.entity.TipType.UNKNOWN
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.base.Fail
 import com.yueban.compilecook.ui.theme.ExtendedTheme
@@ -101,10 +105,10 @@ fun TipTypeHeader(type: TipType) {
 
     Text(
       text = when (type) {
-        TipType.BASIC -> Res.string.main_tip_basic
-        TipType.LEARN -> Res.string.main_tip_learn
-        TipType.ADVANCED -> Res.string.main_tip_advanced
-        TipType.UNKNOWN -> null
+        BASIC -> Res.string.main_tip_basic
+        LEARN -> Res.string.main_tip_learn
+        ADVANCED -> Res.string.main_tip_advanced
+        UNKNOWN -> null
       }?.let { stringResource(it) } ?: "",
       style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
       color = ExtendedTheme.colors.titleText

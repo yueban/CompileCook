@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.StackAnimation
 import com.arkivanov.essenty.backhandler.BackHandler
-import com.yueban.compilecook.service.UiMessage
+import com.yueban.compilecook.service.UiMessage.Error
+import com.yueban.compilecook.service.UiMessage.Resource
+import com.yueban.compilecook.service.UiMessage.Text
 import com.yueban.compilecook.ui.dish.DishListContent
 import com.yueban.compilecook.ui.main.MainContent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
@@ -27,13 +29,13 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
   LaunchedEffect(component) {
     component.messages.collect { message ->
       val text = when (message) {
-        is UiMessage.Text -> message.value
+        is Text -> message.value
 
-        is UiMessage.Resource -> {
+        is Resource -> {
           @Suppress("SpreadOperator")
           getString(message.res, *message.args.toTypedArray())
         }
-        is UiMessage.Error -> getString(message.error.stringRes)
+        is Error -> getString(message.error.stringRes)
       }
       snackbarHostState.showSnackbar(text)
     }

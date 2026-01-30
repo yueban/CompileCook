@@ -16,6 +16,8 @@ import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.yueban.compilecook.ui.main.MainComponent.Child.Dishes
+import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
 import com.yueban.compilecook.ui.widget.CommonTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
@@ -33,13 +35,13 @@ fun MainContent(component: MainComponent) {
     bottomBar = {
       NavigationBar {
         NavigationBarItem(
-          selected = activeChild is MainComponent.Child.Tips,
+          selected = activeChild is Tips,
           onClick = { component.onTabSelected(MainComponent.MainTab.TIPS) },
           icon = { Icon(Icons.Default.Info, stringResource(Res.string.main_tab_tips)) },
           label = { Text(stringResource(Res.string.main_tab_tips)) }
         )
         NavigationBarItem(
-          selected = activeChild is MainComponent.Child.Dishes,
+          selected = activeChild is Dishes,
           onClick = { component.onTabSelected(MainComponent.MainTab.DISHES) },
           icon = { Icon(Icons.Default.Fastfood, stringResource(Res.string.main_tab_dishes)) },
           label = { Text(stringResource(Res.string.main_tab_dishes)) }
@@ -53,8 +55,8 @@ fun MainContent(component: MainComponent) {
       animation = stackAnimation(fade())
     ) {
       when (val child = it.instance) {
-        is MainComponent.Child.Dishes -> MainDishContent(child.component)
-        is MainComponent.Child.Tips -> MainTipContent(child.component)
+        is Dishes -> MainDishContent(child.component)
+        is Tips -> MainTipContent(child.component)
       }
     }
   }

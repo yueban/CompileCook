@@ -23,7 +23,12 @@ import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
+import com.yueban.compilecook.ui.main.MainComponent.Output.DishCategoryClicked
+import com.yueban.compilecook.ui.main.MainComponent.Output.TipClicked
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
+import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.DishList
+import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Main
+import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Tip
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
@@ -78,9 +83,9 @@ class DefaultRootComponent(
     pathMapper = { (config, child, any) ->
       Logger.d("config: $config, child: $child, any: $any")
       when (config) {
-        Config.Main -> "/"
-        is Config.Tip -> "/tips/${config.tipName}"
-        is Config.DishList ->
+        Main -> "/"
+        is Tip -> "/tips/${config.tipName}"
+        is DishList ->
           if (config.dishCategory == null) {
             "/dishes"
           } else {
@@ -107,17 +112,17 @@ class DefaultRootComponent(
 
   private fun child(config: Config, componentContext: ComponentContext): RootComponent.Child =
     when (config) {
-      Config.Main -> DefaultMainComponent(
+      Main -> DefaultMainComponent(
         componentContext = componentContext,
         onOutput = { output ->
           when (output) {
-            is MainComponent.Output.TipClicked -> navigation.push(Config.Tip(output.tipName))
-            is MainComponent.Output.DishCategoryClicked -> navigation.push(Config.DishList(output.dishCategory))
+            is TipClicked -> navigation.push(Tip(output.tipName))
+            is DishCategoryClicked -> navigation.push(DishList(output.dishCategory))
           }
         }
       ).let { MainChild(it) }
 
-      is Config.Tip -> DefaultTipComponent(
+      is Tip -> DefaultTipComponent(
         componentContext = componentContext,
         tipName = config.tipName,
         onOutput = { output ->
@@ -129,7 +134,7 @@ class DefaultRootComponent(
         defaultDispatcher = get(named(DispatcherType.Default)),
       ).let { TipChild(it) }
 
-      is Config.DishList -> DefaultDishListComponent(
+      is DishList -> DefaultDishListComponent(
         componentContext = componentContext,
         dishCategory = config.dishCategory,
         dishRepo = get(),
@@ -145,8 +150,8 @@ class DefaultRootComponent(
     Logger.d("deepLinkUrl: $deepLinkUrl")
     val url = deepLinkUrl?.let { Url(it) }
     return when (url?.segments?.firstOrNull()) {
-      null -> listOf(Config.Main)
-      else -> listOf(Config.Main) // TODO: append dish detail config
+      null -> listOf(Main)
+      else -> listOf(Main) // TODO: append dish detail config
     }
   }
 
