@@ -21,13 +21,17 @@ import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
 import com.yueban.compilecook.ui.inbox.DefaultListComponent
 import com.yueban.compilecook.ui.inbox.DetailComponent
 import com.yueban.compilecook.ui.inbox.ListComponent
+import com.yueban.compilecook.ui.inbox.ListComponent.Event.BackFromDetail
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
+import com.yueban.compilecook.ui.tip.DefaultTipComponent
+import com.yueban.compilecook.ui.tip.TipComponent
 import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +54,7 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
 
   sealed class Child {
     class MainChild(val component: MainComponent) : Child()
+    class TipChild(val component: TipComponent) : Child()
     class ListChild(val component: ListComponent) : Child()
     class DetailChild(val component: DetailComponent) : Child()
   }
@@ -79,6 +84,7 @@ class DefaultRootComponent(
       Logger.d("config: $config, child: $child, any: $any")
       when (config) {
         Config.Main -> "/"
+        is Config.Tip -> "/tips/${config.tipName}"
         Config.List -> "/dishes"
         is Config.Detail -> "/dishes/${config.dishName}"
       }
@@ -103,8 +109,24 @@ class DefaultRootComponent(
   private fun child(config: Config, componentContext: ComponentContext): RootComponent.Child =
     when (config) {
       Config.Main -> DefaultMainComponent(
-        componentContext = componentContext
+        componentContext = componentContext,
+        onOutput = { output ->
+          when (output) {
+            is MainComponent.Output.TipClicked -> navigation.push(Config.Tip(output.tipName))
+          }
+        }
       ).let { MainChild(it) }
+
+      is Config.Tip -> DefaultTipComponent(
+        componentContext = componentContext,
+        tipName = config.tipName,
+        onOutput = { output ->
+          when (output) {
+            TipComponent.Output.BackClicked -> onBackClicked()
+          }
+        },
+        dishRepo = get(),
+      ).let { TipChild(it) }
 
       Config.List -> DefaultListComponent(
         componentContext = componentContext,
@@ -120,7 +142,7 @@ class DefaultRootComponent(
         dishRepo = get(),
         dishName = config.dishName,
         onFinished = { dishName ->
-          navigation.pop { listEvents.trySend(ListComponent.Event.BackFromDetail(dishName)) }
+          navigation.pop { listEvents.trySend(BackFromDetail(dishName)) }
         },
       ).let { DetailChild(it) }
     }
@@ -141,6 +163,8 @@ class DefaultRootComponent(
   @Serializable
   sealed interface Config {
     @Serializable data object Main : Config
+
+    @Serializable data class Tip(val tipName: String) : Config
 
     @Serializable data object List : Config
 

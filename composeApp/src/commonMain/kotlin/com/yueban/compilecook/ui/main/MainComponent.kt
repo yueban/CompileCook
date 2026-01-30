@@ -20,10 +20,15 @@ interface MainComponent {
     class Dishes(val component: MainDishComponent) : Child()
     class Tips(val component: MainTipComponent) : Child()
   }
+
+  sealed interface Output {
+    data class TipClicked(val tipName: String) : Output
+  }
 }
 
 class DefaultMainComponent(
   componentContext: ComponentContext,
+  private val onOutput: (MainComponent.Output) -> Unit,
 ) : MainComponent, ComponentContext by componentContext, KoinComponent {
   private val navigation = StackNavigation<Config>()
 
@@ -51,9 +56,8 @@ class DefaultMainComponent(
           dishRepo = get(),
           onOutput = { output ->
             when (output) {
-              is MainTipComponent.Output.TipClicked -> {
-                // TODO: goto tip detail page
-              }
+              is MainTipComponent.Output.TipClicked ->
+                onOutput(MainComponent.Output.TipClicked(output.tip.name))
             }
           }
         )

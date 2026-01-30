@@ -1,7 +1,11 @@
 package com.yueban.compilecook.ui.widget
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.m3.Markdown
@@ -61,8 +65,11 @@ fun MarkdownFileViewer(filePath: String) {
 }
 
 @Composable
-fun MarkdownViewer(content: String) {
+fun MarkdownViewer(content: String, modifier: Modifier = Modifier) {
   Markdown(
+    modifier = modifier
+      .fillMaxSize()
+      .verticalScroll(rememberScrollState()),
     content = content,
     imageTransformer = Coil3ImageTransformerImpl
   )

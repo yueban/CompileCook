@@ -17,6 +17,8 @@ import com.yueban.compilecook.ui.main.MainContent
 import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
+import com.yueban.compilecook.ui.tip.TipContent
 import com.yueban.compilecook.ui.util.stringRes
 import org.jetbrains.compose.resources.getString
 
@@ -52,6 +54,7 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
     ) {
       when (val child = it.instance) {
         is MainChild -> MainContent(component = child.component)
+        is TipChild -> TipContent(component = child.component)
         is ListChild -> ListContent(component = child.component)
         is DetailChild -> DetailContent(component = child.component)
       }

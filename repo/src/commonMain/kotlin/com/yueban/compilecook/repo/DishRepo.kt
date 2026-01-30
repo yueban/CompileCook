@@ -20,6 +20,7 @@ interface DishRepo {
   fun getDishCategories(): Flow<List<DishCategory>>
   fun getDishByName(name: String): Flow<Dish?>
   fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>>
+  fun getTipByName(name: String): Flow<Tip?>
   suspend fun updateDishes()
   suspend fun updateTips()
   suspend fun deleteDishByName(name: String)
@@ -55,6 +56,9 @@ internal class DishRepoImpl(
         .toList()
         .sortedBy { it.first.ordinal }
     }
+
+  override fun getTipByName(name: String): Flow<Tip?> =
+    dishLocalDataSource.getTipByName(name).map { it?.toTip() }
 
   override suspend fun updateDishes() {
     val dishes = dishRemoteDataSource.getDishes().map { it.toLocalEntity() }
