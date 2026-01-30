@@ -19,6 +19,7 @@ import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
+import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.main.DefaultMainComponent
@@ -125,11 +126,7 @@ class DefaultRootComponent(
       is Tip -> DefaultTipComponent(
         componentContext = componentContext,
         tipName = config.tipName,
-        onOutput = { output ->
-          when (output) {
-            TipComponent.Output.BackClicked -> onBackClicked()
-          }
-        },
+        onOutput = navigation.onOutput(),
         dishRepo = get(),
         defaultDispatcher = get(named(DispatcherType.Default)),
       ).let { TipChild(it) }
@@ -138,11 +135,7 @@ class DefaultRootComponent(
         componentContext = componentContext,
         dishCategory = config.dishCategory,
         dishRepo = get(),
-        onOutput = { output ->
-          when (output) {
-            DishListComponent.Output.BackClicked -> onBackClicked()
-          }
-        }
+        onOutput = navigation.onOutput()
       ).let { DishListChild(it) }
     }
 
@@ -155,9 +148,7 @@ class DefaultRootComponent(
     }
   }
 
-  override fun onBackClicked() {
-    navigation.pop()
-  }
+  override fun onBackClicked() = navigation.pop()
 
   @Serializable
   sealed interface Config {
@@ -180,4 +171,14 @@ private fun ComponentContext.coroutineScope(): CoroutineScope {
   )
   lifecycle.doOnDestroy { scope.cancel() }
   return scope
+}
+
+private inline fun <T> StackNavigation<*>.onOutput(
+  crossinline handler: (T) -> Unit = {},
+): (T) -> Unit = { event ->
+  if (event is BackOutput) {
+    pop()
+  } else {
+    handler(event)
+  }
 }

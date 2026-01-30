@@ -6,10 +6,12 @@ import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.Tip
 import com.yueban.compilecook.ui.base.Async
+import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.base.Success
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.Uninitialized
+import com.yueban.compilecook.ui.tip.TipComponent.Output.BackClicked
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -30,7 +32,7 @@ interface TipComponent : UiStateComponent<TipState> {
   fun onBackClicked()
 
   sealed interface Output {
-    data object BackClicked : Output
+    data object BackClicked : Output, BackOutput
   }
 }
 
@@ -45,7 +47,7 @@ class DefaultTipComponent(
   initialState = TipState(tipName = tipName),
   serializer = TipState.serializer(),
 ) {
-  override fun onBackClicked() = onOutput(TipComponent.Output.BackClicked)
+  override fun onBackClicked() = onOutput(BackClicked)
 
   init {
     dishRepo.getTipByName(tipName)
