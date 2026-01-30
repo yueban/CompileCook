@@ -21,17 +21,10 @@ import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
-import com.yueban.compilecook.ui.inbox.DefaultDetailComponent
-import com.yueban.compilecook.ui.inbox.DefaultListComponent
-import com.yueban.compilecook.ui.inbox.DetailComponent
-import com.yueban.compilecook.ui.inbox.ListComponent
-import com.yueban.compilecook.ui.inbox.ListComponent.Event.BackFromDetail
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
-import com.yueban.compilecook.ui.root.RootComponent.Child.DetailChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
-import com.yueban.compilecook.ui.root.RootComponent.Child.ListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
@@ -43,9 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
@@ -62,8 +53,6 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
     class MainChild(val component: MainComponent) : Child()
     class TipChild(val component: TipComponent) : Child()
     class DishListChild(val component: DishListComponent) : Child()
-    class ListChild(val component: ListComponent) : Child()
-    class DetailChild(val component: DetailComponent) : Child()
   }
 }
 
@@ -73,7 +62,6 @@ class DefaultRootComponent(
 ) : RootComponent, ComponentContext by componentContext, KoinComponent {
   private val scope: CoroutineScope = coroutineScope()
   private val deepLinkHandler: DeepLinkHandler = get()
-  private val listEvents = Channel<ListComponent.Event>(Channel.BUFFERED)
   private val navigation = StackNavigation<Config>()
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
     childStack(
@@ -98,9 +86,6 @@ class DefaultRootComponent(
           } else {
             "/dishes/category=${config.dishCategory.name.lowercase()}"
           }
-
-        Config.List -> "/dishes"
-        is Config.Detail -> "/dishes/${config.dishName}"
       }
     }
   )
@@ -154,32 +139,14 @@ class DefaultRootComponent(
           }
         }
       ).let { DishListChild(it) }
-
-      Config.List -> DefaultListComponent(
-        componentContext = componentContext,
-        dishRepo = get(),
-        eventFlow = listEvents.receiveAsFlow(),
-        onItemSelected = {
-          navigation.push(Config.Detail(dishName = it))
-        }
-      ).let { ListChild(it) }
-
-      is Config.Detail -> DefaultDetailComponent(
-        componentContext = componentContext,
-        dishRepo = get(),
-        dishName = config.dishName,
-        onFinished = { dishName ->
-          navigation.pop { listEvents.trySend(BackFromDetail(dishName)) }
-        },
-      ).let { DetailChild(it) }
     }
 
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
     Logger.d("deepLinkUrl: $deepLinkUrl")
     val url = deepLinkUrl?.let { Url(it) }
-    return when (val dishName = url?.segments?.firstOrNull()) {
+    return when (url?.segments?.firstOrNull()) {
       null -> listOf(Config.Main)
-      else -> listOf(Config.Main, Config.Detail(dishName = dishName))
+      else -> listOf(Config.Main) // TODO: append dish detail config
     }
   }
 
@@ -194,10 +161,6 @@ class DefaultRootComponent(
     @Serializable data class Tip(val tipName: String) : Config
 
     @Serializable data class DishList(val dishCategory: DishCategory?) : Config
-
-    @Serializable data object List : Config
-
-    @Serializable data class Detail(val dishName: String) : Config
   }
 }
 
