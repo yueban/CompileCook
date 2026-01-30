@@ -3,12 +3,14 @@ import json
 import requests
 import zipfile
 import shutil
+import re
 from pypinyin import lazy_pinyin
 
 def convert_tips_to_json(repo_url, output_file):
     """
     Downloads a Git repository, processes all Markdown files in the 'tips'
-    directory, generates a pinyin field for each, and saves the data to a JSON file.
+    directory, generates a pinyin field for each, removes the first H1 heading,
+    and saves the data to a JSON file.
     """
     repo_owner = "Anduin2017"
     repo_name = "HowToCook"
@@ -49,8 +51,7 @@ def convert_tips_to_json(repo_url, output_file):
                 # Get the name from the filename
                 name = os.path.splitext(file)[0]
 
-                # lazy_pinyin returns a list (e.g. ['qi', 'yi', 'guo']), we join them to get 'qiyiguo'
-                # We also ensure it's lowercase and remove any spaces just in case
+                # Generate Pinyin
                 pinyin_value = "".join(lazy_pinyin(name)).lower().replace(" ", "")
 
                 # Determine the type based on the parent folder
@@ -60,16 +61,18 @@ def convert_tips_to_json(repo_url, output_file):
                     tip_type = 'learn'
                 elif parent_folder == 'advanced':
                     tip_type = 'advanced'
-                
+
                 # Read the full content of the markdown file
                 with open(md_file_path, "r", encoding="utf-8") as f:
                     content = f.read()
+
+                content = re.sub(r'^#.*?\n\s*\n', '', content, count=1, flags=re.MULTILINE)
 
                 tip_data = {
                     "name": name,
                     "pinyin": pinyin_value,
                     "type": tip_type,
-                    "content": content,
+                    "content": content.strip(),
                 }
                 all_tips.append(tip_data)
 
