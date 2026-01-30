@@ -18,11 +18,17 @@ data class MainTipState(
 
 interface MainTipComponent : UiStateComponent<MainTipState> {
   fun onRetry()
+  fun onTipClicked(tip: Tip)
+
+  sealed interface Output {
+    data class TipClicked(val tip: Tip) : Output
+  }
 }
 
 class DefaultMainTipComponent(
   componentContext: ComponentContext,
   private val dishRepo: DishRepo,
+  private val onOutput: (MainTipComponent.Output) -> Unit,
 ) : MainTipComponent, BaseComponent<MainTipState>(
   componentContext = componentContext,
   initialState = MainTipState(),
@@ -39,4 +45,6 @@ class DefaultMainTipComponent(
     suspend { dishRepo.updateTips() }
       .execute { copy(loadingAsync = it) }
   }
+
+  override fun onTipClicked(tip: Tip) = onOutput(MainTipComponent.Output.TipClicked(tip))
 }

@@ -58,12 +58,15 @@ fun MainTipContent(component: MainTipComponent) {
     onRetry = component::onRetry,
     emptyContent = { EmptyComposable(message = stringResource(Res.string.main_tip_empty)) },
   ) { groupedTips ->
-    TipList(groupedTips)
+    TipList(
+      groupedTips = groupedTips,
+      onItemClicked = { component.onTipClicked(it) }
+    )
   }
 }
 
 @Composable
-fun TipList(groupedTips: List<Pair<TipType, List<Tip>>>) {
+fun TipList(groupedTips: List<Pair<TipType, List<Tip>>>, onItemClicked: (Tip) -> Unit) {
   LazyColumn(
     contentPadding = PaddingValues(16.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -73,7 +76,7 @@ fun TipList(groupedTips: List<Pair<TipType, List<Tip>>>) {
         TipTypeHeader(type = type)
       }
       items(tips, key = { it.name }) { tip ->
-        TipItem(tip = tip)
+        TipItem(tip = tip, onClick = { onItemClicked(tip) })
       }
     }
   }
@@ -110,16 +113,14 @@ fun TipTypeHeader(type: TipType) {
 }
 
 @Composable
-fun TipItem(tip: Tip) {
+fun TipItem(tip: Tip, onClick: () -> Unit) {
   Card(
     shape = RoundedCornerShape(12.dp),
     colors = CardDefaults.cardColors(
       containerColor = MaterialTheme.colorScheme.surface,
     ),
     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-    onClick = {
-      // TODO: handle click event, goto tip page
-    },
+    onClick = onClick,
     modifier = Modifier.fillMaxWidth()
   ) {
     Row(

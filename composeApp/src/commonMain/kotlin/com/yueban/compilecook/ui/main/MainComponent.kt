@@ -49,6 +49,13 @@ class DefaultMainComponent(
         DefaultMainTipComponent(
           componentContext = ctx,
           dishRepo = get(),
+          onOutput = { output ->
+            when (output) {
+              is MainTipComponent.Output.TipClicked -> {
+                // TODO: goto tip detail page
+              }
+            }
+          }
         )
       )
       Config.Dishes -> MainComponent.Child.Dishes(
