@@ -96,7 +96,7 @@ private fun DishList(
     ),
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
-    items(dishes, key = { it.pinyin }) { dish ->
+    items(dishes, key = { it.name }) { dish ->
       DishItem(dish = dish, onClick = { onDishClick(dish) })
     }
   }
