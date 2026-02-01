@@ -11,6 +11,7 @@ import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.BackClicked
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
+import com.yueban.compilecook.ui.util.SmartMatcher
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -63,8 +64,7 @@ class DefaultDishListComponent(
       if (query.isNullOrBlank()) {
         dishes
       } else {
-        // TODO: Support name/pinyin fuzzy search
-        dishes.filter { it.name.contains(query) }
+        dishes.filter { it.matches(query) }
       }
     }.execute(retainValue = DishListState::dishesAsync) {
       copy(dishesAsync = it)
@@ -90,5 +90,9 @@ class DefaultDishListComponent(
 
   override fun onSearchQueryChanged(query: String) = setState {
     copy(searchQuery = query)
+  }
+
+  private fun Dish.matches(query: String): Boolean {
+    return SmartMatcher.matches(this.name, this.pinyin, query)
   }
 }
