@@ -29,6 +29,7 @@
     <string name="main_dish_category_dessert">甜品</string>
 
     <string name="dish_list_title">菜品列表</string>
+    <string name="dish_list_search_hint_t">搜索%1$s...</string>
     <string name="dish_list_empty">未找到菜谱</string>
     <string name="dish_list_item_difficulty">难度：</string>
 

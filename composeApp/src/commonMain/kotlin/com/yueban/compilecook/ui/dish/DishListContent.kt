@@ -49,6 +49,7 @@ import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
+import compilecook.composeapp.generated.resources.dish_list_search_hint_t
 import compilecook.composeapp.generated.resources.dish_list_title
 import org.jetbrains.compose.resources.stringResource
 
@@ -66,7 +67,8 @@ fun DishListContent(component: DishListComponent) {
           query = state.searchQuery,
           onQueryChange = component::onSearchQueryChanged,
           onBackClick = component::onBackClicked,
-          onClearClick = { component.onSearchQueryChanged("") }
+          onClearClick = { component.onSearchQueryChanged("") },
+          placeholderText = stringResource(Res.string.dish_list_search_hint_t, title)
         )
       } else {
         TitleTopBar(
