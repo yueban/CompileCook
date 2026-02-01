@@ -12,21 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.theme.EdgeToEdgeScreen
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_des_back
 import org.jetbrains.compose.resources.stringResource
 
-@Preview
 @Composable
-fun CommonTopBarPreview() = AppTheme {
-  EdgeToEdgeScreen(fillMaxSize = false) {
-    CommonTopBar("title", true)
-  }
-}
-
-@Composable
-fun CommonTopBar(title: String, enableBack: Boolean = false, onBackClick: () -> Unit = {}) =
+fun TitleTopBar(title: String, enableBack: Boolean = false, onBackClick: () -> Unit = {}) =
   CenterAlignedTopAppBar(
     title = {
       Text(
@@ -50,3 +41,25 @@ fun CommonTopBar(title: String, enableBack: Boolean = false, onBackClick: () -> 
       scrolledContainerColor = MaterialTheme.colorScheme.background,
     )
   )
+
+@Preview
+@Composable
+private fun TitleTopBarPreview() {
+  AppTheme {
+    TitleTopBar(
+      title = "Preview Title",
+      enableBack = true,
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun TitleTopBarNoBackPreview() {
+  AppTheme {
+    TitleTopBar(
+      title = "Preview Title No Back",
+      enableBack = false,
+    )
+  }
+}

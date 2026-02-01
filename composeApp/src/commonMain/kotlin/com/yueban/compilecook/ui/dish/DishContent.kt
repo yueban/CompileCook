@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.ui.base.AsyncContent
-import com.yueban.compilecook.ui.widget.CommonTopBar
 import com.yueban.compilecook.ui.widget.CookMarkdown
+import com.yueban.compilecook.ui.widget.TitleTopBar
 
 @Composable
 fun DishContent(component: DishComponent) {
@@ -17,7 +17,7 @@ fun DishContent(component: DishComponent) {
 
   Scaffold(
     topBar = {
-      CommonTopBar(
+      TitleTopBar(
         title = state.dishName,
         enableBack = true,
         onBackClick = component::onBackClicked,

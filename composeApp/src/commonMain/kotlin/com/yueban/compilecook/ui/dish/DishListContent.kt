@@ -39,8 +39,8 @@ import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.emoji
-import com.yueban.compilecook.ui.widget.CommonTopBar
 import com.yueban.compilecook.ui.widget.EmptyComposable
+import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
@@ -56,7 +56,7 @@ fun DishListContent(component: DishListComponent) {
 
   Scaffold(
     topBar = {
-      CommonTopBar(
+      TitleTopBar(
         title = title,
         enableBack = true,
         onBackClick = component::onBackClicked

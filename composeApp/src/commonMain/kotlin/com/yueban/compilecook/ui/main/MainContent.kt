@@ -18,7 +18,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.yueban.compilecook.ui.main.MainComponent.Child.Dishes
 import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
-import com.yueban.compilecook.ui.widget.CommonTopBar
+import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
 import compilecook.composeapp.generated.resources.main_tab_dishes
@@ -31,7 +31,7 @@ fun MainContent(component: MainComponent) {
   val activeChild = stack.active.instance
 
   Scaffold(
-    topBar = { CommonTopBar(title = stringResource(Res.string.app_name)) },
+    topBar = { TitleTopBar(title = stringResource(Res.string.app_name)) },
     bottomBar = {
       NavigationBar {
         NavigationBarItem(
