@@ -59,7 +59,7 @@ fun DishListContent(component: DishListComponent) {
       CommonTopBar(
         title = title,
         enableBack = true,
-        onBackClick = { component.onBackClicked() }
+        onBackClick = component::onBackClicked
       )
     }
   ) { innerPadding ->

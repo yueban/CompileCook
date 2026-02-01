@@ -20,7 +20,7 @@ fun TipContent(component: TipComponent) {
       CommonTopBar(
         title = state.tipName,
         enableBack = true,
-        onBackClick = { component.onBackClicked() }
+        onBackClick = component::onBackClicked
       )
     },
   ) { padding ->
