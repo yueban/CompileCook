@@ -68,6 +68,7 @@ subprojects {
 
       sourceSets.all {
         languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+        languageSettings.optIn("kotlinx.coroutines.FlowPreview")
         languageSettings.optIn("kotlin.time.ExperimentalTime")
       }
 

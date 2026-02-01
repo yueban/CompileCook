@@ -5,8 +5,9 @@
     <string name="common_retry">Retry</string>
     <string name="common_unknown_error">Unknown error</string>
     <string name="common_network_error">Network error</string>
-
     <string name="common_des_back">Back</string>
+    <string name="common_des_clear">Clear</string>
+    <string name="common_search_hint">Search...</string>
 
     <string name="main_tab_tips">Tips</string>
     <string name="main_tab_dishes">Dishes</string>

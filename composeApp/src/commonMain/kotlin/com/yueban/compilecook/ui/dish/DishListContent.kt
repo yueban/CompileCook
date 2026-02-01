@@ -17,8 +17,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,6 +44,7 @@ import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.emoji
 import com.yueban.compilecook.ui.widget.EmptyComposable
+import com.yueban.compilecook.ui.widget.SearchTopBar
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.dish_list_empty
@@ -56,11 +61,29 @@ fun DishListContent(component: DishListComponent) {
 
   Scaffold(
     topBar = {
-      TitleTopBar(
-        title = title,
-        enableBack = true,
-        onBackClick = component::onBackClicked
-      )
+      if (state.isSearchActive) {
+        SearchTopBar(
+          query = state.searchQuery,
+          onQueryChange = component::onSearchQueryChanged,
+          onBackClick = component::onBackClicked,
+          onClearClick = { component.onSearchQueryChanged("") }
+        )
+      } else {
+        TitleTopBar(
+          title = title,
+          enableBack = true,
+          onBackClick = component::onBackClicked,
+          actions = {
+            IconButton(onClick = { component.onSearchActiveChanged(true) }) {
+              Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+                tint = ExtendedTheme.colors.titleText
+              )
+            }
+          }
+        )
+      }
     }
   ) { innerPadding ->
     AsyncContent(
