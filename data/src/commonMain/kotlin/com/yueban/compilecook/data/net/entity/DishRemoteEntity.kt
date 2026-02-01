@@ -11,10 +11,7 @@ data class DishRemoteEntity(
   val category: String,
   val difficulty: Long,
   val image: String,
-  val ingredient: String,
-  val calculation: String,
-  val operation: String,
-  val addition: String,
+  val content: String,
 )
 
 fun DishRemoteEntity.toLocalEntity(): DishLocalEntity =
@@ -25,8 +22,5 @@ fun DishRemoteEntity.toLocalEntity(): DishLocalEntity =
     category = category,
     difficulty = this.difficulty,
     image = this.image,
-    ingredient = this.ingredient,
-    calculation = this.calculation,
-    operation = this.operation,
-    addition = this.addition
+    content = this.content,
   )

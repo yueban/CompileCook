@@ -5,10 +5,7 @@ CREATE TABLE IF NOT EXISTS DishLocalEntity (
     category TEXT NOT NULL,
     difficulty INTEGER NOT NULL,
     image TEXT NOT NULL,
-    ingredient TEXT NOT NULL,
-    calculation TEXT NOT NULL,
-    operation TEXT NOT NULL,
-    addition TEXT NOT NULL
+    content TEXT NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS Dish_category ON DishLocalEntity(category);
@@ -34,8 +31,8 @@ SELECT * FROM DishLocalEntity WHERE difficulty = ? ORDER BY pinyin;
 
 -- Upsert Operation
 upsertDish:
-INSERT OR REPLACE INTO DishLocalEntity(name,pinyin,description,category,difficulty,image,ingredient,calculation,operation,addition)
-VALUES (?,?,?,?,?,?,?,?,?,?);
+INSERT OR REPLACE INTO DishLocalEntity(name,pinyin,description,category,difficulty,image,content)
+VALUES (?,?,?,?,?,?,?);
 
 -- Delete Operations
 deleteByName:

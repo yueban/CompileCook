@@ -52,36 +52,12 @@ class DishLocalDataSourceImpl(
     tipQueries.getByName(name).asFlow().mapToOneOrNull(dispatcher)
 
   override suspend fun upsertDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
-    dishQueries.upsertDish(
-      name = dish.name,
-      pinyin = dish.pinyin,
-      description = dish.description,
-      category = dish.category,
-      difficulty = dish.difficulty,
-      image = dish.image,
-      ingredient = dish.ingredient,
-      calculation = dish.calculation,
-      operation = dish.operation,
-      addition = dish.addition
-    )
+    dishQueries.upsertDish(dish)
   }
 
   override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = withContext(dispatcher) {
     dishQueries.transaction {
-      dishes.forEach { dish ->
-        dishQueries.upsertDish(
-          name = dish.name,
-          pinyin = dish.pinyin,
-          description = dish.description,
-          category = dish.category,
-          difficulty = dish.difficulty,
-          image = dish.image,
-          ingredient = dish.ingredient,
-          calculation = dish.calculation,
-          operation = dish.operation,
-          addition = dish.addition
-        )
-      }
+      dishes.forEach { dishQueries.upsertDish(it) }
     }
   }
 
@@ -123,3 +99,14 @@ class DishLocalDataSourceImpl(
     tipQueries.deleteAll()
   }
 }
+
+private suspend fun DishQueries.upsertDish(dish: DishLocalEntity) =
+  upsertDish(
+    name = dish.name,
+    pinyin = dish.pinyin,
+    description = dish.description,
+    category = dish.category,
+    difficulty = dish.difficulty,
+    image = dish.image,
+    content = dish.content,
+  )

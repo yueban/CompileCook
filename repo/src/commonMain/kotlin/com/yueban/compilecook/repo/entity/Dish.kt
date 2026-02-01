@@ -12,10 +12,7 @@ data class Dish(
   val category: DishCategory,
   val difficulty: Long,
   val image: String,
-  val ingredient: String,
-  val calculation: String,
-  val operation: String,
-  val addition: String,
+  val content: String,
 )
 
 @Serializable
@@ -67,8 +64,5 @@ fun DishLocalEntity.toDish(): Dish =
     category = DishCategory.fromValue(this.category),
     difficulty = this.difficulty,
     image = this.image,
-    ingredient = this.ingredient,
-    calculation = this.calculation,
-    operation = this.operation,
-    addition = this.addition
+    content = this.content,
   )
