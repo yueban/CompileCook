@@ -85,7 +85,7 @@ fun DishListContent(component: DishListComponent) {
 private fun DishList(
   dishes: List<Dish>,
   contentPadding: PaddingValues,
-  onDishClick: (dishName: String) -> Unit,
+  onDishClick: (dish: Dish) -> Unit,
 ) {
   LazyColumn(
     contentPadding = PaddingValues(
@@ -97,7 +97,7 @@ private fun DishList(
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
     items(dishes, key = { it.pinyin }) { dish ->
-      DishItem(dish = dish, onClick = { onDishClick(dish.name) })
+      DishItem(dish = dish, onClick = { onDishClick(dish) })
     }
   }
 }

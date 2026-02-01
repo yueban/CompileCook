@@ -21,7 +21,7 @@ data class DishListState(
 
 interface DishListComponent : UiStateComponent<DishListState> {
   fun onBackClicked()
-  fun onDishClicked(dishName: String)
+  fun onDishClicked(dish: Dish)
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
@@ -51,5 +51,5 @@ class DefaultDishListComponent(
 
   override fun onBackClicked() = onOutput(BackClicked)
 
-  override fun onDishClicked(dishName: String) = onOutput(DishClicked(dishName))
+  override fun onDishClicked(dish: Dish) = onOutput(DishClicked(dish.name))
 }
