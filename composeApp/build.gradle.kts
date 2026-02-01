@@ -134,3 +134,16 @@ compose.desktop {
     }
   }
 }
+
+tasks.register<JavaExec>("clearJvmData") {
+  group = "application"
+  description = "Clears local database and cache files for the JVM target."
+
+  dependsOn("compileKotlinJvm")
+
+  val jvmTarget = kotlin.targets.getByName("jvm")
+  val mainCompilation = jvmTarget.compilations.getByName("main")
+  classpath = mainCompilation.output.allOutputs + mainCompilation.runtimeDependencyFiles!!
+
+  mainClass.set("com.yueban.compilecook.ClearJvmDataKt")
+}
