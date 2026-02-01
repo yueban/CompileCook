@@ -70,7 +70,7 @@ kotlin {
     androidMain.dependencies {
     }
     jvmMain.dependencies {
-      api(libs.appdirs)
+      implementation(libs.appdirs)
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)
