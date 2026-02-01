@@ -4,17 +4,14 @@ import com.arkivanov.decompose.ComponentContext
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.yueban.compilecook.repo.DishRepo
-import com.yueban.compilecook.repo.entity.Tip
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.BaseComponent
-import com.yueban.compilecook.ui.base.Success
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.tip.TipComponent.Output.BackClicked
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -24,7 +21,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TipState(
   val tipName: String,
-  val tipAsync: Async<Tip?> = Uninitialized,
   val contentAsync: Async<State> = Uninitialized,
 )
 
@@ -51,13 +47,6 @@ class DefaultTipComponent(
 
   init {
     dishRepo.getTipByName(tipName)
-      .execute(retainValue = TipState::tipAsync) {
-        copy(tipAsync = it)
-      }
-
-    uiState.map { it.tipAsync }
-      .filter { it is Success }
-      .map { it.value }
       .filterNotNull()
       .map { it.content }
       .distinctUntilChanged()
