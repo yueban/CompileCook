@@ -20,16 +20,20 @@ import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.base.BackOutput
+import com.yueban.compilecook.ui.dish.DefaultDishComponent
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
+import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishCategoryClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.TipClicked
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
+import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Dish
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.DishList
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Main
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Tip
+import com.yueban.compilecook.ui.root.RootComponent.Child.DishChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
@@ -59,6 +63,7 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
     class MainChild(val component: MainComponent) : Child()
     class TipChild(val component: TipComponent) : Child()
     class DishListChild(val component: DishListComponent) : Child()
+    class DishChild(val component: DishComponent) : Child()
   }
 }
 
@@ -92,6 +97,7 @@ class DefaultRootComponent(
           } else {
             "/dishes/category=${config.dishCategory.name.lowercase()}"
           }
+        is Dish -> "dishes/${config.dishName}"
       }
     }
   )
@@ -135,16 +141,29 @@ class DefaultRootComponent(
         componentContext = componentContext,
         dishCategory = config.dishCategory,
         dishRepo = get(),
-        onOutput = navigation.onOutput()
+        onOutput = navigation.onOutput { output ->
+          when (output) {
+            is DishListComponent.Output.DishClicked -> navigation.push(Dish(output.dishName))
+            else -> {}
+          }
+        }
       ).let { DishListChild(it) }
+
+      is Dish -> DefaultDishComponent(
+        componentContext = componentContext,
+        dishName = config.dishName,
+        dishRepo = get(),
+        onOutput = navigation.onOutput(),
+        defaultDispatcher = get(named(DispatcherType.Default))
+      ).let { DishChild(it) }
     }
 
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
     Logger.d("deepLinkUrl: $deepLinkUrl")
     val url = deepLinkUrl?.let { Url(it) }
-    return when (url?.segments?.firstOrNull()) {
+    return when (val dishName = url?.segments?.firstOrNull()) {
       null -> listOf(Main)
-      else -> listOf(Main) // TODO: append dish detail config
+      else -> listOf(Main, Dish(dishName))
     }
   }
 
@@ -157,6 +176,8 @@ class DefaultRootComponent(
     @Serializable data class Tip(val tipName: String) : Config
 
     @Serializable data class DishList(val dishCategory: DishCategory?) : Config
+
+    @Serializable data class Dish(val dishName: String) : Config
   }
 }
 

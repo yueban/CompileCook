@@ -10,6 +10,7 @@ import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.BackClicked
+import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,9 +21,11 @@ data class DishListState(
 
 interface DishListComponent : UiStateComponent<DishListState> {
   fun onBackClicked()
+  fun onDishClicked(dishName: String)
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
+    data class DishClicked(val dishName: String) : Output
   }
 }
 
@@ -47,4 +50,6 @@ class DefaultDishListComponent(
   }
 
   override fun onBackClicked() = onOutput(BackClicked)
+
+  override fun onDishClicked(dishName: String) = onOutput(DishClicked(dishName))
 }
