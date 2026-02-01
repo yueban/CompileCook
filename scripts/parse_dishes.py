@@ -17,28 +17,18 @@ def clean_description(text):
     """
     # 1. Remove HTML comments
     text = re.sub(r'<!--[\s\S]*?-->', '', text)
-
     # 2. Remove Markdown images: ![alt](url)
     text = re.sub(r'!\[.*?\]\(.*?\)', '', text)
-
     # 3. Remove Blockquotes: lines starting with >
     text = re.sub(r'^>.*$', '', text, flags=re.MULTILINE)
-
     # 4. Remove Difficulty line: 预估烹饪难度：★
     text = re.sub(r'预估烹饪难度：.*', '', text)
-
-    # 5. Remove Markdown bold and italic markers but keep the text inside
-    # Remove ***bold italic***, **bold**, *italic*
+    # 5. Remove Markdown bold and italic markers
     text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
     text = re.sub(r'_{1,3}(.*?)_{1,3}', r'\1', text)
 
     # 6. Cleanup: Remove extra whitespace and newlines
-    # Split into lines, strip them, and join back with double newlines
     lines = [line.strip() for line in text.split('\n') if line.strip()]
-
-    # Note: If you only want the VERY first paragraph (to match your example 2 exactly),
-    # you could return lines[0] if lines else "".
-    # Otherwise, joining them is safer for multi-paragraph descriptions.
     return '\n\n'.join(lines)
 
 def convert_md_to_json(repo_url, output_file):
@@ -79,7 +69,7 @@ def convert_md_to_json(repo_url, output_file):
             if file.lower().endswith(".md"):
                 md_file_path = os.path.join(root, file)
                 with open(md_file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
+                    raw_markdown = f.read()
 
                 name_without_ext = os.path.splitext(file)[0]
                 pinyin_value = "".join(lazy_pinyin(name_without_ext)).lower().replace(" ", "")
@@ -87,7 +77,7 @@ def convert_md_to_json(repo_url, output_file):
                 parent_dir_name = os.path.basename(root)
                 category = os.path.basename(os.path.dirname(root)) if contains_chinese(parent_dir_name) else parent_dir_name
 
-                # Create version with fixed images
+                # 1. Correct all image links in the entire document
                 def replace_image_path(match):
                     image_alt, image_path = match.groups()
                     md_dir_rel_path = os.path.relpath(root, dishes_dir).replace(os.path.sep, '/')
@@ -95,35 +85,25 @@ def convert_md_to_json(repo_url, output_file):
                     base_url = "https://media.githubusercontent.com/media/Anduin2017/HowToCook/master/dishes/"
                     return f"![{image_alt}]({base_url}{full_image_path})"
 
-                content_with_fixed_images = re.sub(r"!\[(.*?)\]\((?!https?://)(.*?)\)", replace_image_path, content, flags=re.IGNORECASE)
+                content_with_fixed_images = re.sub(r"!\[(.*?)\]\((?!https?://)(.*?)\)", replace_image_path, raw_markdown, flags=re.IGNORECASE)
 
-                # Extract raw description
+                # 2. Extract and clean description (for summary purposes)
+                # Still using your specific regex to capture the block before the first ##
                 description_match = re.search(r'#\s*.*?\n([\s\S]*?)(?=\n##)', content_with_fixed_images)
-                raw_description = description_match.group(1).strip() if description_match else ""
+                raw_desc_block = description_match.group(1).strip() if description_match else ""
+                description = clean_description(raw_desc_block)
 
-                # OPTIMIZATION: Clean the description
-                description = clean_description(raw_description)
+                # 3. Process the new 'content' field:
+                # Remove the first H1 heading and its following newlines
+                content_field = re.sub(r'^#.*?\n+', '', content_with_fixed_images, count=1).strip()
 
-                difficulty_match = re.search(r"预估烹饪难度：(★+)", content)
+                # 4. Extract difficulty (from original content to avoid issues with fixed URLs)
+                difficulty_match = re.search(r"预估烹饪难度：(★+)", raw_markdown)
                 difficulty = len(difficulty_match.group(1)) if difficulty_match else 0
 
-                # Extract primary image (before cleaning markers)
-                image_match = re.search(r"!\[.*?\]\((.*?)\)", raw_description)
-                if not image_match:
-                     image_match = re.search(r"!\[.*?\]\((.*?)\)", content_with_fixed_images)
+                # 5. Extract the primary image URL (used for thumbnails/previews)
+                image_match = re.search(r"!\[.*?\]\((.*?)\)", content_with_fixed_images)
                 image = image_match.group(1) if image_match else ""
-
-                def get_section_content(heading, source_content):
-                    match = re.search(fr"## {heading}\n\n(.*?)(?=\n##|\Z)", source_content, re.DOTALL)
-                    return match.group(1).strip() if match else ""
-
-                ingredient = get_section_content("必备原料和工具", content_with_fixed_images)
-                calculation = get_section_content("计算", content_with_fixed_images)
-                operation = get_section_content("操作", content_with_fixed_images)
-                addition = get_section_content("附加内容", content_with_fixed_images)
-
-                addition_to_remove = "如果您遵循本指南的制作流程而发现有问题或可以改进的流程，请提出 Issue 或 Pull request 。"
-                addition = addition.replace(addition_to_remove, "").strip()
 
                 dish_data = {
                     "name": name_without_ext,
@@ -132,10 +112,7 @@ def convert_md_to_json(repo_url, output_file):
                     "category": category,
                     "difficulty": difficulty,
                     "image": image,
-                    "ingredient": ingredient,
-                    "calculation": calculation,
-                    "operation": operation,
-                    "addition": addition,
+                    "content": content_field
                 }
                 all_dishes.append(dish_data)
 
@@ -143,6 +120,7 @@ def convert_md_to_json(repo_url, output_file):
         json.dump(all_dishes, f, ensure_ascii=False, indent=4)
     print(f"Successfully converted all markdown files to {output_file}")
 
+    # Cleanup
     if os.path.exists(zip_file): os.remove(zip_file)
     if os.path.exists(repo_dir): shutil.rmtree(repo_dir)
 
