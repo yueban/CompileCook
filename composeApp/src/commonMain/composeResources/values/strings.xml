@@ -30,6 +30,7 @@
 
     <string name="dish_list_title">Dishes</string>
     <string name="dish_list_search_hint_t">Search%1$s...</string>
+    <string name="dish_list_des_search">Search menus</string>s
     <string name="dish_list_empty">Dishes not found</string>
     <string name="dish_list_item_difficulty">Difficulty: </string>
 

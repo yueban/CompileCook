@@ -144,7 +144,7 @@ fun TipItem(tip: Tip, onClick: () -> Unit) {
 
       Icon(
         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-        contentDescription = null,
+        contentDescription = tip.name,
         tint = ExtendedTheme.colors.subTitleText.copy(alpha = 0.5f),
         modifier = Modifier.size(20.dp)
       )
