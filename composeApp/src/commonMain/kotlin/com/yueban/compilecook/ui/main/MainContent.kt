@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -23,6 +24,7 @@ import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
+import compilecook.composeapp.generated.resources.main_des_random_dish
 import compilecook.composeapp.generated.resources.main_dish_des_search
 import compilecook.composeapp.generated.resources.main_tab_dishes
 import compilecook.composeapp.generated.resources.main_tab_tips
@@ -42,6 +44,13 @@ fun MainContent(component: MainComponent) {
             IconButton(onClick = component::onDishSearchClicked) {
               Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.main_dish_des_search))
             }
+          }
+
+          IconButton(onClick = component::onRandomDishClicked) {
+            Icon(
+              imageVector = Icons.Outlined.Casino,
+              contentDescription = stringResource(Res.string.main_des_random_dish)
+            )
           }
         }
       )

@@ -11,6 +11,7 @@
 
     <string name="main_tab_tips">教程</string>
     <string name="main_tab_dishes">菜谱</string>
+    <string name="main_des_random_dish">随机菜谱</string>
 
     <string name="main_tip_empty">暂无教程</string>
     <string name="main_tip_basic">做菜之前</string>

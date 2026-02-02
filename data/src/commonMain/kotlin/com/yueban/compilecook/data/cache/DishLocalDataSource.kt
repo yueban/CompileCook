@@ -1,5 +1,6 @@
 package com.yueban.compilecook.data.cache
 
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -16,6 +17,7 @@ interface DishLocalDataSource {
   fun getDishCategories(): Flow<List<String>>
   fun getDishByName(name: String): Flow<DishLocalEntity?>
   fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>>
+  suspend fun getRandomDishName(): String?
   fun getAllTips(): Flow<List<TipLocalEntity>>
   fun getTipByName(name: String): Flow<TipLocalEntity?>
   suspend fun upsertDish(dish: DishLocalEntity)
@@ -44,6 +46,10 @@ class DishLocalDataSourceImpl(
 
   override fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>> =
     dishQueries.getByCategory(category).asFlow().mapToList(defaultDispatcher)
+
+  override suspend fun getRandomDishName(): String? = withContext(defaultDispatcher) {
+    dishQueries.getRandomDishName().awaitAsOneOrNull()
+  }
 
   override fun getAllTips(): Flow<List<TipLocalEntity>> =
     tipQueries.getAll().asFlow().mapToList(defaultDispatcher)

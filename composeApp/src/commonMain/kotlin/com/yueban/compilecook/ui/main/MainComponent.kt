@@ -6,16 +6,24 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
+import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.DishCategory
+import com.yueban.compilecook.ui.base.BaseComponent
+import com.yueban.compilecook.ui.main.MainComponent.MainTab.DISHES
+import com.yueban.compilecook.ui.main.MainComponent.MainTab.TIPS
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
+import com.yueban.compilecook.ui.main.MainComponent.Output.RandomDishClicked
+import com.yueban.compilecook.ui.main.MainDishComponent.Output.DishCategoryClicked
+import com.yueban.compilecook.ui.main.MainTipComponent.Output.TipClicked
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
 interface MainComponent {
   val stack: Value<ChildStack<*, Child>>
   fun onTabSelected(tab: MainTab)
   fun onDishSearchClicked()
+  fun onRandomDishClicked()
 
   enum class MainTab { DISHES, TIPS }
 
@@ -28,13 +36,15 @@ interface MainComponent {
     data class TipClicked(val tipName: String) : Output
     data class DishCategoryClicked(val dishCategory: DishCategory) : Output
     data object DishSearchClicked : Output
+    data class RandomDishClicked(val dishName: String) : Output
   }
 }
 
 class DefaultMainComponent(
   componentContext: ComponentContext,
   private val onOutput: (MainComponent.Output) -> Unit,
-) : MainComponent, ComponentContext by componentContext, KoinComponent {
+  private val dishRepo: DishRepo,
+) : MainComponent, BaseComponent(componentContext) {
   private val navigation = StackNavigation<Config>()
 
   override val stack = childStack(
@@ -47,13 +57,21 @@ class DefaultMainComponent(
 
   override fun onTabSelected(tab: MainComponent.MainTab) {
     val config = when (tab) {
-      MainComponent.MainTab.DISHES -> Config.Dishes
-      MainComponent.MainTab.TIPS -> Config.Tips
+      DISHES -> Config.Dishes
+      TIPS -> Config.Tips
     }
     navigation.bringToFront(config)
   }
 
   override fun onDishSearchClicked() = onOutput(DishSearchClicked)
+
+  override fun onRandomDishClicked() {
+    scope.launch {
+      dishRepo.getRandomDishName()?.let {
+        onOutput(RandomDishClicked(it))
+      }
+    }
+  }
 
   private fun createChild(config: Config, ctx: ComponentContext): MainComponent.Child {
     return when (config) {
@@ -63,7 +81,7 @@ class DefaultMainComponent(
           dishRepo = get(),
           onOutput = { output ->
             when (output) {
-              is MainTipComponent.Output.TipClicked ->
+              is TipClicked ->
                 onOutput(MainComponent.Output.TipClicked(output.tip.name))
             }
           }
@@ -75,7 +93,7 @@ class DefaultMainComponent(
           dishRepo = get(),
           onOutput = { output ->
             when (output) {
-              is MainDishComponent.Output.DishCategoryClicked ->
+              is DishCategoryClicked ->
                 onOutput(MainComponent.Output.DishCategoryClicked(output.dishCategory))
             }
           }

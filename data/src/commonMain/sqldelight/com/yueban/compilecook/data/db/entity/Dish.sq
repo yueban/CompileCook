@@ -28,6 +28,8 @@ SELECT * FROM DishLocalEntity WHERE category = ? ORDER BY pinyin;
 getByDifficulty:
 SELECT * FROM DishLocalEntity WHERE difficulty = ? ORDER BY pinyin;
 
+getRandomDishName:
+SELECT name FROM DishLocalEntity ORDER BY RANDOM() LIMIT 1;
 
 -- Upsert Operation
 upsertDish:

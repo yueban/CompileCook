@@ -20,6 +20,7 @@ interface DishRepo {
   fun getDishCategories(): Flow<List<DishCategory>>
   fun getDishByName(name: String): Flow<Dish?>
   fun getDishesByCategory(category: DishCategory): Flow<List<Dish>>
+  suspend fun getRandomDishName(): String?
   fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>>
   fun getTipByName(name: String): Flow<Tip?>
   suspend fun updateDishes()
@@ -51,6 +52,8 @@ internal class DishRepoImpl(
 
   override fun getDishesByCategory(category: DishCategory): Flow<List<Dish>> =
     dishLocalDataSource.getDishesByCategory(category.name.lowercase()).map { entities -> entities.map { it.toDish() } }
+
+  override suspend fun getRandomDishName(): String? = dishLocalDataSource.getRandomDishName()
 
   override fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>> =
     dishLocalDataSource.getAllTips().map { tipLocalEntities ->

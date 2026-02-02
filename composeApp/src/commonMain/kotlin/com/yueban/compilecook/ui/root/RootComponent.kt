@@ -28,6 +28,7 @@ import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishCategoryClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
+import com.yueban.compilecook.ui.main.MainComponent.Output.RandomDishClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.TipClicked
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Dish
@@ -119,8 +120,10 @@ class DefaultRootComponent(
             is TipClicked -> navigation.push(Tip(output.tipName))
             is DishCategoryClicked -> navigation.push(DishList(output.dishCategory))
             DishSearchClicked -> navigation.push(DishList(null, true))
+            is RandomDishClicked -> navigation.push(Dish(output.dishName))
           }
-        }
+        },
+        dishRepo = get(),
       ).let { MainChild(it) }
 
       is Tip -> DefaultTipComponent(
