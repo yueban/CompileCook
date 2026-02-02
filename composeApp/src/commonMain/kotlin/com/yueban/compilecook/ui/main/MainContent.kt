@@ -1,11 +1,15 @@
 package com.yueban.compilecook.ui.main
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Casino
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -14,6 +18,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -24,8 +31,10 @@ import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
+import compilecook.composeapp.generated.resources.main_des_more
 import compilecook.composeapp.generated.resources.main_des_random_dish
 import compilecook.composeapp.generated.resources.main_dish_des_search
+import compilecook.composeapp.generated.resources.main_menu_about
 import compilecook.composeapp.generated.resources.main_tab_dishes
 import compilecook.composeapp.generated.resources.main_tab_tips
 import org.jetbrains.compose.resources.stringResource
@@ -40,18 +49,12 @@ fun MainContent(component: MainComponent) {
       TitleTopBar(
         title = stringResource(Res.string.app_name),
         actions = {
-          if (activeChild is Dishes) {
-            IconButton(onClick = component::onDishSearchClicked) {
-              Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.main_dish_des_search))
-            }
-          }
-
-          IconButton(onClick = component::onRandomDishClicked) {
-            Icon(
-              imageVector = Icons.Outlined.Casino,
-              contentDescription = stringResource(Res.string.main_des_random_dish)
-            )
-          }
+          TopBarActions(
+            activeChild = activeChild,
+            onDishSearchClicked = component::onDishSearchClicked,
+            onRandomDishClicked = component::onRandomDishClicked,
+            onAboutClicked = component::onAboutClicked,
+          )
         }
       )
     },
@@ -81,6 +84,46 @@ fun MainContent(component: MainComponent) {
         is Dishes -> MainDishContent(child.component)
         is Tips -> MainTipContent(child.component)
       }
+    }
+  }
+}
+
+@Composable
+private fun TopBarActions(
+  activeChild: MainComponent.Child,
+  onDishSearchClicked: () -> Unit,
+  onRandomDishClicked: () -> Unit,
+  onAboutClicked: () -> Unit,
+) {
+  if (activeChild is Dishes) {
+    IconButton(onClick = onDishSearchClicked) {
+      Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.main_dish_des_search))
+    }
+  }
+
+  IconButton(onClick = onRandomDishClicked) {
+    Icon(
+      imageVector = Icons.Outlined.Casino,
+      contentDescription = stringResource(Res.string.main_des_random_dish)
+    )
+  }
+
+  var showMenu by remember { mutableStateOf(false) }
+  Box {
+    IconButton(onClick = { showMenu = true }) {
+      Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.main_des_more))
+    }
+    DropdownMenu(
+      expanded = showMenu,
+      onDismissRequest = { showMenu = false }
+    ) {
+      DropdownMenuItem(
+        text = { Text(stringResource(Res.string.main_menu_about)) },
+        onClick = {
+          showMenu = false
+          onAboutClicked()
+        }
+      )
     }
   }
 }

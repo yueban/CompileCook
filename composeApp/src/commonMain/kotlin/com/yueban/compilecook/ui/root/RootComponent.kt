@@ -26,6 +26,7 @@ import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
+import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishCategoryClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.RandomDishClicked
@@ -121,6 +122,10 @@ class DefaultRootComponent(
             is DishCategoryClicked -> navigation.push(DishList(output.dishCategory))
             DishSearchClicked -> navigation.push(DishList(null, true))
             is RandomDishClicked -> navigation.push(Dish(output.dishName))
+            AboutClicked -> {
+              // TODO: goto about page
+              Logger.d("AboutClicked")
+            }
           }
         },
         dishRepo = get(),

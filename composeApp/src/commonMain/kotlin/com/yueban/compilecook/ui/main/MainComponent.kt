@@ -11,6 +11,7 @@ import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.main.MainComponent.MainTab.DISHES
 import com.yueban.compilecook.ui.main.MainComponent.MainTab.TIPS
+import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.RandomDishClicked
 import com.yueban.compilecook.ui.main.MainDishComponent.Output.DishCategoryClicked
@@ -24,6 +25,7 @@ interface MainComponent {
   fun onTabSelected(tab: MainTab)
   fun onDishSearchClicked()
   fun onRandomDishClicked()
+  fun onAboutClicked()
 
   enum class MainTab { DISHES, TIPS }
 
@@ -37,6 +39,7 @@ interface MainComponent {
     data class DishCategoryClicked(val dishCategory: DishCategory) : Output
     data object DishSearchClicked : Output
     data class RandomDishClicked(val dishName: String) : Output
+    data object AboutClicked : Output
   }
 }
 
@@ -72,6 +75,8 @@ class DefaultMainComponent(
       }
     }
   }
+
+  override fun onAboutClicked() = onOutput(AboutClicked)
 
   private fun createChild(config: Config, ctx: ComponentContext): MainComponent.Child {
     return when (config) {
