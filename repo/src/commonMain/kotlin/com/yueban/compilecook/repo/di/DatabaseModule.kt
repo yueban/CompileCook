@@ -6,8 +6,8 @@ import com.yueban.compilecook.data.cache.db.APP_DATABASE_FILE_NAME
 import com.yueban.compilecook.data.cache.db.AppDatabase
 import com.yueban.compilecook.data.cache.db.createDatabase
 import com.yueban.compilecook.data.cache.db.provideDbDriver
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
+import com.yueban.compilecook.di.DispatcherType
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val initialDatabaseModule = module {
@@ -19,5 +19,11 @@ internal fun databaseModule(database: AppDatabase) = module {
   single { database }
   single { database.dishQueries }
   single { database.tipQueries }
-  singleOf(::DishLocalDataSourceImpl) bind DishLocalDataSource::class
+  single<DishLocalDataSource> {
+    DishLocalDataSourceImpl(
+      dishQueries = get(),
+      tipQueries = get(),
+      defaultDispatcher = get(named(DispatcherType.Default)),
+    )
+  }
 }

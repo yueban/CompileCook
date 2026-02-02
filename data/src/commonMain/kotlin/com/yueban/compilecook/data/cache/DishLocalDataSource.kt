@@ -31,41 +31,41 @@ interface DishLocalDataSource {
 class DishLocalDataSourceImpl(
   private val dishQueries: DishQueries,
   private val tipQueries: TipQueries,
-  private val dispatcher: CoroutineDispatcher,
+  private val defaultDispatcher: CoroutineDispatcher,
 ) : DishLocalDataSource {
   override fun getAllDishes(): Flow<List<DishLocalEntity>> =
-    dishQueries.getAll().asFlow().mapToList(dispatcher)
+    dishQueries.getAll().asFlow().mapToList(defaultDispatcher)
 
   override fun getDishCategories(): Flow<List<String>> =
-    dishQueries.getDishCategories().asFlow().mapToList(dispatcher)
+    dishQueries.getDishCategories().asFlow().mapToList(defaultDispatcher)
 
   override fun getDishByName(name: String): Flow<DishLocalEntity?> =
-    dishQueries.getByName(name).asFlow().mapToOneOrNull(dispatcher)
+    dishQueries.getByName(name).asFlow().mapToOneOrNull(defaultDispatcher)
 
   override fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>> =
-    dishQueries.getByCategory(category).asFlow().mapToList(dispatcher)
+    dishQueries.getByCategory(category).asFlow().mapToList(defaultDispatcher)
 
   override fun getAllTips(): Flow<List<TipLocalEntity>> =
-    tipQueries.getAll().asFlow().mapToList(dispatcher)
+    tipQueries.getAll().asFlow().mapToList(defaultDispatcher)
 
   override fun getTipByName(name: String): Flow<TipLocalEntity?> =
-    tipQueries.getByName(name).asFlow().mapToOneOrNull(dispatcher)
+    tipQueries.getByName(name).asFlow().mapToOneOrNull(defaultDispatcher)
 
-  override suspend fun upsertDish(dish: DishLocalEntity): Unit = withContext(dispatcher) {
+  override suspend fun upsertDish(dish: DishLocalEntity): Unit = withContext(defaultDispatcher) {
     dishQueries.upsertDish(dish)
   }
 
-  override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = withContext(dispatcher) {
+  override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = withContext(defaultDispatcher) {
     dishQueries.transaction {
       dishes.forEach { dishQueries.upsertDish(it) }
     }
   }
 
-  override suspend fun deleteDishByName(name: String): Unit = withContext(dispatcher) {
+  override suspend fun deleteDishByName(name: String): Unit = withContext(defaultDispatcher) {
     dishQueries.deleteByName(name)
   }
 
-  override suspend fun deleteAllDishes(): Unit = withContext(dispatcher) {
+  override suspend fun deleteAllDishes(): Unit = withContext(defaultDispatcher) {
     dishQueries.deleteAll()
   }
 

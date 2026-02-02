@@ -14,11 +14,12 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
 abstract class BaseComponent(componentContext: ComponentContext) : ComponentContext by componentContext, KoinComponent {
+  private val mainImmediateDispatcher: CoroutineDispatcher = get(named(DispatcherType.MainImmediate))
   protected val scope: CoroutineScope = componentContext.coroutineScope()
 
   private fun ComponentContext.coroutineScope(): CoroutineScope {
     val scope = CoroutineScope(
-      get<CoroutineDispatcher>(named(DispatcherType.MainImmediate)) +
+      mainImmediateDispatcher +
         SupervisorJob() +
         CoroutineExceptionHandler { _, throwable ->
           Logger.e(throwable)

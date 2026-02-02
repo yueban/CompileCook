@@ -11,7 +11,6 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 private val coroutineDispatcherModule = module {
-  single<CoroutineDispatcher> { Dispatchers.Default }
   single<CoroutineDispatcher>(named(DispatcherType.Main)) { Dispatchers.Main }
   single<CoroutineDispatcher>(named(DispatcherType.MainImmediate)) { Dispatchers.Main.immediate }
   single<CoroutineDispatcher>(named(DispatcherType.Default)) { Dispatchers.Default }
