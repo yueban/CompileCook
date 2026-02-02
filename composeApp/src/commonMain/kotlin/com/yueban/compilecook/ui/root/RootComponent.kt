@@ -23,9 +23,11 @@ import com.yueban.compilecook.ui.dish.DefaultDishComponent
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
+import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishCategoryClicked
+import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.TipClicked
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Dish
@@ -116,6 +118,7 @@ class DefaultRootComponent(
           when (output) {
             is TipClicked -> navigation.push(Tip(output.tipName))
             is DishCategoryClicked -> navigation.push(DishList(output.dishCategory))
+            DishSearchClicked -> navigation.push(DishList(null, true))
           }
         }
       ).let { MainChild(it) }
@@ -130,10 +133,11 @@ class DefaultRootComponent(
       is DishList -> DefaultDishListComponent(
         componentContext = componentContext,
         dishCategory = config.dishCategory,
+        startInSearchMode = config.startInSearchMode,
         dishRepo = get(),
         onOutput = navigation.onOutput { output ->
           when (output) {
-            is DishListComponent.Output.DishClicked -> navigation.push(Dish(output.dishName))
+            is DishClicked -> navigation.push(Dish(output.dishName))
             else -> {}
           }
         }
@@ -164,7 +168,10 @@ class DefaultRootComponent(
 
     @Serializable data class Tip(val tipName: String) : Config
 
-    @Serializable data class DishList(val dishCategory: DishCategory?) : Config
+    @Serializable data class DishList(
+      val dishCategory: DishCategory?,
+      val startInSearchMode: Boolean = false,
+    ) : Config
 
     @Serializable data class Dish(val dishName: String) : Config
   }

@@ -27,6 +27,7 @@
     <string name="main_dish_category_drink">饮料</string>
     <string name="main_dish_category_condiment">酱料和其它材料</string>
     <string name="main_dish_category_dessert">甜品</string>
+    <string name="main_dish_des_search">搜索菜谱</string>
 
     <string name="dish_list_title">菜品列表</string>
     <string name="dish_list_search_hint_t">搜索%1$s...</string>

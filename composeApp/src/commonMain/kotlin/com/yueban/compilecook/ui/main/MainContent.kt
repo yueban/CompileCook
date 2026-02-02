@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -21,6 +23,7 @@ import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
+import compilecook.composeapp.generated.resources.main_dish_des_search
 import compilecook.composeapp.generated.resources.main_tab_dishes
 import compilecook.composeapp.generated.resources.main_tab_tips
 import org.jetbrains.compose.resources.stringResource
@@ -31,7 +34,18 @@ fun MainContent(component: MainComponent) {
   val activeChild = stack.active.instance
 
   Scaffold(
-    topBar = { TitleTopBar(title = stringResource(Res.string.app_name)) },
+    topBar = {
+      TitleTopBar(
+        title = stringResource(Res.string.app_name),
+        actions = {
+          if (activeChild is Dishes) {
+            IconButton(onClick = component::onDishSearchClicked) {
+              Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.main_dish_des_search))
+            }
+          }
+        }
+      )
+    },
     bottomBar = {
       NavigationBar {
         NavigationBarItem(

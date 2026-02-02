@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DishListState(
   val dishCategory: DishCategory?,
+  val startInSearchMode: Boolean,
   val isSearchActive: Boolean = false,
   val searchQuery: String = "",
   val dishesAsync: Async<List<Dish>> = Uninitialized,
@@ -41,11 +42,16 @@ interface DishListComponent : UiStateComponent<DishListState> {
 class DefaultDishListComponent(
   componentContext: ComponentContext,
   dishCategory: DishCategory?,
+  startInSearchMode: Boolean,
   private val onOutput: (DishListComponent.Output) -> Unit,
   dishRepo: DishRepo,
 ) : DishListComponent, UiStateComponentImpl<DishListState>(
   componentContext = componentContext,
-  initialState = DishListState(dishCategory = dishCategory),
+  initialState = DishListState(
+    dishCategory = dishCategory,
+    startInSearchMode = startInSearchMode,
+    isSearchActive = startInSearchMode
+  ),
   serializer = DishListState.serializer(),
 ) {
   init {
@@ -72,10 +78,10 @@ class DefaultDishListComponent(
   }
 
   override fun onBackClicked() {
-    if (uiState.value.isSearchActive) {
-      onSearchActiveChanged(false)
-    } else {
+    if (uiState.value.startInSearchMode || !uiState.value.isSearchActive) {
       onOutput(BackClicked)
+    } else {
+      onSearchActiveChanged(false)
     }
   }
 

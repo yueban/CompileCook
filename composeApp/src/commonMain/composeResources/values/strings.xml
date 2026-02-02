@@ -27,6 +27,7 @@
     <string name="main_dish_category_drink">Drinks</string>
     <string name="main_dish_category_condiment">Sauces &amp; Others</string>
     <string name="main_dish_category_dessert">Dessert</string>
+    <string name="main_dish_des_search">Search menus</string>
 
     <string name="dish_list_title">Dishes</string>
     <string name="dish_list_search_hint_t">Search%1$s...</string>

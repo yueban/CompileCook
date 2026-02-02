@@ -7,6 +7,7 @@ import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.yueban.compilecook.repo.entity.DishCategory
+import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -14,6 +15,7 @@ import org.koin.core.component.get
 interface MainComponent {
   val stack: Value<ChildStack<*, Child>>
   fun onTabSelected(tab: MainTab)
+  fun onDishSearchClicked()
 
   enum class MainTab { DISHES, TIPS }
 
@@ -25,6 +27,7 @@ interface MainComponent {
   sealed interface Output {
     data class TipClicked(val tipName: String) : Output
     data class DishCategoryClicked(val dishCategory: DishCategory) : Output
+    data object DishSearchClicked : Output
   }
 }
 
@@ -49,6 +52,8 @@ class DefaultMainComponent(
     }
     navigation.bringToFront(config)
   }
+
+  override fun onDishSearchClicked() = onOutput(DishSearchClicked)
 
   private fun createChild(config: Config, ctx: ComponentContext): MainComponent.Child {
     return when (config) {
