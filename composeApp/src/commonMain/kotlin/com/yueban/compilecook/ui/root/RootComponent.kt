@@ -13,7 +13,6 @@ import com.arkivanov.decompose.router.webhistory.WebNavigationOwner
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.lifecycle.doOnCreate
-import com.yueban.compilecook.di.DispatcherType
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.service.MessageService
@@ -45,7 +44,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.core.component.get
-import org.koin.core.qualifier.named
 
 interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   val stack: Value<ChildStack<Config, Child>>
@@ -127,7 +125,6 @@ class DefaultRootComponent(
         tipName = config.tipName,
         onOutput = navigation.onOutput(),
         dishRepo = get(),
-        defaultDispatcher = get(named(DispatcherType.Default)),
       ).let { TipChild(it) }
 
       is DishList -> DefaultDishListComponent(
@@ -146,8 +143,7 @@ class DefaultRootComponent(
         componentContext = componentContext,
         dishName = config.dishName,
         dishRepo = get(),
-        onOutput = navigation.onOutput(),
-        defaultDispatcher = get(named(DispatcherType.Default))
+        onOutput = navigation.onOutput()
       ).let { DishChild(it) }
     }
 

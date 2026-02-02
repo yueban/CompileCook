@@ -10,11 +10,9 @@ import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.tip.TipComponent.Output.BackClicked
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 
@@ -37,7 +35,6 @@ class DefaultTipComponent(
   tipName: String,
   private val onOutput: (TipComponent.Output) -> Unit,
   dishRepo: DishRepo,
-  defaultDispatcher: CoroutineDispatcher,
 ) : TipComponent, UiStateComponentImpl<TipState>(
   componentContext = componentContext,
   initialState = TipState(tipName = tipName),
@@ -51,7 +48,6 @@ class DefaultTipComponent(
       .map { it.content }
       .distinctUntilChanged()
       .flatMapLatest { parseMarkdownFlow(it) }
-      .flowOn(defaultDispatcher)
       .execute(retainValue = TipState::contentAsync) {
         copy(contentAsync = it)
       }

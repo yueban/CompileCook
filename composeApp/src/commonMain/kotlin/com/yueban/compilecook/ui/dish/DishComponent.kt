@@ -10,11 +10,9 @@ import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishComponent.Output.BackClicked
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 
@@ -37,7 +35,6 @@ class DefaultDishComponent(
   dishName: String,
   private val onOutput: (DishComponent.Output) -> Unit,
   dishRepo: DishRepo,
-  defaultDispatcher: CoroutineDispatcher,
 ) : DishComponent, UiStateComponentImpl<DishState>(
   componentContext = componentContext,
   initialState = DishState(dishName = dishName),
@@ -49,7 +46,6 @@ class DefaultDishComponent(
       .map { it.content }
       .distinctUntilChanged()
       .flatMapLatest { parseMarkdownFlow(it) }
-      .flowOn(defaultDispatcher)
       .execute(retainValue = DishState::contentAsync) {
         copy(contentAsync = it)
       }
