@@ -6,8 +6,8 @@ import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
-import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.base.UiStateComponent
+import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.tip.TipComponent.Output.BackClicked
 import kotlinx.coroutines.CoroutineDispatcher
@@ -38,7 +38,7 @@ class DefaultTipComponent(
   private val onOutput: (TipComponent.Output) -> Unit,
   dishRepo: DishRepo,
   defaultDispatcher: CoroutineDispatcher,
-) : TipComponent, BaseComponent<TipState>(
+) : TipComponent, UiStateComponentImpl<TipState>(
   componentContext = componentContext,
   initialState = TipState(tipName = tipName),
   serializer = TipState.serializer(),

@@ -6,8 +6,8 @@ import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
-import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.base.UiStateComponent
+import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.BackClicked
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
@@ -43,7 +43,7 @@ class DefaultDishListComponent(
   dishCategory: DishCategory?,
   private val onOutput: (DishListComponent.Output) -> Unit,
   dishRepo: DishRepo,
-) : DishListComponent, BaseComponent<DishListState>(
+) : DishListComponent, UiStateComponentImpl<DishListState>(
   componentContext = componentContext,
   initialState = DishListState(dishCategory = dishCategory),
   serializer = DishListState.serializer(),

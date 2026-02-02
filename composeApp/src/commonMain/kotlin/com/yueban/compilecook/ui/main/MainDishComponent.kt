@@ -4,8 +4,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.Async
-import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.base.UiStateComponent
+import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import kotlinx.serialization.Serializable
 
@@ -28,7 +28,7 @@ class DefaultMainDishComponent(
   componentContext: ComponentContext,
   private val onOutput: (MainDishComponent.Output) -> Unit,
   private val dishRepo: DishRepo,
-) : MainDishComponent, BaseComponent<MainDishState>(
+) : MainDishComponent, UiStateComponentImpl<MainDishState>(
   componentContext = componentContext,
   initialState = MainDishState(),
   serializer = MainDishState.serializer(),

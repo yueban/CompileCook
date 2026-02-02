@@ -6,8 +6,8 @@ import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
-import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.base.UiStateComponent
+import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishComponent.Output.BackClicked
 import kotlinx.coroutines.CoroutineDispatcher
@@ -38,7 +38,7 @@ class DefaultDishComponent(
   private val onOutput: (DishComponent.Output) -> Unit,
   dishRepo: DishRepo,
   defaultDispatcher: CoroutineDispatcher,
-) : DishComponent, BaseComponent<DishState>(
+) : DishComponent, UiStateComponentImpl<DishState>(
   componentContext = componentContext,
   initialState = DishState(dishName = dishName),
   serializer = DishState.serializer(),

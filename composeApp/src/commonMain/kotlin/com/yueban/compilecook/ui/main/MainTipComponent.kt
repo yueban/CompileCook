@@ -5,8 +5,8 @@ import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.Tip
 import com.yueban.compilecook.repo.entity.TipType
 import com.yueban.compilecook.ui.base.Async
-import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.base.UiStateComponent
+import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import kotlinx.serialization.Serializable
 
@@ -29,7 +29,7 @@ class DefaultMainTipComponent(
   componentContext: ComponentContext,
   private val dishRepo: DishRepo,
   private val onOutput: (MainTipComponent.Output) -> Unit,
-) : MainTipComponent, BaseComponent<MainTipState>(
+) : MainTipComponent, UiStateComponentImpl<MainTipState>(
   componentContext = componentContext,
   initialState = MainTipState(),
   serializer = MainTipState.serializer(),

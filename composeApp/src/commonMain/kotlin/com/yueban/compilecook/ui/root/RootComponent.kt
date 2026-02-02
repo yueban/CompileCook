@@ -13,13 +13,13 @@ import com.arkivanov.decompose.router.webhistory.WebNavigationOwner
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.lifecycle.doOnCreate
-import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.yueban.compilecook.di.DispatcherType
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.base.BackOutput
+import com.yueban.compilecook.ui.base.BaseComponent
 import com.yueban.compilecook.ui.dish.DefaultDishComponent
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishComponent
@@ -41,15 +41,9 @@ import com.yueban.compilecook.ui.service.DeepLinkHandler
 import com.yueban.compilecook.ui.tip.DefaultTipComponent
 import com.yueban.compilecook.ui.tip.TipComponent
 import io.ktor.http.Url
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
@@ -70,8 +64,7 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
 class DefaultRootComponent(
   componentContext: ComponentContext,
   deepLinkUrl: String? = null,
-) : RootComponent, ComponentContext by componentContext, KoinComponent {
-  private val scope: CoroutineScope = coroutineScope()
+) : RootComponent, BaseComponent(componentContext) {
   private val deepLinkHandler: DeepLinkHandler = get()
   private val navigation = StackNavigation<Config>()
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
@@ -179,19 +172,6 @@ class DefaultRootComponent(
 
     @Serializable data class Dish(val dishName: String) : Config
   }
-}
-
-private fun ComponentContext.coroutineScope(): CoroutineScope {
-  val scope = CoroutineScope(
-    Dispatchers.Main.immediate +
-      SupervisorJob() +
-      CoroutineExceptionHandler { _, throwable ->
-        Logger.e(throwable)
-        throw throwable
-      }
-  )
-  lifecycle.doOnDestroy { scope.cancel() }
-  return scope
 }
 
 private inline fun <T> StackNavigation<*>.onOutput(
