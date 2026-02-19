@@ -39,4 +39,7 @@
     <string name="dish_list_item_difficulty">Difficulty: </string>
 
     <string name="dish_detail_empty">Dish not found</string>
+
+    <string name="about_title">About</string>
+    <string name="about_des_app_icon">Compile Cook</string>
 </resources>

@@ -10,6 +10,7 @@ plugins {
   alias(libs.plugins.composeCompiler)
   alias(libs.plugins.composeHotReload)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.aboutLibraries)
 }
 
 kotlin {
@@ -88,6 +89,8 @@ kotlin {
       implementation(libs.markdown.renderer.coil3)
       implementation(libs.decompose.extensions.compose)
       implementation(libs.decompose.extensions.compose.experimental)
+      implementation(libs.aboutlibraries.core)
+      implementation(libs.aboutlibraries.compose.m3)
     }
     androidMain.dependencies {
       implementation(libs.compose.uiToolingPreview)
@@ -132,6 +135,12 @@ compose.desktop {
 
       modules("java.sql")
     }
+  }
+}
+
+aboutLibraries {
+  export {
+    outputFile = file("src/commonMain/composeResources/files/aboutlibraries.json")
   }
 }
 

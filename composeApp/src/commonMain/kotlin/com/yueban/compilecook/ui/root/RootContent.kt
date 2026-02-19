@@ -13,9 +13,11 @@ import com.arkivanov.essenty.backhandler.BackHandler
 import com.yueban.compilecook.service.UiMessage.Error
 import com.yueban.compilecook.service.UiMessage.Resource
 import com.yueban.compilecook.service.UiMessage.Text
+import com.yueban.compilecook.ui.about.AboutContent
 import com.yueban.compilecook.ui.dish.DishContent
 import com.yueban.compilecook.ui.dish.DishListContent
 import com.yueban.compilecook.ui.main.MainContent
+import com.yueban.compilecook.ui.root.RootComponent.Child.AboutChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
@@ -59,6 +61,7 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
         is TipChild -> TipContent(component = child.component)
         is DishListChild -> DishListContent(component = child.component)
         is DishChild -> DishContent(component = child.component)
+        is AboutChild -> AboutContent(component = child.component)
       }
     }
   }
