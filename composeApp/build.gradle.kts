@@ -139,11 +139,32 @@ compose.desktop {
         iconFile.set(project.file("desktop_icons/macos_app_icon.icns"))
         bundleID = Configs.applicationId
         dmgPackageBuildVersion = Configs.versionCode.toString()
+
+        infoPlist {
+          extraKeysRawXml = """
+            <key>LSHasLocalizedDisplayName</key>
+            <true/>
+          """.trimIndent()
+        }
       }
       windows {
         iconFile.set(project.file("desktop_icons/win_app_icon.ico"))
       }
     }
+  }
+}
+
+val macLprojPath: String = project.file("src/jvmMain/mac_lproj").absolutePath
+val composeBinariesPath: String = layout.buildDirectory.dir("compose/binaries").get().asFile.absolutePath
+
+tasks.configureEach {
+  if (name.startsWith("package") && name.contains("Dmg")) {
+    val action = objects.newInstance(InjectMacLocalizationsAction::class.java)
+
+    action.sourceDirPath.set(macLprojPath)
+    action.binariesDirPath.set(composeBinariesPath)
+
+    doFirst(action)
   }
 }
 
