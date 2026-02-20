@@ -19,6 +19,7 @@ buildConfig {
   buildConfigField("IS_DEBUG", Configs.DEBUG)
   buildConfigField("APP_ID", Configs.applicationId)
   buildConfigField("APP_VERSION", Configs.versionName)
+  buildConfigField("APP_NAME", Configs.appName)
 }
 
 kotlin {

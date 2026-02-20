@@ -130,14 +130,15 @@ compose.desktop {
 
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-      packageName = "com.yueban.compilecook"
-      packageVersion = "1.0.0"
+      packageName = Configs.appName
+      packageVersion = Configs.versionName
 
       modules("java.sql")
 
       macOS {
         iconFile.set(project.file("desktop_icons/macos_app_icon.icns"))
         bundleID = Configs.applicationId
+        dmgPackageBuildVersion = Configs.versionCode.toString()
       }
       windows {
         iconFile.set(project.file("desktop_icons/win_app_icon.ico"))

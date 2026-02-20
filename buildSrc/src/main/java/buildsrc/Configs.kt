@@ -12,11 +12,12 @@ object Configs {
 
   const val packageName = "com.yueban.compilecook"
   const val applicationId = "com.yueban.compilecook"
+  const val appName = "Compile Cook"
   const val compileSdk = 36
   const val minSdk = 29
   val versionCode: Int =
     LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.CHINA)).toInt()
-  const val versionName = "0.0.1"
+  const val versionName = "1.0.0"
 
   const val testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
