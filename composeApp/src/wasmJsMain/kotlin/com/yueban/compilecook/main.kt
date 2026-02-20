@@ -2,6 +2,7 @@
 
 package com.yueban.compilecook
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
@@ -11,6 +12,9 @@ import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.essenty.lifecycle.stop
 import com.yueban.compilecook.ui.root.DefaultRootComponent
+import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.app_name
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.skiko.wasm.onWasmReady
 import web.dom.DocumentVisibilityState
 import web.dom.document
@@ -28,6 +32,11 @@ fun main() {
   onWasmReady {
     ComposeViewport {
       App {
+        val appTitle = stringResource(Res.string.app_name)
+        LaunchedEffect(appTitle) {
+          document.title = appTitle
+        }
+
         remember {
           withWebHistory { stateKeeper, deepLink ->
             DefaultRootComponent(
