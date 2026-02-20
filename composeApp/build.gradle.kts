@@ -134,6 +134,14 @@ compose.desktop {
       packageVersion = "1.0.0"
 
       modules("java.sql")
+
+      macOS {
+        iconFile.set(project.file("desktop_icons/macos_app_icon.icns"))
+        bundleID = Configs.applicationId
+      }
+      windows {
+        iconFile.set(project.file("desktop_icons/win_app_icon.ico"))
+      }
     }
   }
 }

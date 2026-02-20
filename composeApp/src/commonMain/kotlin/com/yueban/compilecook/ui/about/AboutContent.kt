@@ -25,8 +25,8 @@ import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.about_des_app_icon
 import compilecook.composeapp.generated.resources.about_title
+import compilecook.composeapp.generated.resources.app_icon
 import compilecook.composeapp.generated.resources.app_name
-import compilecook.composeapp.generated.resources.compose_multiplatform
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -54,7 +54,7 @@ fun AboutContent(component: AboutComponent) {
             horizontalAlignment = Alignment.CenterHorizontally
           ) {
             Image(
-              painter = painterResource(Res.drawable.compose_multiplatform),
+              painter = painterResource(Res.drawable.app_icon),
               contentDescription = stringResource(Res.string.about_des_app_icon),
               modifier = Modifier.size(100.dp)
             )

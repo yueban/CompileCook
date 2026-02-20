@@ -21,6 +21,9 @@ import com.yueban.compilecook.util.FileUtils
 import com.yueban.compilecook.util.readSerializableContainer
 import com.yueban.compilecook.util.runOnUiThread
 import com.yueban.compilecook.util.writeToFile
+import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.app_icon
+import org.jetbrains.compose.resources.painterResource
 import java.io.File
 
 private const val SAVED_STATE_FILE_NAME = "saved_state.dat"
@@ -50,6 +53,7 @@ fun main() {
       },
       state = windowState,
       title = "CompileCook",
+      icon = painterResource(Res.drawable.app_icon)
     ) {
       LifecycleController(
         lifecycleRegistry = lifecycle,
