@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,7 +44,7 @@ import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.displayName
-import com.yueban.compilecook.ui.util.emoji
+import com.yueban.compilecook.ui.util.icon // Import the SVG icon extension
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import com.yueban.compilecook.ui.widget.SearchTopBar
 import com.yueban.compilecook.ui.widget.TitleTopBar
@@ -51,14 +53,14 @@ import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
 import compilecook.composeapp.generated.resources.dish_list_search_hint_t
 import compilecook.composeapp.generated.resources.dish_list_title
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DishListContent(component: DishListComponent) {
   val state by component.uiState.collectAsStateWithLifecycle()
 
-  val title = state.dishCategory?.run { "$emoji $displayName" }
-    ?: stringResource(Res.string.dish_list_title)
+  val title = state.dishCategory?.displayName ?: stringResource(Res.string.dish_list_title)
 
   Scaffold(
     topBar = {
@@ -165,7 +167,7 @@ private fun DishItem(
           Spacer(modifier = Modifier.height(4.dp))
 
           Text(
-            text = dish.description.replace("\n", " "), // Remove line breaks for list view
+            text = dish.description.replace("\n", " "),
             style = MaterialTheme.typography.bodySmall,
             color = ExtendedTheme.colors.bodyMedium,
             maxLines = 2,
@@ -206,9 +208,11 @@ private fun DishImage(dish: Dish) {
       modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
       contentAlignment = Alignment.Center
     ) {
-      Text(
-        text = dish.category.emoji,
-        fontSize = 40.sp
+      Icon(
+        painter = painterResource(dish.category.icon),
+        contentDescription = null,
+        modifier = Modifier.size(48.dp),
+        tint = Color.Unspecified
       )
     }
   }
