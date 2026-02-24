@@ -89,15 +89,14 @@ class DefaultRootComponent(
     pathMapper = { (config, child, any) ->
       Logger.d("config: $config, child: $child, any: $any")
       when (config) {
-        Main, About -> "/"
+        Main -> "/"
+        About -> "/about"
         is Tip -> "/tips/${config.tipName}"
-        is DishList ->
-          if (config.dishCategory == null) {
-            "/dishes"
-          } else {
-            "/dishes/category=${config.dishCategory.name.lowercase()}"
-          }
-        is Dish -> "dishes/${config.dishName}"
+        is DishList -> {
+          val cat = config.dishCategory?.name?.lowercase()
+          if (cat == null) "/dishes" else "/dishes?category=$cat"
+        }
+        is Dish -> "/dishes/${config.dishName}"
       }
     }
   )
@@ -168,10 +167,34 @@ class DefaultRootComponent(
 
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
     Logger.d("deepLinkUrl: $deepLinkUrl")
-    val url = deepLinkUrl?.let { Url(it) }
-    return when (val dishName = url?.segments?.firstOrNull()) {
-      null -> listOf(Main)
-      else -> listOf(Main, Dish(dishName))
+    val url = deepLinkUrl?.let { Url(it) } ?: return listOf(Main)
+    val segments = url.segments.filter { it.isNotEmpty() }
+
+    return when {
+      // /about
+      segments.firstOrNull() == "about" -> listOf(Main, About)
+
+      // /tips/{name}
+      segments.firstOrNull() == "tips" -> {
+        val tipName = segments.getOrNull(1)
+        if (tipName != null) listOf(Main, Tip(tipName)) else listOf(Main)
+      }
+
+      // /dishes
+      segments.firstOrNull() == "dishes" -> {
+        val nextSegment = segments.getOrNull(1)
+        if (nextSegment == null) {
+          // /dishes?category=?
+          val categoryName = url.parameters["category"]
+          val category = DishCategory.entries.find { it.name.lowercase() == categoryName }
+          listOf(Main, DishList(dishCategory = category))
+        } else {
+          // /dishes/{dishName}
+          listOf(Main, Dish(nextSegment))
+        }
+      }
+
+      else -> listOf(Main)
     }
   }
 
