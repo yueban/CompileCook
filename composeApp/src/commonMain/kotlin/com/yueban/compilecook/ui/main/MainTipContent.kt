@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.Tip
@@ -48,7 +49,7 @@ import compilecook.composeapp.generated.resources.main_tip_learn
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun MainTipContent(component: MainTipComponent) {
+fun MainTipContent(component: MainTipComponent, extraContentPaddingBottom: Dp) {
   val state by component.uiState.collectAsStateWithLifecycle()
 
   LaunchedEffect(state.loadingAsync) {
@@ -64,15 +65,21 @@ fun MainTipContent(component: MainTipComponent) {
   ) { groupedTips ->
     TipList(
       groupedTips = groupedTips,
+      extraContentPaddingBottom = extraContentPaddingBottom,
       onItemClicked = { component.onTipClicked(it) }
     )
   }
 }
 
 @Composable
-fun TipList(groupedTips: List<Pair<TipType, List<Tip>>>, onItemClicked: (Tip) -> Unit) {
+fun TipList(groupedTips: List<Pair<TipType, List<Tip>>>, extraContentPaddingBottom: Dp, onItemClicked: (Tip) -> Unit) {
   LazyColumn(
-    contentPadding = PaddingValues(16.dp),
+    contentPadding = PaddingValues(
+      top = 16.dp,
+      start = 16.dp,
+      end = 16.dp,
+      bottom = 16.dp + extraContentPaddingBottom
+    ),
     verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     groupedTips.forEach { (type, tips) ->

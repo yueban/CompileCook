@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,7 +33,7 @@ import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.emoji
 
 @Composable
-fun MainDishContent(component: MainDishComponent) {
+fun MainDishContent(component: MainDishComponent, extraContentPaddingBottom: Dp) {
   val state by component.uiState.collectAsStateWithLifecycle()
 
   AsyncContent(
@@ -41,7 +42,12 @@ fun MainDishContent(component: MainDishComponent) {
   ) { categories ->
     LazyVerticalGrid(
       columns = GridCells.Adaptive(minSize = 140.dp),
-      contentPadding = PaddingValues(16.dp),
+      contentPadding = PaddingValues(
+        top = 16.dp,
+        start = 16.dp,
+        end = 16.dp,
+        bottom = 16.dp + extraContentPaddingBottom
+      ),
       horizontalArrangement = Arrangement.spacedBy(16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
