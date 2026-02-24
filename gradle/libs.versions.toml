@@ -16,7 +16,7 @@ aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "abo
 
 [versions]
 
-agp = "9.0.0"
+agp = "9.0.1"
 ##⬆= "9.1.0-alpha01"
 ##⬆= "9.1.0-alpha02"
 ##⬆= "9.1.0-alpha03"
@@ -24,7 +24,11 @@ agp = "9.0.0"
 ##⬆= "9.1.0-alpha05"
 ##⬆= "9.1.0-alpha06"
 ##⬆= "9.1.0-alpha07"
-androidx-activity = "1.12.3"
+##⬆= "9.1.0-alpha08"
+##⬆= "9.1.0-alpha09"
+##⬆= "9.1.0-rc01"
+##⬆= "9.2.0-alpha01"
+androidx-activity = "1.12.4"
 ##             ⬆ = "1.13.0-alpha01"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.17.0"
@@ -44,15 +48,16 @@ composeHotReload = "1.0.0"
 ##            ⬆ = "1.1.0-alpha02"
 ##            ⬆ = "1.1.0-alpha03"
 ##            ⬆ = "1.1.0-alpha04"
+##            ⬆ = "1.1.0-alpha05"
 ##            ⬆ = "1.1.0-alpha+172"
-composeMultiplatform = "1.10.0"
+composeMultiplatform = "1.10.1"
 ##                ⬆ = "1.11.0-alpha01"
 ##                ⬆ = "1.11.0-alpha02"
 junit = "4.13.2"
-kotlin = "2.3.0"
-##  ⬆ = "2.3.10-RC"
+kotlin = "2.3.10"
 ##  ⬆ = "2.3.20-Beta1"
 ##  ⬆ = "2.3.20-Beta2"
+##  ⬆ = "2.3.20-RC"
 kotlinx-coroutines = "1.10.2"
 kotlinx-browser = "0.5.0"
 detekt = "1.23.8"
@@ -74,40 +79,26 @@ kotlinx-serialization = "1.10.0"
 sqldelight = "2.2.1"
 webpack = "9.1.0"
 sqljs = "1.8.0"
-markdown-renderer = "0.39.1"
+markdown-renderer = "0.39.2"
 ktor = "3.4.0"
 decompose = "3.4.0"
 ##     ⬆ = "3.5.0-alpha01"
+##     ⬆ = "3.5.0-beta01"
 essenty = "2.5.0"
-kotlin-browser = "2026.1.17"
+kotlin-browser = "2026.2.18"
 appdirs = "1.5.0"
-compose-runtime = "1.10.0"
-##           ⬆ = "1.11.0-alpha01"
-##           ⬆ = "1.11.0-alpha02"
-compose-foundation = "1.10.0"
-##              ⬆ = "1.11.0-alpha01"
-##              ⬆ = "1.11.0-alpha02"
-compose-material3 = "1.9.0"
-##             ⬆ = "1.10.0-alpha01"
-##             ⬆ = "1.10.0-alpha02"
-##             ⬆ = "1.10.0-alpha03"
-##             ⬆ = "1.10.0-alpha04"
-##             ⬆ = "1.10.0-alpha05"
+jetbrains-compose = "1.10.1"
 ##             ⬆ = "1.11.0-alpha01"
 ##             ⬆ = "1.11.0-alpha02"
-compose-ui = "1.10.0"
-##      ⬆ = "1.11.0-alpha01"
-##      ⬆ = "1.11.0-alpha02"
-compose-components-resources = "1.10.0"
-##                        ⬆ = "1.11.0-alpha01"
-##                        ⬆ = "1.11.0-alpha02"
-compose-uiTooling = "1.10.0"
-##             ⬆ = "1.11.0-alpha01"
-##             ⬆ = "1.11.0-alpha02"
-compose-uiToolingPreview = "1.10.0"
-##                    ⬆ = "1.11.0-alpha01"
-##                    ⬆ = "1.11.0-alpha02"
-compose-materialIconsExtended = "1.7.3"
+jetbrains-compose-material3 = "1.9.0"
+##                       ⬆ = "1.10.0-alpha01"
+##                       ⬆ = "1.10.0-alpha02"
+##                       ⬆ = "1.10.0-alpha03"
+##                       ⬆ = "1.10.0-alpha04"
+##                       ⬆ = "1.10.0-alpha05"
+##                       ⬆ = "1.11.0-alpha01"
+##                       ⬆ = "1.11.0-alpha02"
+jetbrains-compose-materialIconsExtended = "1.7.3"
 aboutLibraries = "14.0.0-b02"
 
 [libraries]
@@ -160,13 +151,13 @@ essenty-backHandler = { module = "com.arkivanov.essenty:back-handler", version.r
 essenty-stateKeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
 kotlin-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlin-browser" }
 appdirs = { module = "net.harawata:appdirs", version.ref = "appdirs" }
-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-runtime" }
-compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-foundation" }
-compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-ui" }
-compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-components-resources" }
-compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-uiTooling" }
-compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-uiToolingPreview" }
-compose-materialIconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "compose-materialIconsExtended" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "jetbrains-compose" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "jetbrains-compose-material3" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "jetbrains-compose" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "jetbrains-compose" }
+compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "jetbrains-compose" }
+compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "jetbrains-compose" }
+compose-materialIconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "jetbrains-compose-materialIconsExtended" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
