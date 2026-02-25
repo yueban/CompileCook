@@ -3,7 +3,7 @@ package com.yueban.compilecook
 import com.yueban.compilecook.di.appModule
 import com.yueban.compilecook.di.coroutineModule
 import com.yueban.compilecook.logger.KoinLogger
-import com.yueban.compilecook.repo.di.initialDatabaseModule
+import com.yueban.compilecook.repo.di.databaseModule
 import com.yueban.compilecook.repo.di.loadDataModules
 import com.yueban.compilecook.ui.service.DeepLinkHandler
 import com.yueban.compilecook.ui.util.CoilUtil
@@ -43,7 +43,7 @@ object AppInitializer {
       modules(
         coroutineModule,
         initialAppModule,
-        initialDatabaseModule,
+        databaseModule,
         appModule,
       )
     }.koin

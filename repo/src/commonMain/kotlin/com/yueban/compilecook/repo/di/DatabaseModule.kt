@@ -10,15 +10,13 @@ import com.yueban.compilecook.di.DispatcherType
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-val initialDatabaseModule = module {
+val databaseModule = module {
   single { provideDbDriver(AppDatabase.Schema, APP_DATABASE_FILE_NAME) }
   single { createDatabase(get()) }
-}
 
-internal fun databaseModule(database: AppDatabase) = module {
-  single { database }
-  single { database.dishQueries }
-  single { database.tipQueries }
+  // Lazily resolve the database when these are injected
+  single { get<AppDatabase>().dishQueries }
+  single { get<AppDatabase>().tipQueries }
   single<DishLocalDataSource> {
     DishLocalDataSourceImpl(
       dishQueries = get(),
