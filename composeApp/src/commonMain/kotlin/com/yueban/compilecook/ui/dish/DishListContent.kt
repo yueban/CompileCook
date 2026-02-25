@@ -51,6 +51,7 @@ import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
+import compilecook.composeapp.generated.resources.dish_list_res_item_difficulty_t
 import compilecook.composeapp.generated.resources.dish_list_search_hint_t
 import compilecook.composeapp.generated.resources.dish_list_title
 import compilecook.composeapp.generated.resources.ic_difficulty_star
@@ -211,7 +212,7 @@ private fun DishImage(dish: Dish) {
     ) {
       Icon(
         painter = painterResource(dish.category.icon),
-        contentDescription = null,
+        contentDescription = dish.category.displayName,
         modifier = Modifier.size(48.dp),
         tint = Color.Unspecified
       )
@@ -228,7 +229,7 @@ private fun DifficultyStars(count: Int) {
     repeat(count) {
       Icon(
         painter = painterResource(Res.drawable.ic_difficulty_star),
-        contentDescription = null,
+        contentDescription = stringResource(Res.string.dish_list_res_item_difficulty_t, count),
         modifier = Modifier.size(14.dp),
         tint = ExtendedTheme.colors.difficultyStar,
       )

@@ -37,6 +37,7 @@
     <string name="dish_list_des_search">搜索菜谱</string>
     <string name="dish_list_empty">未找到菜谱</string>
     <string name="dish_list_item_difficulty">难度：</string>
+    <string name="dish_list_res_item_difficulty_t">难度：%1$s</string>
 
     <string name="dish_detail_empty">菜品不存在</string>
 

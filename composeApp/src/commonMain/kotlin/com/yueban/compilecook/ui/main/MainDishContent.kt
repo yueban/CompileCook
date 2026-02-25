@@ -105,7 +105,7 @@ private fun DishCategoryCard(
       ) {
         Icon(
           painter = painterResource(icon),
-          contentDescription = null,
+          contentDescription = name,
           modifier = Modifier.size(48.dp),
           tint = Color.Unspecified
         )
