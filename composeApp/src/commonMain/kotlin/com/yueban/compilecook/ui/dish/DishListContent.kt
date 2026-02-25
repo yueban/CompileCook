@@ -53,6 +53,7 @@ import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
 import compilecook.composeapp.generated.resources.dish_list_search_hint_t
 import compilecook.composeapp.generated.resources.dish_list_title
+import compilecook.composeapp.generated.resources.ic_difficulty_star
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -220,10 +221,18 @@ private fun DishImage(dish: Dish) {
 
 @Composable
 private fun DifficultyStars(count: Int) {
-  val stars = "⭐".repeat(count)
-  Text(
-    text = stars,
-    style = MaterialTheme.typography.labelSmall,
-    modifier = Modifier.padding(start = 2.dp)
-  )
+  Row(
+    modifier = Modifier.padding(start = 2.dp),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    repeat(count) {
+      Icon(
+        painter = painterResource(Res.drawable.ic_difficulty_star),
+        contentDescription = null,
+        modifier = Modifier.size(14.dp),
+        tint = ExtendedTheme.colors.difficultyStar,
+      )
+      Spacer(Modifier.width(1.dp))
+    }
+  }
 }
