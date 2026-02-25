@@ -6,4 +6,5 @@ import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.worker.createDefaultWebWorkerDriver
 
 actual fun provideDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>, dbFileName: String): SqlDriver =
+  // TODO: manually specify sql.js worker
   createDefaultWebWorkerDriver()
