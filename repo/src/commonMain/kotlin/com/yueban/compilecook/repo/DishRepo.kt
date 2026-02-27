@@ -57,11 +57,11 @@ internal class DishRepoImpl(
 
   override fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>> =
     dishLocalDataSource.getAllTips().map { tipLocalEntities ->
-      tipLocalEntities.map { it.toTip() }
+      tipLocalEntities.asSequence().map { it.toTip() }
         .filter { it.type != TipType.UNKNOWN }
         .groupBy { it.type }
         .toList()
-        .sortedBy { it.first.ordinal }
+        .sortedBy { it.first.ordinal }.toList()
     }
 
   override fun getTipByName(name: String): Flow<Tip?> =
