@@ -16,7 +16,6 @@ SELECT * FROM TipLocalEntity WHERE name = ?;
 getByType:
 SELECT * FROM TipLocalEntity WHERE type = ? ORDER BY pinyin;
 
-
 -- Upsert Operation
 upsertTip:
 INSERT OR REPLACE INTO TipLocalEntity(name,pinyin,type,content)

@@ -8,6 +8,7 @@ import com.yueban.compilecook.data.db.entity.DishLocalEntity
 import com.yueban.compilecook.data.db.entity.DishQueries
 import com.yueban.compilecook.data.db.entity.TipLocalEntity
 import com.yueban.compilecook.data.db.entity.TipQueries
+import com.yueban.compilecook.logger.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -59,50 +60,46 @@ class DishLocalDataSourceImpl(
 
   override suspend fun upsertDish(dish: DishLocalEntity): Unit = withContext(defaultDispatcher) {
     dishQueries.upsertDish(dish)
+    Logger.d("upsert dish: $dish")
   }
 
   override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = withContext(defaultDispatcher) {
     dishQueries.transaction {
       dishes.forEach { dishQueries.upsertDish(it) }
     }
+    Logger.d("upsert dishes: ${dishes.size}")
   }
 
   override suspend fun deleteDishByName(name: String): Unit = withContext(defaultDispatcher) {
     dishQueries.deleteByName(name)
+    Logger.d("delete dish by name: $name")
   }
 
   override suspend fun deleteAllDishes(): Unit = withContext(defaultDispatcher) {
     dishQueries.deleteAll()
+      .also { Logger.d("delete all dishes: $it") }
   }
 
-  override suspend fun upsertTip(tip: TipLocalEntity) {
-    tipQueries.upsertTip(
-      name = tip.name,
-      pinyin = tip.pinyin,
-      type = tip.type,
-      content = tip.content,
-    )
+  override suspend fun upsertTip(tip: TipLocalEntity): Unit = withContext(defaultDispatcher) {
+    tipQueries.upsertTip(tip)
+    Logger.d("upsert tip: $tip")
   }
 
-  override suspend fun upsertTips(tips: List<TipLocalEntity>) {
+  override suspend fun upsertTips(tips: List<TipLocalEntity>) = withContext(defaultDispatcher) {
     tipQueries.transaction {
-      tips.forEach { tip ->
-        tipQueries.upsertTip(
-          name = tip.name,
-          pinyin = tip.pinyin,
-          type = tip.type,
-          content = tip.content,
-        )
-      }
+      tips.forEach { tipQueries.upsertTip(it) }
     }
+    Logger.d("upsert tips: ${tips.size}")
   }
 
-  override suspend fun deleteTipByName(name: String) {
+  override suspend fun deleteTipByName(name: String): Unit = withContext(defaultDispatcher) {
     tipQueries.deleteByName(name)
+    Logger.d("delete tip by name: $name")
   }
 
-  override suspend fun deleteAllTips() {
+  override suspend fun deleteAllTips(): Unit = withContext(defaultDispatcher) {
     tipQueries.deleteAll()
+      .also { Logger.d("delete all tips: $it") }
   }
 }
 
@@ -115,4 +112,12 @@ private suspend fun DishQueries.upsertDish(dish: DishLocalEntity) =
     difficulty = dish.difficulty,
     image = dish.image,
     content = dish.content,
+  )
+
+private suspend fun TipQueries.upsertTip(tip: TipLocalEntity) =
+  upsertTip(
+    name = tip.name,
+    pinyin = tip.pinyin,
+    type = tip.type,
+    content = tip.content,
   )
