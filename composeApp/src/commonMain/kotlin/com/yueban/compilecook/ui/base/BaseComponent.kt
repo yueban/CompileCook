@@ -2,6 +2,7 @@ package com.yueban.compilecook.ui.base
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.subscribe
 import com.yueban.compilecook.di.DispatcherType
 import com.yueban.compilecook.logger.Logger
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,6 +17,17 @@ import org.koin.core.qualifier.named
 abstract class BaseComponent(componentContext: ComponentContext) : ComponentContext by componentContext, KoinComponent {
   private val mainImmediateDispatcher: CoroutineDispatcher = get(named(DispatcherType.MainImmediate))
   protected val scope: CoroutineScope = componentContext.coroutineScope()
+
+  init {
+    lifecycle.subscribe(
+      onCreate = { Logger.i("$this create") },
+      onStart = { Logger.i("$this start") },
+      onResume = { Logger.i("$this resume") },
+      onPause = { Logger.i("$this pause") },
+      onStop = { Logger.i("$this stop") },
+      onDestroy = { Logger.i("$this destroy") },
+    )
+  }
 
   private fun ComponentContext.coroutineScope(): CoroutineScope {
     val scope = CoroutineScope(
