@@ -36,6 +36,20 @@ class DishLocalDataSourceImpl(
   private val tipQueries: TipQueries,
   private val defaultDispatcher: CoroutineDispatcher,
 ) : DishLocalDataSource {
+  private val transactionLock = DbTransactionLock()
+
+  /**
+   * For single inserts/deletes. Pushes work to background, NO Mutex required.
+   */
+  private suspend inline fun <T> write(crossinline block: suspend () -> T): T =
+    withContext(defaultDispatcher) { block() }
+
+  /**
+   * For bulk operations. Pushes to background AND applies platform-specific transaction lock.
+   */
+  private suspend inline fun <T> transactionWrite(crossinline block: suspend () -> T): T =
+    withContext(defaultDispatcher) { transactionLock.withLock { block() } }
+
   override fun getAllDishes(): Flow<List<DishLocalEntity>> =
     dishQueries.getAll().asFlow().mapToList(defaultDispatcher)
 
@@ -58,48 +72,48 @@ class DishLocalDataSourceImpl(
   override fun getTipByName(name: String): Flow<TipLocalEntity?> =
     tipQueries.getByName(name).asFlow().mapToOneOrNull(defaultDispatcher)
 
-  override suspend fun upsertDish(dish: DishLocalEntity): Unit = withContext(defaultDispatcher) {
+  override suspend fun upsertDish(dish: DishLocalEntity) = write {
     dishQueries.upsertDish(dish)
     Logger.d("upsert dish: $dish")
   }
 
-  override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = withContext(defaultDispatcher) {
+  override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = transactionWrite {
     dishQueries.transaction {
       dishes.forEach { dishQueries.upsertDish(it) }
     }
     Logger.d("upsert dishes: ${dishes.size}")
   }
 
-  override suspend fun deleteDishByName(name: String): Unit = withContext(defaultDispatcher) {
+  override suspend fun deleteDishByName(name: String) = write {
     dishQueries.deleteByName(name)
     Logger.d("delete dish by name: $name")
   }
 
-  override suspend fun deleteAllDishes(): Unit = withContext(defaultDispatcher) {
+  override suspend fun deleteAllDishes() = write {
     dishQueries.deleteAll()
-      .also { Logger.d("delete all dishes: $it") }
+    Logger.d("delete all dishes")
   }
 
-  override suspend fun upsertTip(tip: TipLocalEntity): Unit = withContext(defaultDispatcher) {
+  override suspend fun upsertTip(tip: TipLocalEntity) = write {
     tipQueries.upsertTip(tip)
     Logger.d("upsert tip: $tip")
   }
 
-  override suspend fun upsertTips(tips: List<TipLocalEntity>) = withContext(defaultDispatcher) {
+  override suspend fun upsertTips(tips: List<TipLocalEntity>) = transactionWrite {
     tipQueries.transaction {
       tips.forEach { tipQueries.upsertTip(it) }
     }
     Logger.d("upsert tips: ${tips.size}")
   }
 
-  override suspend fun deleteTipByName(name: String): Unit = withContext(defaultDispatcher) {
+  override suspend fun deleteTipByName(name: String) = write {
     tipQueries.deleteByName(name)
     Logger.d("delete tip by name: $name")
   }
 
-  override suspend fun deleteAllTips(): Unit = withContext(defaultDispatcher) {
+  override suspend fun deleteAllTips() = write {
     tipQueries.deleteAll()
-      .also { Logger.d("delete all tips: $it") }
+    Logger.d("delete all tips")
   }
 }
 
