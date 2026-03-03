@@ -9,8 +9,7 @@ import com.arkivanov.decompose.value.Value
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.BaseComponent
-import com.yueban.compilecook.ui.main.MainComponent.MainTab.DISHES
-import com.yueban.compilecook.ui.main.MainComponent.MainTab.TIPS
+import com.yueban.compilecook.ui.main.DefaultMainComponent.Config
 import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.RandomDishClicked
@@ -27,7 +26,14 @@ interface MainComponent {
   fun onRandomDishClicked()
   fun onAboutClicked()
 
-  enum class MainTab { DISHES, TIPS }
+  enum class MainTab {
+    DISHES, TIPS;
+
+    fun toConfig(): Config = when (this) {
+      DISHES -> Config.Dishes
+      TIPS -> Config.Tips
+    }
+  }
 
   sealed class Child {
     class Dishes(val component: MainDishComponent) : Child()
@@ -45,6 +51,7 @@ interface MainComponent {
 
 class DefaultMainComponent(
   componentContext: ComponentContext,
+  initialTab: MainComponent.MainTab,
   private val onOutput: (MainComponent.Output) -> Unit,
   private val dishRepo: DishRepo,
 ) : MainComponent, BaseComponent(componentContext) {
@@ -53,16 +60,13 @@ class DefaultMainComponent(
   override val stack = childStack(
     source = navigation,
     serializer = Config.serializer(),
-    initialConfiguration = Config.Tips,
+    initialConfiguration = initialTab.toConfig(),
     handleBackButton = false,
     childFactory = ::createChild
   )
 
   override fun onTabSelected(tab: MainComponent.MainTab) {
-    val config = when (tab) {
-      DISHES -> Config.Dishes
-      TIPS -> Config.Tips
-    }
+    val config = tab.toConfig()
     navigation.bringToFront(config)
   }
 

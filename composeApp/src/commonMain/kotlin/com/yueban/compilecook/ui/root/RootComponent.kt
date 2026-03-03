@@ -28,6 +28,7 @@ import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
+import com.yueban.compilecook.ui.main.MainComponent.MainTab
 import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishCategoryClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
@@ -89,7 +90,7 @@ class DefaultRootComponent(
     pathMapper = { (config, child, any) ->
       Logger.d("config: $config, child: $child, any: $any")
       when (config) {
-        Main -> "/"
+        is Main -> "/"
         About -> "/about"
         is Tip -> "/tips/${config.tipName}"
         is DishList -> {
@@ -118,8 +119,9 @@ class DefaultRootComponent(
 
   private fun child(config: Config, componentContext: ComponentContext): RootComponent.Child =
     when (config) {
-      Main -> DefaultMainComponent(
+      is Main -> DefaultMainComponent(
         componentContext = componentContext,
+        initialTab = config.initialTab,
         onOutput = { output ->
           when (output) {
             is TipClicked -> navigation.push(Tip(output.tipName))
@@ -167,17 +169,17 @@ class DefaultRootComponent(
 
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
     Logger.d("deepLinkUrl: $deepLinkUrl")
-    val url = deepLinkUrl?.let { Url(it) } ?: return listOf(Main)
+    val url = deepLinkUrl?.let { Url(it) } ?: return listOf(Main(MainTab.TIPS))
     val segments = url.segments.filter { it.isNotEmpty() }
 
     return when {
       // /about
-      segments.firstOrNull() == "about" -> listOf(Main, About)
+      segments.firstOrNull() == "about" -> listOf(Main(MainTab.TIPS), About)
 
       // /tips/{name}
       segments.firstOrNull() == "tips" -> {
         val tipName = segments.getOrNull(1)
-        if (tipName != null) listOf(Main, Tip(tipName)) else listOf(Main)
+        if (tipName != null) listOf(Main(MainTab.TIPS), Tip(tipName)) else listOf(Main(MainTab.TIPS))
       }
 
       // /dishes
@@ -187,14 +189,14 @@ class DefaultRootComponent(
           // /dishes?category=?
           val categoryName = url.parameters["category"]
           val category = DishCategory.entries.find { it.name.lowercase() == categoryName }
-          listOf(Main, DishList(dishCategory = category))
+          listOf(Main(MainTab.DISHES), DishList(dishCategory = category))
         } else {
           // /dishes/{dishName}
-          listOf(Main, Dish(nextSegment))
+          listOf(Main(MainTab.DISHES), DishList(null), Dish(nextSegment))
         }
       }
 
-      else -> listOf(Main)
+      else -> listOf(Main(MainTab.TIPS))
     }
   }
 
@@ -202,7 +204,7 @@ class DefaultRootComponent(
 
   @Serializable
   sealed interface Config {
-    @Serializable data object Main : Config
+    @Serializable data class Main(val initialTab: MainTab = MainTab.TIPS) : Config
 
     @Serializable data class Tip(val tipName: String) : Config
 
