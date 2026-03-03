@@ -17,8 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-import com.mikepenz.aboutlibraries.ui.compose.produceLibraries
 import com.yueban.compilecook.BuildKonfig
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.widget.TitleTopBar
@@ -32,6 +32,8 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AboutContent(component: AboutComponent) {
+  val state by component.uiState.collectAsStateWithLifecycle()
+
   Scaffold(
     topBar = {
       TitleTopBar(
@@ -41,11 +43,8 @@ fun AboutContent(component: AboutComponent) {
       )
     }
   ) { padding ->
-    val libraries by produceLibraries {
-      Res.readBytes("files/aboutlibraries.json").decodeToString()
-    }
     LibrariesContainer(
-      libraries = libraries,
+      libraries = state.aboutLibs.value,
       modifier = Modifier.fillMaxSize().padding(padding),
       header = {
         item {
