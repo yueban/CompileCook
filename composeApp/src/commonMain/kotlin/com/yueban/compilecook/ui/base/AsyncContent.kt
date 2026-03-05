@@ -15,7 +15,7 @@ import com.yueban.compilecook.ui.widget.LoadingComposable
 inline fun <reified T> AsyncContent(
   async: Async<T?>,
   modifier: Modifier = Modifier,
-  contentAlignment: Alignment = Alignment.Center,
+  contentAlignment: Alignment = Alignment.TopStart,
   noinline onRetry: (() -> Unit)? = null,
   noinline isEmpty: ((T) -> Boolean)? = null,
   noinline loadingContent: @Composable BoxScope.() -> Unit = { LoadingComposable() },
@@ -54,10 +54,12 @@ inline fun <reified T> AsyncContent(
       !isDataEmpty -> content(currentData)
 
       isDataEmpty ->
-        if (async is Fail) {
-          errorContent(async.error)
-        } else {
-          emptyContent()
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+          if (async is Fail) {
+            errorContent(async.error)
+          } else {
+            emptyContent()
+          }
         }
     }
   }

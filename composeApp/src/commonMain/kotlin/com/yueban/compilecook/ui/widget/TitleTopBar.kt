@@ -13,8 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import com.yueban.compilecook.ui.theme.AppTheme
+import com.yueban.compilecook.ui.util.UniversalPreview
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_des_back
 import org.jetbrains.compose.resources.stringResource
@@ -56,7 +56,7 @@ fun TitleTopBar(
   )
 }
 
-@Preview
+@UniversalPreview
 @Composable
 private fun PreviewTitleTopBar_Simple() {
   AppTheme {
@@ -66,7 +66,7 @@ private fun PreviewTitleTopBar_Simple() {
   }
 }
 
-@Preview
+@UniversalPreview
 @Composable
 private fun PreviewTitleTopBar_WithBack() {
   AppTheme {
@@ -77,7 +77,7 @@ private fun PreviewTitleTopBar_WithBack() {
   }
 }
 
-@Preview
+@UniversalPreview
 @Composable
 private fun PreviewTitleTopBar_WithActions() {
   AppTheme {

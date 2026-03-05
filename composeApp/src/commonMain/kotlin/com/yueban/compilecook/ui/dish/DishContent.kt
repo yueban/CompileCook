@@ -8,8 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.ui.base.AsyncContent
+import com.yueban.compilecook.ui.theme.AppTheme
+import com.yueban.compilecook.ui.util.PreviewData
+import com.yueban.compilecook.ui.util.UniversalPreview
 import com.yueban.compilecook.ui.widget.CookMarkdown
 import com.yueban.compilecook.ui.widget.TitleTopBar
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun DishContent(component: DishComponent) {
@@ -28,4 +32,15 @@ fun DishContent(component: DishComponent) {
       CookMarkdown(state = it, modifier = Modifier.padding(16.dp))
     }
   }
+}
+
+private class PreviewDishComponent : DishComponent {
+  override val uiState = MutableStateFlow(PreviewData.dishState)
+  override fun onBackClicked() = Unit
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewDishContent() = AppTheme {
+  DishContent(component = PreviewDishComponent())
 }

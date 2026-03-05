@@ -38,8 +38,15 @@ import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.value.MutableValue
+import com.arkivanov.decompose.value.Value
+import com.yueban.compilecook.ui.main.MainComponent.Child
 import com.yueban.compilecook.ui.main.MainComponent.Child.Dishes
 import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
+import com.yueban.compilecook.ui.main.MainComponent.MainTab
+import com.yueban.compilecook.ui.theme.AppTheme
+import com.yueban.compilecook.ui.util.UniversalPreview
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
@@ -95,8 +102,8 @@ fun MainContent(component: MainComponent) {
 
 @Composable
 private fun ArchNavigationBar(
-  activeChild: MainComponent.Child,
-  onTabSelected: (MainComponent.MainTab) -> Unit,
+  activeChild: Child,
+  onTabSelected: (MainTab) -> Unit,
   onRandomDishClicked: () -> Unit,
 ) {
   // unify container color and elevation to make a seamless shape.
@@ -114,7 +121,7 @@ private fun ArchNavigationBar(
     ) {
       NavigationBarItem(
         selected = activeChild is Tips,
-        onClick = { onTabSelected(MainComponent.MainTab.TIPS) },
+        onClick = { onTabSelected(MainTab.TIPS) },
         icon = { Icon(Icons.Default.Info, stringResource(Res.string.main_tab_tips)) },
         label = { Text(stringResource(Res.string.main_tab_tips)) }
       )
@@ -124,7 +131,7 @@ private fun ArchNavigationBar(
 
       NavigationBarItem(
         selected = activeChild is Dishes,
-        onClick = { onTabSelected(MainComponent.MainTab.DISHES) },
+        onClick = { onTabSelected(MainTab.DISHES) },
         icon = { Icon(Icons.Default.Fastfood, stringResource(Res.string.main_tab_dishes)) },
         label = { Text(stringResource(Res.string.main_tab_dishes)) }
       )
@@ -162,7 +169,7 @@ private fun ArchNavigationBar(
 
 @Composable
 private fun TopBarActions(
-  activeChild: MainComponent.Child,
+  activeChild: Child,
   onDishSearchClicked: () -> Unit,
   onAboutClicked: () -> Unit,
 ) {
@@ -190,4 +197,33 @@ private fun TopBarActions(
       )
     }
   }
+}
+
+private class PreviewMainComponent(activeTab: MainTab = MainTab.TIPS) : MainComponent {
+  override val stack: Value<ChildStack<*, Child>> = MutableValue(
+    ChildStack(
+      configuration = activeTab.name,
+      instance = when (activeTab) {
+        MainTab.TIPS -> Tips(PreviewMainTipComponent())
+        MainTab.DISHES -> Dishes(PreviewMainDishComponent())
+      }
+    )
+  )
+
+  override fun onTabSelected(tab: MainTab) = Unit
+  override fun onDishSearchClicked() = Unit
+  override fun onRandomDishClicked() = Unit
+  override fun onAboutClicked() = Unit
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewMainContentTips() = AppTheme {
+  MainContent(component = PreviewMainComponent(activeTab = MainTab.TIPS))
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewMainContentDishes() = AppTheme {
+  MainContent(component = PreviewMainComponent(activeTab = MainTab.DISHES))
 }

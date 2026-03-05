@@ -1,0 +1,86 @@
+@file:Suppress("MaximumLineLength", "MaxLineLength", "MagicNumber")
+
+package com.yueban.compilecook.ui.util
+
+import com.mikepenz.aboutlibraries.Libs
+import com.mikepenz.markdown.model.State
+import com.yueban.compilecook.repo.entity.DishCategory
+import com.yueban.compilecook.repo.entity.TipType
+import com.yueban.compilecook.ui.about.AboutState
+import com.yueban.compilecook.ui.base.Success
+import com.yueban.compilecook.ui.dish.DishListState
+import com.yueban.compilecook.ui.dish.DishState
+import com.yueban.compilecook.ui.main.MainDishState
+import com.yueban.compilecook.ui.main.MainTipState
+import com.yueban.compilecook.ui.tip.TipState
+import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.MarkdownParser
+
+object PreviewData {
+  val mainTipState by lazy {
+    val tip = PreviewConstant.tip
+    val tips = List(10) { index ->
+      tip.copy(
+        name = tip.name + index,
+        type = TipType.entries.toTypedArray().let { it[index % it.size] }
+      )
+    }
+    val groupedTips = tips.asSequence()
+      .filter { it.type != TipType.UNKNOWN }
+      .groupBy { it.type }
+      .toList()
+      .sortedBy { it.first.ordinal }.toList()
+    MainTipState(
+      loadingAsync = Success(Unit),
+      groupedTipsAsync = Success(groupedTips)
+    )
+  }
+
+  val mainDishState by lazy {
+    MainDishState(
+      loadingAsync = Success(Unit),
+      dishCategoriesAsync = Success(DishCategory.entries)
+    )
+  }
+
+  val dishListState by lazy {
+    val dish = PreviewConstant.dish
+    val dishes = List(10) { index ->
+      dish.copy(name = dish.name + index, pinyin = dish.pinyin + index)
+    }
+    DishListState(
+      dishCategory = PreviewConstant.dish.category,
+      dishesAsync = Success(dishes),
+      startInSearchMode = false,
+    )
+  }
+
+  val dishListSearchState by lazy {
+    dishListState.copy(isSearchActive = true)
+  }
+
+  val tipState by lazy {
+    val markdownContent = PreviewConstant.tip.content.trimIndent()
+    val rootNode = MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdownContent)
+    val markdownState = State.Success(rootNode, markdownContent, true)
+    TipState(
+      tipName = PreviewConstant.tip.name,
+      contentAsync = Success(markdownState),
+    )
+  }
+
+  val dishState by lazy {
+    val markdownContent = PreviewConstant.dish.content.trimIndent()
+    val rootNode = MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdownContent)
+    val markdownState = State.Success(rootNode, markdownContent, true)
+    DishState(
+      dishName = PreviewConstant.dish.name,
+      contentAsync = Success(markdownState),
+    )
+  }
+
+  val aboutState by lazy {
+    val libsValue = Libs.Builder().withJson(PreviewConstant.ABOUT_LIBRARIES).build()
+    AboutState(aboutLibs = Success(libsValue))
+  }
+}

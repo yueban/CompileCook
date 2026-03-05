@@ -42,9 +42,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.ui.base.AsyncContent
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.util.PreviewData
+import com.yueban.compilecook.ui.util.UniversalPreview
 import com.yueban.compilecook.ui.util.displayName
-import com.yueban.compilecook.ui.util.icon // Import the SVG icon extension
+import com.yueban.compilecook.ui.util.icon
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import com.yueban.compilecook.ui.widget.SearchTopBar
 import com.yueban.compilecook.ui.widget.TitleTopBar
@@ -55,6 +58,7 @@ import compilecook.composeapp.generated.resources.dish_list_res_item_difficulty_
 import compilecook.composeapp.generated.resources.dish_list_search_hint_t
 import compilecook.composeapp.generated.resources.dish_list_title
 import compilecook.composeapp.generated.resources.ic_difficulty_star
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -236,4 +240,28 @@ private fun DifficultyStars(count: Int) {
       Spacer(Modifier.width(1.dp))
     }
   }
+}
+
+private abstract class PreviewDishListComponent : DishListComponent {
+  override val uiState = MutableStateFlow(PreviewData.dishListState)
+  override fun onBackClicked() = Unit
+  override fun onDishClicked(dish: Dish) = Unit
+  override fun onSearchActiveChanged(active: Boolean) = Unit
+  override fun onSearchQueryChanged(query: String) = Unit
+}
+
+private class PreviewDishListSearchComponent : PreviewDishListComponent() {
+  override val uiState = MutableStateFlow(PreviewData.dishListSearchState)
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewDishListContent() = AppTheme {
+  DishListContent(component = object : PreviewDishListComponent() {})
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewDishListContent_Search() = AppTheme {
+  DishListContent(component = PreviewDishListSearchComponent())
 }

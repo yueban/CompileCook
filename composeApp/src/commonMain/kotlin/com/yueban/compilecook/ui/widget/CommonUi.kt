@@ -19,9 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.yueban.compilecook.ui.theme.AppTheme
+import com.yueban.compilecook.ui.util.UniversalPreview
 import com.yueban.compilecook.ui.util.stringRes
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_empty_data
@@ -78,7 +81,7 @@ fun EmptyComposable(
 private fun InfoStateComposable(
   icon: ImageVector,
   message: String,
-  color: androidx.compose.ui.graphics.Color,
+  color: Color,
   modifier: Modifier = Modifier,
   action: (@Composable () -> Unit)? = null,
 ) {
@@ -95,4 +98,49 @@ private fun InfoStateComposable(
       action()
     }
   }
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewLoadingComposable() = AppTheme {
+  LoadingComposable()
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewEmptyComposable() = AppTheme {
+  EmptyComposable(
+    message = stringResource(Res.string.common_empty_data)
+  )
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewEmptyComposable_WithAction() = AppTheme {
+  EmptyComposable(
+    message = stringResource(Res.string.common_empty_data),
+    action = {
+      Button(onClick = {}) {
+        Text(stringResource(Res.string.common_retry))
+      }
+    }
+  )
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewErrorComposable() = AppTheme {
+  ErrorComposable(
+    error = IllegalStateException("unknown error"),
+    onRetry = {}
+  )
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewErrorComposable_NoRetry() = AppTheme {
+  ErrorComposable(
+    error = Exception("unknown error"),
+    onRetry = null
+  )
 }

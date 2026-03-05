@@ -39,13 +39,17 @@ import com.yueban.compilecook.repo.entity.TipType.LEARN
 import com.yueban.compilecook.repo.entity.TipType.UNKNOWN
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.base.Fail
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.util.PreviewData
+import com.yueban.compilecook.ui.util.UniversalPreview
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.main_tip_advanced
 import compilecook.composeapp.generated.resources.main_tip_basic
 import compilecook.composeapp.generated.resources.main_tip_empty
 import compilecook.composeapp.generated.resources.main_tip_learn
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -157,4 +161,16 @@ fun TipItem(tip: Tip, onClick: () -> Unit) {
       )
     }
   }
+}
+
+class PreviewMainTipComponent : MainTipComponent {
+  override val uiState = MutableStateFlow(PreviewData.mainTipState)
+  override fun onRetry() = Unit
+  override fun onTipClicked(tip: Tip) = Unit
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewMainTipContent() = AppTheme {
+  MainTipContent(component = PreviewMainTipComponent(), extraContentPaddingBottom = 0.dp)
 }

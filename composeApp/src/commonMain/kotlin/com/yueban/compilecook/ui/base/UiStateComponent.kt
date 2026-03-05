@@ -25,8 +25,8 @@ import kotlin.coroutines.cancellation.CancellationException
 
 interface UiStateComponent<S : Any> {
   val uiState: StateFlow<S>
-  fun showMessage(text: String)
-  fun showGlobalError(error: Throwable)
+  fun showMessage(text: String) = Unit
+  fun showGlobalError(error: Throwable) = Unit
 }
 
 /**

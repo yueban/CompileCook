@@ -32,7 +32,10 @@ import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.State
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.util.PreviewConstant
+import com.yueban.compilecook.ui.util.UniversalPreview
 
 @Composable
 fun CookMarkdown(
@@ -171,4 +174,10 @@ val CustomImageComponent: MarkdownComponent = { model ->
       contentScale = ContentScale.FillWidth
     )
   }
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewCookMarkdown() = AppTheme {
+  CookMarkdown(content = PreviewConstant.dish.content.trimIndent())
 }

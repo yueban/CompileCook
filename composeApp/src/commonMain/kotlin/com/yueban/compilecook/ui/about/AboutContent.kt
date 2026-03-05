@@ -20,13 +20,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.yueban.compilecook.BuildKonfig
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.util.PreviewData
+import com.yueban.compilecook.ui.util.UniversalPreview
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.about_des_app_icon
 import compilecook.composeapp.generated.resources.about_title
 import compilecook.composeapp.generated.resources.app_icon
 import compilecook.composeapp.generated.resources.app_name
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -46,33 +50,46 @@ fun AboutContent(component: AboutComponent) {
     LibrariesContainer(
       libraries = state.aboutLibs.value,
       modifier = Modifier.fillMaxSize().padding(padding),
-      header = {
-        item {
-          Column(
-            modifier = Modifier.fillMaxWidth().padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-          ) {
-            Image(
-              painter = painterResource(Res.drawable.app_icon),
-              contentDescription = stringResource(Res.string.about_des_app_icon),
-              modifier = Modifier.size(100.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-              text = stringResource(Res.string.app_name),
-              style = MaterialTheme.typography.headlineSmall,
-              fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-              text = BuildKonfig.APP_VERSION,
-              style = MaterialTheme.typography.bodyMedium,
-              color = ExtendedTheme.colors.subTitleText
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-          }
-        }
-      }
+      header = { item { AboutHeader() } }
     )
   }
+}
+
+@Composable
+private fun AboutHeader() {
+  Column(
+    modifier = Modifier.fillMaxWidth().padding(24.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Image(
+      painter = painterResource(Res.drawable.app_icon),
+      contentDescription = stringResource(Res.string.about_des_app_icon),
+      modifier = Modifier.size(100.dp)
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+    Text(
+      text = stringResource(Res.string.app_name),
+      style = MaterialTheme.typography.headlineSmall,
+      fontWeight = FontWeight.Bold,
+      color = ExtendedTheme.colors.titleText
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+      text = BuildKonfig.APP_VERSION,
+      style = MaterialTheme.typography.bodyMedium,
+      color = ExtendedTheme.colors.subTitleText
+    )
+    Spacer(modifier = Modifier.height(32.dp))
+  }
+}
+
+private class PreviewAboutComponent : AboutComponent {
+  override val uiState = MutableStateFlow(PreviewData.aboutState)
+  override fun onBackClicked() = Unit
+}
+
+@UniversalPreview
+@Composable
+private fun PreviewAboutContent() = AppTheme {
+  AboutContent(component = PreviewAboutComponent())
 }
