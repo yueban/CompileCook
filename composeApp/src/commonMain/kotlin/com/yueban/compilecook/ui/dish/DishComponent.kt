@@ -15,10 +15,12 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class DishState(
   val dishName: String,
+  @Transient
   val contentAsync: Async<State> = Uninitialized,
 )
 
