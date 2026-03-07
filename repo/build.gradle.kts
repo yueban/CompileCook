@@ -9,7 +9,7 @@ plugins {
 }
 
 kotlin {
-  androidLibrary {
+  android {
     namespace = "com.yueban.compilecook.repo"
     compileSdk = Configs.compileSdk
     minSdk = Configs.minSdk

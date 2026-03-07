@@ -23,7 +23,7 @@ buildConfig {
 }
 
 kotlin {
-  androidLibrary {
+  android {
     namespace = "com.yueban.compilecook.base"
     compileSdk = Configs.compileSdk
     minSdk = Configs.minSdk

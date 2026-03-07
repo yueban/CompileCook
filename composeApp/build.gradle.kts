@@ -14,7 +14,7 @@ plugins {
 }
 
 kotlin {
-  androidLibrary {
+  android {
     namespace = "com.yueban.compilecook.app"
     compileSdk = Configs.compileSdk
     minSdk = Configs.minSdk
