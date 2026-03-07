@@ -54,9 +54,10 @@ private val DarkColorScheme = darkColorScheme(
   tertiaryContainer = Color(0xFF832400),
   onTertiaryContainer = Color(0xFFFFDBD0),
 
-  background = Color(0xFF121212),
+  background = Color(0xFF0E1113),
   onBackground = Color(0xFFE6E1E5),
-  surface = Color(0xFF121212),
+  surface = Color(0xFF1C1B1F),
+  surfaceVariant = Color(0xFF44474E),
   onSurface = Color(0xFFE6E1E5),
 
   error = Color(0xFFCF6679),
@@ -67,9 +68,9 @@ private val DarkColorScheme = darkColorScheme(
   ExtendedColorScheme(
     colorScheme = it,
     titleText = titleTextDark,
-    subTitleText = Color(0xFF61758A),
+    subTitleText = Color(0xFF9BA1A7),
     divider = Color(0xFF303030),
-    textFieldHint = Color(0xFF9BA1A7),
+    textFieldHint = Color(0xFF70777C),
     bodyMedium = Color(0xFF9BA1A7),
   )
 }
@@ -90,9 +91,10 @@ private val LightColorScheme = lightColorScheme(
   tertiaryContainer = Color(0xFFFFCCBC),
   onTertiaryContainer = Color(0xFF9A2800),
 
-  background = Color(0xFFFFFFFF),
+  background = Color(0xFFF8F9FA),
   onBackground = Color(0xFF1C1B1F),
   surface = Color(0xFFFFFFFF),
+  surfaceVariant = Color(0xFFE1E2EC),
   onSurface = Color(0xFF1C1B1F),
 
   error = Color(0xFFB3261E),
