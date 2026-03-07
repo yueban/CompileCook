@@ -58,6 +58,7 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   val stack: Value<ChildStack<Config, Child>>
   val messages: Flow<UiMessage>
   fun onDeepLink(url: String)
+  fun onUriClicked(uri: String): Boolean
   fun onBackClicked()
 
   sealed class Child {
@@ -115,6 +116,19 @@ class DefaultRootComponent(
 
   override fun onDeepLink(url: String) {
     navigation.navigate { getInitialStack(url) }
+  }
+
+  override fun onUriClicked(uri: String): Boolean =
+    parseUriToConfig(uri)?.let { navigation.push(it) } != null
+
+  private fun parseUriToConfig(uri: String): Config? {
+    val segments = uri.split("/")
+    val fileName = segments.lastOrNull()?.removeSuffix(".md") ?: return null
+    return when {
+      uri.contains("/dishes/") -> Dish(fileName)
+      uri.contains("/tips/") -> Tip(fileName)
+      else -> null
+    }
   }
 
   private fun child(config: Config, componentContext: ComponentContext): RootComponent.Child =

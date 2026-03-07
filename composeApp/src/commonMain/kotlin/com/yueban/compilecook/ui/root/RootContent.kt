@@ -4,12 +4,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.StackAnimation
 import com.arkivanov.essenty.backhandler.BackHandler
+import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.UiMessage.Error
 import com.yueban.compilecook.service.UiMessage.Resource
 import com.yueban.compilecook.service.UiMessage.Text
@@ -45,23 +49,40 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
     }
   }
 
-  Scaffold(
-    snackbarHost = { SnackbarHost(snackbarHostState) }
-  ) { _ ->
-    ChildStack(
-      stack = component.stack,
-      modifier = modifier,
-      animation = backAnimation(
-        backHandler = component.backHandler,
-        onBack = component::onBackClicked,
-      ),
-    ) {
-      when (val child = it.instance) {
-        is MainChild -> MainContent(component = child.component)
-        is TipChild -> TipContent(component = child.component)
-        is DishListChild -> DishListContent(component = child.component)
-        is DishChild -> DishContent(component = child.component)
-        is AboutChild -> AboutContent(component = child.component)
+  val systemUriHandler = LocalUriHandler.current
+  val customUriHandler = remember(component, systemUriHandler) {
+    object : UriHandler {
+      override fun openUri(uri: String) {
+        if (!component.onUriClicked(uri)) {
+          try {
+            systemUriHandler.openUri(uri)
+          } catch (e: IllegalArgumentException) {
+            Logger.e("Failed to open external URI: $uri", e)
+          }
+        }
+      }
+    }
+  }
+
+  CompositionLocalProvider(LocalUriHandler provides customUriHandler) {
+    Scaffold(
+      snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { _ ->
+      ChildStack(
+        stack = component.stack,
+        modifier = modifier,
+        animation = backAnimation(
+          backHandler = component.backHandler,
+          onBack = component::onBackClicked,
+        ),
+      ) {
+        when (val child = it.instance) {
+          is MainChild -> MainContent(component = child.component)
+          is TipChild -> TipContent(component = child.component)
+          is DishListChild -> DishListContent(component = child.component)
+          is DishChild -> DishContent(component = child.component)
+          is AboutChild -> AboutContent(component = child.component)
+        }
       }
     }
   }
