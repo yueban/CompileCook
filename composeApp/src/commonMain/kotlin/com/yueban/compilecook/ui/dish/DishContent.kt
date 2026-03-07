@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.ui.base.AsyncContent
-import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.widget.CookMarkdown
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,8 +39,8 @@ private class PreviewDishComponent : DishComponent {
   override fun onBackClicked() = Unit
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewDishContent() = AppTheme {
+private fun PreviewDishContent() = PreviewWrapper {
   DishContent(component = PreviewDishComponent())
 }

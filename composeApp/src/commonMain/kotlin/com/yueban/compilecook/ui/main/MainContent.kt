@@ -45,8 +45,8 @@ import com.yueban.compilecook.ui.main.MainComponent.Child
 import com.yueban.compilecook.ui.main.MainComponent.Child.Dishes
 import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
-import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
@@ -216,14 +216,14 @@ private class PreviewMainComponent(activeTab: MainTab = MainTab.TIPS) : MainComp
   override fun onAboutClicked() = Unit
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewMainContentTips() = AppTheme {
+private fun PreviewMainContentTips() = PreviewWrapper {
   MainContent(component = PreviewMainComponent(activeTab = MainTab.TIPS))
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewMainContentDishes() = AppTheme {
+private fun PreviewMainContentDishes() = PreviewWrapper {
   MainContent(component = PreviewMainComponent(activeTab = MainTab.DISHES))
 }

@@ -42,10 +42,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.ui.base.AsyncContent
-import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
 import com.yueban.compilecook.ui.widget.EmptyComposable
@@ -254,14 +254,14 @@ private class PreviewDishListSearchComponent : PreviewDishListComponent() {
   override val uiState = MutableStateFlow(PreviewData.dishListSearchState)
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewDishListContent() = AppTheme {
+private fun PreviewDishListContent() = PreviewWrapper {
   DishListContent(component = object : PreviewDishListComponent() {})
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewDishListContent_Search() = AppTheme {
+private fun PreviewDishListContent_Search() = PreviewWrapper {
   DishListContent(component = PreviewDishListSearchComponent())
 }

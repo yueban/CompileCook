@@ -32,10 +32,10 @@ import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.State
-import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.PreviewConstant
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalScreenPreview
 
 @Composable
 fun CookMarkdown(
@@ -176,8 +176,8 @@ val CustomImageComponent: MarkdownComponent = { model ->
   }
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewCookMarkdown() = AppTheme {
+private fun PreviewCookMarkdown() = PreviewWrapper {
   CookMarkdown(content = PreviewConstant.dish.content.trimIndent())
 }

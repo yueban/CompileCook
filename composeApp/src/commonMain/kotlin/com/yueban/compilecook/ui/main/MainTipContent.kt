@@ -39,10 +39,10 @@ import com.yueban.compilecook.repo.entity.TipType.LEARN
 import com.yueban.compilecook.repo.entity.TipType.UNKNOWN
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.base.Fail
-import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.main_tip_advanced
@@ -169,8 +169,8 @@ class PreviewMainTipComponent : MainTipComponent {
   override fun onTipClicked(tip: Tip) = Unit
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewMainTipContent() = AppTheme {
+private fun PreviewMainTipContent() = PreviewWrapper {
   MainTipContent(component = PreviewMainTipComponent(), extraContentPaddingBottom = 0.dp)
 }

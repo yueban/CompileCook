@@ -750,7 +750,7 @@ style:
   UnusedPrivateMember:
     active: true
     allowedNames: ''
-    ignoreAnnotated: ['Preview', 'UniversalPreview']
+    ignoreAnnotated: ['Preview', 'UniversalScreenPreview', 'UniversalWidgetPreview']
   UnusedPrivateProperty:
     active: true
     allowedNames: '_|ignored|expected|serialVersionUID'

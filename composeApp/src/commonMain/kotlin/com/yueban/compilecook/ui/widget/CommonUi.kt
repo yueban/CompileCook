@@ -23,8 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import com.yueban.compilecook.ui.util.stringRes
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_empty_data
@@ -100,23 +100,23 @@ private fun InfoStateComposable(
   }
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewLoadingComposable() = AppTheme {
+private fun PreviewLoadingComposable() = PreviewWrapper {
   LoadingComposable()
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewEmptyComposable() = AppTheme {
+private fun PreviewEmptyComposable() = PreviewWrapper {
   EmptyComposable(
     message = stringResource(Res.string.common_empty_data)
   )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewEmptyComposable_WithAction() = AppTheme {
+private fun PreviewEmptyComposable_WithAction() = PreviewWrapper {
   EmptyComposable(
     message = stringResource(Res.string.common_empty_data),
     action = {
@@ -127,18 +127,18 @@ private fun PreviewEmptyComposable_WithAction() = AppTheme {
   )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewErrorComposable() = AppTheme {
+private fun PreviewErrorComposable() = PreviewWrapper {
   ErrorComposable(
     error = IllegalStateException("unknown error"),
     onRetry = {}
   )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewErrorComposable_NoRetry() = AppTheme {
+private fun PreviewErrorComposable_NoRetry() = PreviewWrapper {
   ErrorComposable(
     error = Exception("unknown error"),
     onRetry = null

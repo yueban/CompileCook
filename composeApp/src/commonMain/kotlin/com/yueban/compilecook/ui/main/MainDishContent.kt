@@ -35,10 +35,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.AsyncContent
-import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -138,8 +138,8 @@ class PreviewMainDishComponent : MainDishComponent {
   override fun onDishCategoryClicked(dishCategory: DishCategory) = Unit
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewMainDishContent() = AppTheme {
+private fun PreviewMainDishContent() = PreviewWrapper {
   MainDishContent(component = PreviewMainDishComponent(), extraContentPaddingBottom = 0.dp)
 }

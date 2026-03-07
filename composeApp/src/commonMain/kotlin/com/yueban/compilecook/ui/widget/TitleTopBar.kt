@@ -13,9 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
-import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.app_name
 import compilecook.composeapp.generated.resources.common_des_back
 import org.jetbrains.compose.resources.stringResource
 
@@ -56,42 +57,36 @@ fun TitleTopBar(
   )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewTitleTopBar_Simple() {
-  AppTheme {
-    TitleTopBar(
-      title = "Cookbook"
-    )
-  }
+private fun PreviewTitleTopBar_Simple() = PreviewWrapper {
+  TitleTopBar(
+    title = stringResource(Res.string.app_name)
+  )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewTitleTopBar_WithBack() {
-  AppTheme {
-    TitleTopBar(
-      title = "Vegetables",
-      enableBack = true
-    )
-  }
+private fun PreviewTitleTopBar_WithBack() = PreviewWrapper {
+  TitleTopBar(
+    title = stringResource(Res.string.app_name),
+    enableBack = true
+  )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewTitleTopBar_WithActions() {
-  AppTheme {
-    TitleTopBar(
-      title = "All Dishes",
-      enableBack = true,
-      actions = {
-        IconButton(onClick = {}) {
-          Icon(Icons.Default.Search, contentDescription = "Search")
-        }
-        IconButton(onClick = {}) {
-          Icon(Icons.Default.Settings, contentDescription = "Settings")
-        }
+private fun PreviewTitleTopBar_WithActions() = PreviewWrapper {
+  TitleTopBar(
+    title = stringResource(Res.string.app_name),
+    enableBack = true,
+    actions = {
+      IconButton(onClick = {}) {
+        Icon(Icons.Default.Search, contentDescription = "Search")
       }
-    )
-  }
+      IconButton(onClick = {}) {
+        Icon(Icons.Default.Settings, contentDescription = "Settings")
+      }
+    }
+  )
 }

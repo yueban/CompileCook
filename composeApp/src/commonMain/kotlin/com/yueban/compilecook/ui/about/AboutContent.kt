@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.yueban.compilecook.BuildKonfig
-import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.about_des_app_icon
@@ -88,8 +88,8 @@ private class PreviewAboutComponent : AboutComponent {
   override fun onBackClicked() = Unit
 }
 
-@UniversalPreview
+@UniversalScreenPreview
 @Composable
-private fun PreviewAboutContent() = AppTheme {
+private fun PreviewAboutContent() = PreviewWrapper {
   AboutContent(component = PreviewAboutComponent())
 }

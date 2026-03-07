@@ -22,9 +22,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.ExtendedTheme
-import com.yueban.compilecook.ui.util.UniversalPreview
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_des_back
 import compilecook.composeapp.generated.resources.common_des_clear
@@ -97,9 +97,9 @@ fun SearchTopBar(
   )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewSearchTopBar() = AppTheme {
+private fun PreviewSearchTopBar() = PreviewWrapper {
   SearchTopBar(
     query = "",
     onQueryChange = {},
@@ -108,9 +108,9 @@ private fun PreviewSearchTopBar() = AppTheme {
   )
 }
 
-@UniversalPreview
+@UniversalWidgetPreview
 @Composable
-private fun PreviewSearchTopBar_WithQuery() = AppTheme {
+private fun PreviewSearchTopBar_WithQuery() = PreviewWrapper {
   SearchTopBar(
     query = "搜索内容",
     onQueryChange = {},
