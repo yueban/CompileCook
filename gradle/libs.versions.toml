@@ -128,6 +128,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin" }
 ktor-client-js = { module = "io.ktor:ktor-client-js" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json" }
 decompose-decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
