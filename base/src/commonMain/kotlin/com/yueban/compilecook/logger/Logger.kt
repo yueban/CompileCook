@@ -5,6 +5,8 @@ import io.github.aakira.napier.Napier
 import org.koin.core.logger.Level
 import org.koin.core.logger.MESSAGE
 
+typealias KoinLogger = org.koin.core.logger.Logger
+
 object Logger {
   fun init(debug: Boolean) {
     if (debug) {
@@ -22,7 +24,7 @@ object Logger {
   fun wtf(message: String, throwable: Throwable? = null, tag: String? = null) = Napier.wtf(message, throwable, tag)
 }
 
-class KoinLogger(debug: Boolean) : org.koin.core.logger.Logger(if (debug) Level.INFO else Level.ERROR) {
+class CustomKoinLogger(debug: Boolean) : KoinLogger(if (debug) Level.INFO else Level.ERROR) {
   override fun display(level: Level, msg: MESSAGE) {
     when (level) {
       Level.DEBUG -> Logger.d(msg)

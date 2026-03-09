@@ -2,7 +2,7 @@ package com.yueban.compilecook
 
 import com.yueban.compilecook.di.appModule
 import com.yueban.compilecook.di.coroutineModule
-import com.yueban.compilecook.logger.KoinLogger
+import com.yueban.compilecook.logger.CustomKoinLogger
 import com.yueban.compilecook.repo.di.databaseModule
 import com.yueban.compilecook.repo.di.loadDataModules
 import com.yueban.compilecook.ui.service.DeepLinkHandler
@@ -39,7 +39,7 @@ object AppInitializer {
   private fun initKoin(koinInitializer: KoinApplication.() -> Unit = {}) {
     val koin = startKoin {
       koinInitializer()
-      logger(KoinLogger(BuildKonfig.IS_DEBUG))
+      logger(CustomKoinLogger(BuildKonfig.IS_DEBUG))
       modules(
         coroutineModule,
         initialAppModule,
