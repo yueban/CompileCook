@@ -91,6 +91,7 @@ composeMultiplatform-material3 = "1.9.0"
 ##                          ⬆ = "1.11.0-alpha03"
 composeMultiplatform-materialIconsExtended = "1.7.3"
 aboutLibraries = "14.0.0-b02"
+slf4j-nop = "2.0.17"
 
 [libraries]
 
@@ -149,3 +150,4 @@ compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-previ
 compose-materialIconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "composeMultiplatform-materialIconsExtended" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j-nop" }

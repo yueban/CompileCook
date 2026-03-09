@@ -71,6 +71,7 @@ kotlin {
       implementation(libs.sqldelight.sqlite.driver)
       implementation(project.dependencies.platform(libs.ktor.bom))
       implementation(libs.ktor.client.okhttp)
+      implementation(libs.slf4j.nop) // silence slf4j warning
     }
     wasmJsMain.dependencies {
       implementation(libs.sqldelight.web.driver)
