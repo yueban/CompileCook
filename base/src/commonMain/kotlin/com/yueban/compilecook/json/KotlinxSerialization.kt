@@ -6,6 +6,7 @@ val json = Json {
   ignoreUnknownKeys = true
   isLenient = true
   encodeDefaults = true
+  allowStructuredMapKeys = true
 }
 
 inline fun <reified T> T.toJson(): String = json.encodeToString(this)

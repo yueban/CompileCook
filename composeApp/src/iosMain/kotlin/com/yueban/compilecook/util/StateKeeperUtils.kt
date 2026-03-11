@@ -3,17 +3,13 @@
 package com.yueban.compilecook.util
 
 import com.arkivanov.essenty.statekeeper.SerializableContainer
+import com.yueban.compilecook.json.json
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.serialization.json.Json
 import platform.Foundation.NSCoder
 import platform.Foundation.NSString
 import platform.Foundation.decodeTopLevelObjectOfClass
 import platform.Foundation.encodeObject
-
-private val json = Json {
-  allowStructuredMapKeys = true
-}
 
 @Suppress("unused") // Used in Swift
 fun save(coder: NSCoder, state: SerializableContainer) {
