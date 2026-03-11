@@ -106,7 +106,7 @@ class DefaultRootComponent(
 
   init {
     lifecycle.doOnCreate {
-      scope.launch {
+      componentScope.launch {
         deepLinkHandler.deepLinkFlow.collect { url ->
           onDeepLink(url)
         }

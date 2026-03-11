@@ -55,7 +55,7 @@ abstract class UiStateComponentImpl<S : Any>(
     dispatcher: CoroutineDispatcher = defaultDispatcher,
     retainValue: ((S) -> Async<T>)? = null,
     reducer: S.(Async<T>) -> S,
-  ): Job = scope.launch {
+  ): Job = componentScope.launch {
     setState { reducer(Loading(value = retainValue?.invoke(this)?.invoke())) }
     try {
       val result = withContext(dispatcher) { this@execute() }
@@ -76,7 +76,7 @@ abstract class UiStateComponentImpl<S : Any>(
       .onStart { setState { reducer(Loading(value = retainValue?.invoke(this)?.invoke())) } }
       .catch { e -> setState { reducer(Fail(e, value = retainValue?.invoke(this)?.invoke())) } }
       .onEach { data -> setState { reducer(Success(data)) } }
-      .launchIn(scope)
+      .launchIn(componentScope)
 
   override fun showMessage(text: String) {
     messageService.showMessage(text)

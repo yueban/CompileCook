@@ -73,7 +73,7 @@ class DefaultMainComponent(
   override fun onDishSearchClicked() = onOutput(DishSearchClicked)
 
   override fun onRandomDishClicked() {
-    scope.launch {
+    componentScope.launch {
       dishRepo.getRandomDishName()?.let {
         onOutput(RandomDishClicked(it))
       }

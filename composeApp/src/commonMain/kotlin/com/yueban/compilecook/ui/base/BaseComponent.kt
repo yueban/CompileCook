@@ -16,7 +16,7 @@ import org.koin.core.qualifier.named
 
 abstract class BaseComponent(componentContext: ComponentContext) : ComponentContext by componentContext, KoinComponent {
   private val mainImmediateDispatcher: CoroutineDispatcher = get(named(DispatcherType.MainImmediate))
-  protected val scope: CoroutineScope = componentContext.coroutineScope()
+  protected val componentScope: CoroutineScope = componentContext.coroutineScope()
 
   init {
     lifecycle.subscribe(
