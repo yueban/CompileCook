@@ -45,12 +45,16 @@ object PreviewData {
   }
 
   val dishListState by lazy {
-    val dish = PreviewConstant.dish
+    val dish = PreviewConstant.dishSummary
     val dishes = List(10) { index ->
-      dish.copy(name = dish.name + index, pinyin = dish.pinyin + index)
+      dish.copy(
+        name = dish.name + index,
+        pinyin = dish.pinyin + index,
+        isFavorite = index % 2 == 0
+      )
     }
     DishListState(
-      dishCategory = PreviewConstant.dish.category,
+      dishCategory = PreviewConstant.dishSummary.category,
       dishesAsync = Success(dishes),
       startInSearchMode = false,
     )
@@ -71,11 +75,11 @@ object PreviewData {
   }
 
   val dishState by lazy {
-    val markdownContent = PreviewConstant.dish.content.trimIndent()
+    val markdownContent = PreviewConstant.dishDetail.content.trimIndent()
     val rootNode = MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdownContent)
     val markdownState = State.Success(rootNode, markdownContent, true)
     DishState(
-      dishName = PreviewConstant.dish.name,
+      dishName = PreviewConstant.dishDetail.name,
       contentAsync = Success(markdownState),
     )
   }

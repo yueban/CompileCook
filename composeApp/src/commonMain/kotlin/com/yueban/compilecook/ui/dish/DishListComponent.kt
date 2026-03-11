@@ -2,8 +2,8 @@ package com.yueban.compilecook.ui.dish
 
 import com.arkivanov.decompose.ComponentContext
 import com.yueban.compilecook.repo.DishRepo
-import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.repo.entity.DishCategory
+import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
@@ -24,12 +24,12 @@ data class DishListState(
   val startInSearchMode: Boolean,
   val isSearchActive: Boolean = false,
   val searchQuery: String = "",
-  val dishesAsync: Async<List<Dish>> = Uninitialized,
+  val dishesAsync: Async<List<DishSummary>> = Uninitialized,
 )
 
 interface DishListComponent : UiStateComponent<DishListState> {
   fun onBackClicked()
-  fun onDishClicked(dish: Dish)
+  fun onDishClicked(dish: DishSummary)
   fun onSearchActiveChanged(active: Boolean)
   fun onSearchQueryChanged(query: String)
 
@@ -85,7 +85,7 @@ class DefaultDishListComponent(
     }
   }
 
-  override fun onDishClicked(dish: Dish) = onOutput(DishClicked(dish.name))
+  override fun onDishClicked(dish: DishSummary) = onOutput(DishClicked(dish.name))
 
   override fun onSearchActiveChanged(active: Boolean) = setState {
     copy(
@@ -98,7 +98,7 @@ class DefaultDishListComponent(
     copy(searchQuery = query)
   }
 
-  private fun Dish.matches(query: String): Boolean {
+  private fun DishSummary.matches(query: String): Boolean {
     return SmartMatcher.matches(this.name, this.pinyin, query)
   }
 }

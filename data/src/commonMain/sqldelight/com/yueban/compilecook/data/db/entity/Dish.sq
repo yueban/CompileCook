@@ -11,34 +11,83 @@ CREATE TABLE IF NOT EXISTS DishLocalEntity (
 CREATE INDEX IF NOT EXISTS Dish_category ON DishLocalEntity(category);
 CREATE INDEX IF NOT EXISTS Dish_difficulty ON DishLocalEntity(difficulty);
 
+CREATE TABLE IF NOT EXISTS DishFavoriteLocalEntity (
+    name TEXT PRIMARY KEY NOT NULL
+);
 
 -- Read Operations
-getAll:
-SELECT * FROM DishLocalEntity ORDER BY pinyin;
+getDishSummaries:
+SELECT
+    T.name,
+    T.pinyin,
+    T.description,
+    T.category,
+    T.difficulty,
+    T.image,
+    F.name IS NOT NULL AS isFavorite
+FROM DishLocalEntity AS T
+LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
+ORDER BY T.pinyin;
+
+getDishSummariesByCategory:
+SELECT
+    T.name,
+    T.pinyin,
+    T.description,
+    T.category,
+    T.difficulty,
+    T.image,
+    F.name IS NOT NULL AS isFavorite
+FROM DishLocalEntity AS T
+LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
+WHERE category = ?
+ORDER BY T.pinyin;
+
+getDishSummariesByDifficulty:
+SELECT
+    T.name,
+    T.pinyin,
+    T.description,
+    T.category,
+    T.difficulty,
+    T.image,
+    F.name IS NOT NULL AS isFavorite
+FROM DishLocalEntity AS T
+LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
+WHERE difficulty = ?
+ORDER BY T.pinyin;
+
+getDishDetail:
+SELECT
+    T.*,
+    F.name IS NOT NULL AS isFavorite
+FROM DishLocalEntity AS T
+LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
+WHERE T.name = ?;
 
 getDishCategories:
 SELECT DISTINCT category FROM DishLocalEntity;
 
-getByName:
-SELECT * FROM DishLocalEntity WHERE name = ?;
-
-getByCategory:
-SELECT * FROM DishLocalEntity WHERE category = ? ORDER BY pinyin;
-
-getByDifficulty:
-SELECT * FROM DishLocalEntity WHERE difficulty = ? ORDER BY pinyin;
-
 getRandomDishName:
 SELECT name FROM DishLocalEntity ORDER BY RANDOM() LIMIT 1;
 
--- Upsert Operation
+isDishFavorite:
+SELECT EXISTS(SELECT 1 FROM DishFavoriteLocalEntity WHERE name = ?);
+
+-- Insert/Update Operation
 upsertDish:
 INSERT OR REPLACE INTO DishLocalEntity(name,pinyin,description,category,difficulty,image,content)
 VALUES (?,?,?,?,?,?,?);
 
+insertDishFavorite:
+INSERT OR IGNORE INTO DishFavoriteLocalEntity(name) VALUES (?);
+
 -- Delete Operations
-deleteByName:
+deleteDishByName:
 DELETE FROM DishLocalEntity WHERE name = ?;
 
-deleteAll:
+deleteAllDishes:
 DELETE FROM DishLocalEntity;
+
+deleteDishFavorite:
+DELETE FROM DishFavoriteLocalEntity WHERE name = ?;

@@ -1,11 +1,23 @@
 package com.yueban.compilecook.repo.entity
 
-import com.yueban.compilecook.data.db.entity.DishLocalEntity
+import com.yueban.compilecook.data.cache.db.entity.DishDetailLocalEntity
+import com.yueban.compilecook.data.cache.db.entity.DishSummaryLocalEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Dish(
+data class DishSummary(
+  val name: String,
+  val pinyin: String,
+  val description: String,
+  val category: DishCategory,
+  val difficulty: Long,
+  val image: String,
+  val isFavorite: Boolean,
+)
+
+@Serializable
+data class DishDetail(
   val name: String,
   val pinyin: String,
   val description: String,
@@ -13,6 +25,7 @@ data class Dish(
   val difficulty: Long,
   val image: String,
   val content: String,
+  val isFavorite: Boolean,
 )
 
 @Serializable
@@ -56,8 +69,19 @@ enum class DishCategory {
   }
 }
 
-fun DishLocalEntity.toDish(): Dish =
-  Dish(
+fun DishSummaryLocalEntity.toDishSummary(): DishSummary =
+  DishSummary(
+    name = this.name,
+    pinyin = this.pinyin,
+    description = this.description,
+    category = DishCategory.fromValue(this.category),
+    difficulty = this.difficulty,
+    image = this.image,
+    isFavorite = this.isFavorite,
+  )
+
+fun DishDetailLocalEntity.toDishDetail(): DishDetail =
+  DishDetail(
     name = this.name,
     pinyin = this.pinyin,
     description = this.description,
@@ -65,4 +89,5 @@ fun DishLocalEntity.toDish(): Dish =
     difficulty = this.difficulty,
     image = this.image,
     content = this.content,
+    isFavorite = this.isFavorite,
   )

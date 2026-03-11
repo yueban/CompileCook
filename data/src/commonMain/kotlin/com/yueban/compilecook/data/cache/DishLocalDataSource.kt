@@ -5,6 +5,8 @@ import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.yueban.compilecook.data.cache.db.entity.DishDetailLocalEntity
+import com.yueban.compilecook.data.cache.db.entity.DishSummaryLocalEntity
 import com.yueban.compilecook.data.cache.db.entity.TipDetailLocalEntity
 import com.yueban.compilecook.data.cache.db.entity.TipSummaryLocalEntity
 import com.yueban.compilecook.data.db.entity.DishLocalEntity
@@ -17,10 +19,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 interface DishLocalDataSource {
-  fun getAllDishes(): Flow<List<DishLocalEntity>>
+  fun getDishSummaries(): Flow<List<DishSummaryLocalEntity>>
+  fun getDishSummariesByCategory(category: String): Flow<List<DishSummaryLocalEntity>>
+  fun getDishSummariesByDifficulty(difficulty: Long): Flow<List<DishSummaryLocalEntity>>
+  fun getDishByName(name: String): Flow<DishDetailLocalEntity?>
   fun getDishCategories(): Flow<List<String>>
-  fun getDishByName(name: String): Flow<DishLocalEntity?>
-  fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>>
   suspend fun getRandomDishName(): String?
   fun getTipSummaries(): Flow<List<TipSummaryLocalEntity>>
   fun getTipDetail(name: String): Flow<TipDetailLocalEntity?>
@@ -33,6 +36,7 @@ interface DishLocalDataSource {
   suspend fun deleteTipByName(name: String)
   suspend fun deleteAllTips()
   suspend fun toggleTipFavorite(name: String)
+  suspend fun toggleDishFavorite(name: String)
 }
 
 class DishLocalDataSourceImpl(
@@ -54,17 +58,22 @@ class DishLocalDataSourceImpl(
   private suspend inline fun <T> transactionWrite(crossinline block: suspend () -> T): T =
     withContext(defaultDispatcher) { transactionLock.withLock { block() } }
 
-  override fun getAllDishes(): Flow<List<DishLocalEntity>> =
-    dishQueries.getAll().asFlow().mapToList(defaultDispatcher)
+  override fun getDishSummaries(): Flow<List<DishSummaryLocalEntity>> =
+    dishQueries.getDishSummaries(mapper = ::DishSummaryLocalEntity).asFlow().mapToList(defaultDispatcher)
+
+  override fun getDishSummariesByCategory(category: String): Flow<List<DishSummaryLocalEntity>> =
+    dishQueries.getDishSummariesByCategory(category, mapper = ::DishSummaryLocalEntity)
+      .asFlow().mapToList(defaultDispatcher)
+
+  override fun getDishSummariesByDifficulty(difficulty: Long): Flow<List<DishSummaryLocalEntity>> =
+    dishQueries.getDishSummariesByDifficulty(difficulty, mapper = ::DishSummaryLocalEntity)
+      .asFlow().mapToList(defaultDispatcher)
+
+  override fun getDishByName(name: String): Flow<DishDetailLocalEntity?> =
+    dishQueries.getDishDetail(name, mapper = ::DishDetailLocalEntity).asFlow().mapToOneOrNull(defaultDispatcher)
 
   override fun getDishCategories(): Flow<List<String>> =
     dishQueries.getDishCategories().asFlow().mapToList(defaultDispatcher)
-
-  override fun getDishByName(name: String): Flow<DishLocalEntity?> =
-    dishQueries.getByName(name).asFlow().mapToOneOrNull(defaultDispatcher)
-
-  override fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>> =
-    dishQueries.getByCategory(category).asFlow().mapToList(defaultDispatcher)
 
   override suspend fun getRandomDishName(): String? = withContext(defaultDispatcher) {
     dishQueries.getRandomDishName().awaitAsOneOrNull()
@@ -89,12 +98,12 @@ class DishLocalDataSourceImpl(
   }
 
   override suspend fun deleteDishByName(name: String) = write {
-    dishQueries.deleteByName(name)
+    dishQueries.deleteDishByName(name)
     Logger.d("delete dish by name: $name")
   }
 
   override suspend fun deleteAllDishes() = write {
-    dishQueries.deleteAll()
+    dishQueries.deleteAllDishes()
     Logger.d("delete all dishes")
   }
 
@@ -128,6 +137,16 @@ class DishLocalDataSourceImpl(
       tipQueries.insertTipFavorite(name)
     }
     Logger.d("toggle tip favorite: $name, updated: ${!exists}")
+  }
+
+  override suspend fun toggleDishFavorite(name: String) = transactionWrite {
+    val exists = dishQueries.isDishFavorite(name).awaitAsOne()
+    if (exists) {
+      dishQueries.deleteDishFavorite(name)
+    } else {
+      dishQueries.insertDishFavorite(name)
+    }
+    Logger.d("toggle dish favorite: $name, updated: ${!exists}")
   }
 }
 

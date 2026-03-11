@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.yueban.compilecook.repo.entity.Dish
+import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.PreviewData
@@ -116,9 +116,9 @@ fun DishListContent(component: DishListComponent) {
 
 @Composable
 private fun DishList(
-  dishes: List<Dish>,
+  dishes: List<DishSummary>,
   contentPadding: PaddingValues,
-  onDishClick: (dish: Dish) -> Unit,
+  onDishClick: (dish: DishSummary) -> Unit,
 ) {
   LazyColumn(
     contentPadding = PaddingValues(
@@ -137,7 +137,7 @@ private fun DishList(
 
 @Composable
 private fun DishItem(
-  dish: Dish,
+  dish: DishSummary,
   onClick: () -> Unit,
 ) {
   Card(
@@ -196,7 +196,7 @@ private fun DishItem(
 }
 
 @Composable
-private fun DishImage(dish: Dish) {
+private fun DishImage(dish: DishSummary) {
   val modifier = Modifier
     .width(110.dp)
     .fillMaxHeight()
@@ -245,7 +245,7 @@ private fun DifficultyStars(count: Int) {
 private abstract class PreviewDishListComponent : DishListComponent {
   override val uiState = MutableStateFlow(PreviewData.dishListState)
   override fun onBackClicked() = Unit
-  override fun onDishClicked(dish: Dish) = Unit
+  override fun onDishClicked(dish: DishSummary) = Unit
   override fun onSearchActiveChanged(active: Boolean) = Unit
   override fun onSearchQueryChanged(query: String) = Unit
 }

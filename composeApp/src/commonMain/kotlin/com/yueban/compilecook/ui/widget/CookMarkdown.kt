@@ -179,5 +179,5 @@ val CustomImageComponent: MarkdownComponent = { model ->
 @UniversalScreenPreview
 @Composable
 private fun PreviewCookMarkdown() = PreviewWrapper {
-  CookMarkdown(content = PreviewConstant.dish.content.trimIndent())
+  CookMarkdown(content = PreviewConstant.dishDetail.content.trimIndent())
 }

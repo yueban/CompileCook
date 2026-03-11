@@ -1,7 +1,8 @@
 package com.yueban.compilecook.ui.util
 
-import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.repo.entity.DishCategory
+import com.yueban.compilecook.repo.entity.DishDetail
+import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.repo.entity.TipDetail
 import com.yueban.compilecook.repo.entity.TipSummary
 import com.yueban.compilecook.repo.entity.TipType
@@ -70,13 +71,24 @@ object PreviewConstant {
     }
   """
 
-  val dish = Dish(
+  val dishSummary = DishSummary(
     name = "炒意大利面",
     pinyin = "chaoyidalimian",
     description = "这是一道软糯爽口的意大利面的做法，非常简单，用时大概 30 分钟。",
     category = DishCategory.STAPLE,
     difficulty = 3,
     image = "https://media.githubusercontent.com/media/Anduin2017/HowToCook/master/dishes/staple/炒意大利面/a.jpg",
+    isFavorite = false,
+  )
+
+  val dishDetail = DishDetail(
+    name = dishSummary.name,
+    pinyin = dishSummary.pinyin,
+    description = dishSummary.description,
+    category = dishSummary.category,
+    difficulty = dishSummary.difficulty,
+    image = dishSummary.image,
+    isFavorite = dishSummary.isFavorite,
     content = """
       # 炒意大利面的做法
     
@@ -107,7 +119,7 @@ object PreviewConstant {
       - 热锅倒入食用油，待油温中热，下入面条翻炒一分钟（如果太干，加入少量水）
       - 放入 10 克番茄酱、肥牛、加入 2g 食盐，继续翻炒一分钟
       - 起锅
-    """,
+    """.trimIndent(),
   )
 
   val tipSummary = TipSummary(
