@@ -2,6 +2,7 @@ package com.yueban.compilecook.ui.base
 
 import com.arkivanov.decompose.ComponentContext
 import com.yueban.compilecook.di.DispatcherType
+import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.MessageService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -85,13 +86,21 @@ abstract class UiStateComponentImpl<S : Any>(
     messageService.showError(error)
   }
 
+  @Suppress("TooGenericExceptionCaught")
   private fun createStateFlow(
     initialState: S,
     serializer: KSerializer<S>?,
   ): MutableStateFlow<S> {
     // Auto-Restore
     val restored = if (serializer != null) {
-      stateKeeper.consume(KEY_SAVED_STATE, serializer) ?: initialState
+      try {
+        // the json instance used by Essenty library doesn't support ignoreUnknownKeys, which may cause crash.
+        // TODO: replace with our own json instance when Essenty adds support for this.
+        stateKeeper.consume(KEY_SAVED_STATE, serializer) ?: initialState
+      } catch (e: Exception) {
+        Logger.e("Error restoring state: ${e.message}")
+        initialState
+      }
     } else {
       initialState
     }
