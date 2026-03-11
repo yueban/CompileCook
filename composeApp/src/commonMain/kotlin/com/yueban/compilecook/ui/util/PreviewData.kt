@@ -18,11 +18,12 @@ import org.intellij.markdown.parser.MarkdownParser
 
 object PreviewData {
   val mainTipState by lazy {
-    val tip = PreviewConstant.tip
+    val tip = PreviewConstant.tipSummary
     val tips = List(10) { index ->
       tip.copy(
         name = tip.name + index,
-        type = TipType.entries.toTypedArray().let { it[index % it.size] }
+        type = TipType.entries.toTypedArray().let { it[index % it.size] },
+        isFavorite = index % 2 == 0
       )
     }
     val groupedTips = tips.asSequence()
@@ -60,11 +61,11 @@ object PreviewData {
   }
 
   val tipState by lazy {
-    val markdownContent = PreviewConstant.tip.content.trimIndent()
+    val markdownContent = PreviewConstant.tipDetail.content.trimIndent()
     val rootNode = MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdownContent)
     val markdownState = State.Success(rootNode, markdownContent, true)
     TipState(
-      tipName = PreviewConstant.tip.name,
+      tipName = PreviewConstant.tipDetail.name,
       contentAsync = Success(markdownState),
     )
   }

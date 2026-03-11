@@ -2,7 +2,8 @@ package com.yueban.compilecook.ui.util
 
 import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.repo.entity.DishCategory
-import com.yueban.compilecook.repo.entity.Tip
+import com.yueban.compilecook.repo.entity.TipDetail
+import com.yueban.compilecook.repo.entity.TipSummary
 import com.yueban.compilecook.repo.entity.TipType
 
 object PreviewConstant {
@@ -109,10 +110,18 @@ object PreviewConstant {
     """,
   )
 
-  val tip = Tip(
+  val tipSummary = TipSummary(
     name = "如何选择现在吃什么",
     pinyin = "ruhexuanzexianzaichishenme",
     type = TipType.BASIC,
+    isFavorite = false
+  )
+
+  val tipDetail = TipDetail(
+    name = tipSummary.name,
+    pinyin = tipSummary.pinyin,
+    type = tipSummary.type,
+    isFavorite = tipSummary.isFavorite,
     content = """
         # 如何决策吃什么
 

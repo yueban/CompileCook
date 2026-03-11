@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.yueban.compilecook.repo.entity.Tip
+import com.yueban.compilecook.repo.entity.TipSummary
 import com.yueban.compilecook.repo.entity.TipType
 import com.yueban.compilecook.repo.entity.TipType.ADVANCED
 import com.yueban.compilecook.repo.entity.TipType.BASIC
@@ -76,7 +76,11 @@ fun MainTipContent(component: MainTipComponent, extraContentPaddingBottom: Dp) {
 }
 
 @Composable
-fun TipList(groupedTips: List<Pair<TipType, List<Tip>>>, extraContentPaddingBottom: Dp, onItemClicked: (Tip) -> Unit) {
+fun TipList(
+  groupedTips: List<Pair<TipType, List<TipSummary>>>,
+  extraContentPaddingBottom: Dp,
+  onItemClicked: (TipSummary) -> Unit,
+) {
   LazyColumn(
     contentPadding = PaddingValues(
       top = 16.dp,
@@ -128,7 +132,7 @@ fun TipTypeHeader(type: TipType) {
 }
 
 @Composable
-fun TipItem(tip: Tip, onClick: () -> Unit) {
+fun TipItem(tip: TipSummary, onClick: () -> Unit) {
   Card(
     shape = RoundedCornerShape(12.dp),
     colors = CardDefaults.cardColors(
@@ -166,7 +170,7 @@ fun TipItem(tip: Tip, onClick: () -> Unit) {
 class PreviewMainTipComponent : MainTipComponent {
   override val uiState = MutableStateFlow(PreviewData.mainTipState)
   override fun onRetry() = Unit
-  override fun onTipClicked(tip: Tip) = Unit
+  override fun onTipClicked(tip: TipSummary) = Unit
 }
 
 @UniversalScreenPreview

@@ -5,25 +5,46 @@ CREATE TABLE IF NOT EXISTS TipLocalEntity (
     content TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS TipFavoriteLocalEntity (
+    name TEXT PRIMARY KEY NOT NULL
+);
 
 -- Read Operations
-getAll:
-SELECT * FROM TipLocalEntity ORDER BY pinyin;
+getTipSummaries:
+SELECT
+    T.name,
+    T.pinyin,
+    T.type,
+    F.name IS NOT NULL AS isFavorite
+FROM TipLocalEntity AS T
+LEFT JOIN TipFavoriteLocalEntity AS F ON T.name = F.name
+ORDER BY T.pinyin;
 
-getByName:
-SELECT * FROM TipLocalEntity WHERE name = ?;
+getTipDetail:
+SELECT
+    T.*,
+    F.name IS NOT NULL AS isFavorite
+FROM TipLocalEntity AS T
+LEFT JOIN TipFavoriteLocalEntity AS F ON T.name = F.name
+WHERE T.name = ?;
 
-getByType:
-SELECT * FROM TipLocalEntity WHERE type = ? ORDER BY pinyin;
+isTipFavorite:
+SELECT EXISTS(SELECT 1 FROM TipFavoriteLocalEntity WHERE name = ?);
 
--- Upsert Operation
+-- Insert/Update Operation
 upsertTip:
 INSERT OR REPLACE INTO TipLocalEntity(name,pinyin,type,content)
 VALUES (?,?,?,?);
 
+insertTipFavorite:
+INSERT OR IGNORE INTO TipFavoriteLocalEntity(name) VALUES (?);
+
 -- Delete Operations
-deleteByName:
+deleteTipByName:
 DELETE FROM TipLocalEntity WHERE name = ?;
 
-deleteAll:
+deleteAllTips:
 DELETE FROM TipLocalEntity;
+
+deleteTipFavorite:
+DELETE FROM TipFavoriteLocalEntity WHERE name = ?;

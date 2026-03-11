@@ -2,7 +2,7 @@ package com.yueban.compilecook.ui.main
 
 import com.arkivanov.decompose.ComponentContext
 import com.yueban.compilecook.repo.DishRepo
-import com.yueban.compilecook.repo.entity.Tip
+import com.yueban.compilecook.repo.entity.TipSummary
 import com.yueban.compilecook.repo.entity.TipType
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.UiStateComponent
@@ -13,15 +13,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MainTipState(
   val loadingAsync: Async<Unit> = Uninitialized,
-  val groupedTipsAsync: Async<List<Pair<TipType, List<Tip>>>> = Uninitialized,
+  val groupedTipsAsync: Async<List<Pair<TipType, List<TipSummary>>>> = Uninitialized,
 )
 
 interface MainTipComponent : UiStateComponent<MainTipState> {
   fun onRetry()
-  fun onTipClicked(tip: Tip)
+  fun onTipClicked(tip: TipSummary)
 
   sealed interface Output {
-    data class TipClicked(val tip: Tip) : Output
+    data class TipClicked(val tip: TipSummary) : Output
   }
 }
 
@@ -46,5 +46,5 @@ class DefaultMainTipComponent(
       .execute { copy(loadingAsync = it) }
   }
 
-  override fun onTipClicked(tip: Tip) = onOutput(MainTipComponent.Output.TipClicked(tip))
+  override fun onTipClicked(tip: TipSummary) = onOutput(MainTipComponent.Output.TipClicked(tip))
 }

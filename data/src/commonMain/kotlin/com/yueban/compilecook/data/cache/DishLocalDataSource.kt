@@ -1,9 +1,12 @@
 package com.yueban.compilecook.data.cache
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.yueban.compilecook.data.cache.db.entity.TipDetailLocalEntity
+import com.yueban.compilecook.data.cache.db.entity.TipSummaryLocalEntity
 import com.yueban.compilecook.data.db.entity.DishLocalEntity
 import com.yueban.compilecook.data.db.entity.DishQueries
 import com.yueban.compilecook.data.db.entity.TipLocalEntity
@@ -19,8 +22,8 @@ interface DishLocalDataSource {
   fun getDishByName(name: String): Flow<DishLocalEntity?>
   fun getDishesByCategory(category: String): Flow<List<DishLocalEntity>>
   suspend fun getRandomDishName(): String?
-  fun getAllTips(): Flow<List<TipLocalEntity>>
-  fun getTipByName(name: String): Flow<TipLocalEntity?>
+  fun getTipSummaries(): Flow<List<TipSummaryLocalEntity>>
+  fun getTipDetail(name: String): Flow<TipDetailLocalEntity?>
   suspend fun upsertDish(dish: DishLocalEntity)
   suspend fun upsertDishes(dishes: List<DishLocalEntity>)
   suspend fun deleteDishByName(name: String)
@@ -29,6 +32,7 @@ interface DishLocalDataSource {
   suspend fun upsertTips(tips: List<TipLocalEntity>)
   suspend fun deleteTipByName(name: String)
   suspend fun deleteAllTips()
+  suspend fun toggleTipFavorite(name: String)
 }
 
 class DishLocalDataSourceImpl(
@@ -66,11 +70,11 @@ class DishLocalDataSourceImpl(
     dishQueries.getRandomDishName().awaitAsOneOrNull()
   }
 
-  override fun getAllTips(): Flow<List<TipLocalEntity>> =
-    tipQueries.getAll().asFlow().mapToList(defaultDispatcher)
+  override fun getTipSummaries(): Flow<List<TipSummaryLocalEntity>> =
+    tipQueries.getTipSummaries(mapper = ::TipSummaryLocalEntity).asFlow().mapToList(defaultDispatcher)
 
-  override fun getTipByName(name: String): Flow<TipLocalEntity?> =
-    tipQueries.getByName(name).asFlow().mapToOneOrNull(defaultDispatcher)
+  override fun getTipDetail(name: String): Flow<TipDetailLocalEntity?> =
+    tipQueries.getTipDetail(name, mapper = ::TipDetailLocalEntity).asFlow().mapToOneOrNull(defaultDispatcher)
 
   override suspend fun upsertDish(dish: DishLocalEntity) = write {
     dishQueries.upsertDish(dish)
@@ -107,13 +111,23 @@ class DishLocalDataSourceImpl(
   }
 
   override suspend fun deleteTipByName(name: String) = write {
-    tipQueries.deleteByName(name)
+    tipQueries.deleteTipByName(name)
     Logger.d("delete tip by name: $name")
   }
 
   override suspend fun deleteAllTips() = write {
-    tipQueries.deleteAll()
+    tipQueries.deleteAllTips()
     Logger.d("delete all tips")
+  }
+
+  override suspend fun toggleTipFavorite(name: String) = transactionWrite {
+    val exists = tipQueries.isTipFavorite(name).awaitAsOne()
+    if (exists) {
+      tipQueries.deleteTipFavorite(name)
+    } else {
+      tipQueries.insertTipFavorite(name)
+    }
+    Logger.d("toggle tip favorite: $name, updated: ${!exists}")
   }
 }
 

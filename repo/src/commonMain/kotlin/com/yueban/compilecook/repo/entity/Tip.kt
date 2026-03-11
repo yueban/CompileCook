@@ -1,15 +1,25 @@
 package com.yueban.compilecook.repo.entity
 
-import com.yueban.compilecook.data.db.entity.TipLocalEntity
+import com.yueban.compilecook.data.cache.db.entity.TipDetailLocalEntity
+import com.yueban.compilecook.data.cache.db.entity.TipSummaryLocalEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Tip(
+data class TipSummary(
+  val name: String,
+  val pinyin: String,
+  val type: TipType,
+  val isFavorite: Boolean,
+)
+
+@Serializable
+data class TipDetail(
   val name: String,
   val pinyin: String,
   val type: TipType,
   val content: String,
+  val isFavorite: Boolean,
 )
 
 @Serializable
@@ -32,10 +42,19 @@ enum class TipType {
   }
 }
 
-fun TipLocalEntity.toTip(): Tip =
-  Tip(
+fun TipSummaryLocalEntity.toTipSummary(): TipSummary =
+  TipSummary(
+    name = this.name,
+    pinyin = this.pinyin,
+    type = TipType.fromValue(this.type),
+    isFavorite = this.isFavorite,
+  )
+
+fun TipDetailLocalEntity.toTipDetail(): TipDetail =
+  TipDetail(
     name = this.name,
     pinyin = this.pinyin,
     type = TipType.fromValue(this.type),
     content = this.content,
+    isFavorite = this.isFavorite
   )

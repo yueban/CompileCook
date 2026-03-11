@@ -6,10 +6,12 @@ import com.yueban.compilecook.data.net.service.DishRemoteDataSource
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.Dish
 import com.yueban.compilecook.repo.entity.DishCategory
-import com.yueban.compilecook.repo.entity.Tip
+import com.yueban.compilecook.repo.entity.TipDetail
+import com.yueban.compilecook.repo.entity.TipSummary
 import com.yueban.compilecook.repo.entity.TipType
 import com.yueban.compilecook.repo.entity.toDish
-import com.yueban.compilecook.repo.entity.toTip
+import com.yueban.compilecook.repo.entity.toTipDetail
+import com.yueban.compilecook.repo.entity.toTipSummary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,8 +23,8 @@ interface DishRepo {
   fun getDishByName(name: String): Flow<Dish?>
   fun getDishesByCategory(category: DishCategory): Flow<List<Dish>>
   suspend fun getRandomDishName(): String?
-  fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>>
-  fun getTipByName(name: String): Flow<Tip?>
+  fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<TipSummary>>>>
+  fun getTipByName(name: String): Flow<TipDetail?>
   suspend fun updateDishes()
   suspend fun updateTips()
   suspend fun deleteDishByName(name: String)
@@ -55,17 +57,17 @@ internal class DishRepoImpl(
 
   override suspend fun getRandomDishName(): String? = dishLocalDataSource.getRandomDishName()
 
-  override fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<Tip>>>> =
-    dishLocalDataSource.getAllTips().map { tipLocalEntities ->
-      tipLocalEntities.asSequence().map { it.toTip() }
+  override fun getGroupedTipsSortedByPinyin(): Flow<List<Pair<TipType, List<TipSummary>>>> =
+    dishLocalDataSource.getTipSummaries().map { entities ->
+      entities.asSequence().map { it.toTipSummary() }
         .filter { it.type != TipType.UNKNOWN }
         .groupBy { it.type }
         .toList()
         .sortedBy { it.first.ordinal }.toList()
     }
 
-  override fun getTipByName(name: String): Flow<Tip?> =
-    dishLocalDataSource.getTipByName(name).map { it?.toTip() }
+  override fun getTipByName(name: String): Flow<TipDetail?> =
+    dishLocalDataSource.getTipDetail(name).map { it?.toTipDetail() }
 
   override suspend fun updateDishes() {
     val dishes = dishRemoteDataSource.getDishes().map { it.toLocalEntity() }
