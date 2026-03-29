@@ -49,6 +49,7 @@ import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
 import com.yueban.compilecook.ui.widget.EmptyComposable
+import com.yueban.compilecook.ui.widget.FavoriteButton
 import com.yueban.compilecook.ui.widget.SearchTopBar
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
@@ -108,7 +109,8 @@ fun DishListContent(component: DishListComponent) {
       DishList(
         dishes = dishes,
         contentPadding = innerPadding,
-        onDishClick = component::onDishClicked
+        onDishClick = component::onDishClicked,
+        onDishFavoriteClick = component::onDishFavoriteClick,
       )
     }
   }
@@ -119,6 +121,7 @@ private fun DishList(
   dishes: List<DishSummary>,
   contentPadding: PaddingValues,
   onDishClick: (dish: DishSummary) -> Unit,
+  onDishFavoriteClick: (dish: DishSummary) -> Unit,
 ) {
   LazyColumn(
     contentPadding = PaddingValues(
@@ -130,7 +133,11 @@ private fun DishList(
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
     items(dishes, key = { it.name }) { dish ->
-      DishItem(dish = dish, onClick = { onDishClick(dish) })
+      DishItem(
+        dish = dish,
+        onClick = { onDishClick(dish) },
+        onFavoriteClick = { onDishFavoriteClick(dish) }
+      )
     }
   }
 }
@@ -139,6 +146,7 @@ private fun DishList(
 private fun DishItem(
   dish: DishSummary,
   onClick: () -> Unit,
+  onFavoriteClick: () -> Unit,
 ) {
   Card(
     shape = RoundedCornerShape(12.dp),
@@ -151,46 +159,55 @@ private fun DishItem(
       .height(110.dp)
       .clickable(onClick = onClick)
   ) {
-    Row(modifier = Modifier.fillMaxSize()) {
-      DishImage(dish = dish)
+    Box(modifier = Modifier.fillMaxSize()) {
+      Row(modifier = Modifier.fillMaxSize()) {
+        DishImage(dish = dish)
 
-      Column(
-        modifier = Modifier
-          .weight(1f)
-          .padding(12.dp)
-          .fillMaxHeight(),
-        verticalArrangement = Arrangement.SpaceBetween
-      ) {
-        Column {
-          Text(
-            text = dish.name,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = ExtendedTheme.colors.titleText,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-          )
+        Column(
+          modifier = Modifier
+            .weight(1f)
+            .padding(12.dp)
+            .fillMaxHeight(),
+          verticalArrangement = Arrangement.SpaceBetween
+        ) {
+          Column {
+            Text(
+              modifier = Modifier.padding(end = 30.dp),
+              text = dish.name,
+              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+              color = ExtendedTheme.colors.titleText,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+            )
 
-          Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-          Text(
-            text = dish.description.replace("\n", " "),
-            style = MaterialTheme.typography.bodySmall,
-            color = ExtendedTheme.colors.bodyMedium,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            lineHeight = 16.sp
-          )
-        }
+            Text(
+              text = dish.description.replace("\n", " "),
+              style = MaterialTheme.typography.bodySmall,
+              color = ExtendedTheme.colors.bodyMedium,
+              maxLines = 2,
+              overflow = TextOverflow.Ellipsis,
+              lineHeight = 16.sp
+            )
+          }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(
-            text = stringResource(Res.string.dish_list_item_difficulty),
-            style = MaterialTheme.typography.labelSmall,
-            color = ExtendedTheme.colors.subTitleText
-          )
-          DifficultyStars(count = dish.difficulty.toInt())
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+              text = stringResource(Res.string.dish_list_item_difficulty),
+              style = MaterialTheme.typography.labelSmall,
+              color = ExtendedTheme.colors.subTitleText
+            )
+            DifficultyStars(count = dish.difficulty.toInt())
+          }
         }
       }
+
+      FavoriteButton(
+        isFavorite = dish.isFavorite,
+        onClick = onFavoriteClick,
+        modifier = Modifier.align(Alignment.TopEnd).size(40.dp)
+      )
     }
   }
 }
@@ -246,6 +263,7 @@ private abstract class PreviewDishListComponent : DishListComponent {
   override val uiState = MutableStateFlow(PreviewData.dishListState)
   override fun onBackClicked() = Unit
   override fun onDishClicked(dish: DishSummary) = Unit
+  override fun onDishFavoriteClick(dish: DishSummary) = Unit
   override fun onSearchActiveChanged(active: Boolean) = Unit
   override fun onSearchQueryChanged(query: String) = Unit
 }

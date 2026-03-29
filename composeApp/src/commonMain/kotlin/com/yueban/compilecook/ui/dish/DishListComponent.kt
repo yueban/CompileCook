@@ -30,6 +30,7 @@ data class DishListState(
 interface DishListComponent : UiStateComponent<DishListState> {
   fun onBackClicked()
   fun onDishClicked(dish: DishSummary)
+  fun onDishFavoriteClick(dish: DishSummary)
   fun onSearchActiveChanged(active: Boolean)
   fun onSearchQueryChanged(query: String)
 
@@ -44,7 +45,7 @@ class DefaultDishListComponent(
   dishCategory: DishCategory?,
   startInSearchMode: Boolean,
   private val onOutput: (DishListComponent.Output) -> Unit,
-  dishRepo: DishRepo,
+  private val dishRepo: DishRepo,
 ) : DishListComponent, UiStateComponentImpl<DishListState>(
   componentContext = componentContext,
   initialState = DishListState(
@@ -86,6 +87,10 @@ class DefaultDishListComponent(
   }
 
   override fun onDishClicked(dish: DishSummary) = onOutput(DishClicked(dish.name))
+
+  override fun onDishFavoriteClick(dish: DishSummary) {
+    launch { dishRepo.toggleDishFavorite(dish.name) }
+  }
 
   override fun onSearchActiveChanged(active: Boolean) = setState {
     copy(

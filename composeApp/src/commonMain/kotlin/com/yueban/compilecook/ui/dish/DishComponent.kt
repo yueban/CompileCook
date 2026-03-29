@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.yueban.compilecook.repo.DishRepo
+import com.yueban.compilecook.repo.entity.DishDetail
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
@@ -20,12 +21,14 @@ import kotlinx.serialization.Transient
 @Serializable
 data class DishState(
   val dishName: String,
+  val dishAsync: Async<DishDetail?> = Uninitialized,
   @Transient
   val contentAsync: Async<State> = Uninitialized,
 )
 
 interface DishComponent : UiStateComponent<DishState> {
   fun onBackClicked()
+  fun onFavoriteToggle()
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
@@ -34,9 +37,9 @@ interface DishComponent : UiStateComponent<DishState> {
 
 class DefaultDishComponent(
   componentContext: ComponentContext,
-  dishName: String,
+  private val dishName: String,
   private val onOutput: (DishComponent.Output) -> Unit,
-  dishRepo: DishRepo,
+  private val dishRepo: DishRepo,
 ) : DishComponent, UiStateComponentImpl<DishState>(
   componentContext = componentContext,
   initialState = DishState(dishName = dishName),
@@ -44,6 +47,11 @@ class DefaultDishComponent(
 ) {
   init {
     dishRepo.getDishByName(dishName)
+      .execute(retainValue = DishState::dishAsync) {
+        copy(dishAsync = it)
+      }
+
+    uiState.map { it.dishAsync.value }
       .filterNotNull()
       .map { it.content }
       .distinctUntilChanged()
@@ -54,4 +62,8 @@ class DefaultDishComponent(
   }
 
   override fun onBackClicked() = onOutput(BackClicked)
+
+  override fun onFavoriteToggle() {
+    launch { dishRepo.toggleDishFavorite(dishName) }
+  }
 }

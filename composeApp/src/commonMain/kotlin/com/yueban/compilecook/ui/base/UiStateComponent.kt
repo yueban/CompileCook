@@ -5,6 +5,8 @@ import com.yueban.compilecook.di.DispatcherType
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.MessageService
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,7 @@ import kotlinx.serialization.KSerializer
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.koin.mp.KoinPlatform
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
 interface UiStateComponent<S : Any> {
@@ -77,6 +80,23 @@ abstract class UiStateComponentImpl<S : Any>(
       .catch { e -> setState { reducer(Fail(e, value = retainValue?.invoke(this)?.invoke())) } }
       .onEach { data -> setState { reducer(Success(data)) } }
       .launchIn(componentScope)
+
+  protected fun launch(
+    context: CoroutineContext = defaultDispatcher,
+    showError: Boolean = true,
+    onException: ((e: Throwable) -> Unit)? = null,
+    block: suspend CoroutineScope.() -> Unit,
+  ) = componentScope.launch(
+    CoroutineExceptionHandler { _, t ->
+      if (t !is CancellationException) {
+        Logger.e(t)
+        onException?.invoke(t)
+        if (showError) showGlobalError(t)
+      }
+    } + context
+  ) {
+    block.invoke(this)
+  }
 
   override fun showMessage(text: String) {
     messageService.showMessage(text)

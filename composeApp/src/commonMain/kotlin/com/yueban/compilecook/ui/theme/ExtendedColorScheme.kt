@@ -36,6 +36,7 @@ data class ExtendedColorScheme(
   val textFieldHint: Color,
   val bodyMedium: Color,
   val difficultyStar: Color = Color(0xFFFFB300),
+  val favorite: Color = Color(0xFFE91E63),
 )
 
 private val DarkColorScheme = darkColorScheme(

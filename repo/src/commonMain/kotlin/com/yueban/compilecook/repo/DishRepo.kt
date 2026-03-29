@@ -32,6 +32,7 @@ interface DishRepo {
   suspend fun updateTips()
   suspend fun deleteDishByName(name: String)
   suspend fun clearAllDishes()
+  suspend fun toggleDishFavorite(name: String)
 }
 
 internal class DishRepoImpl(
@@ -91,4 +92,6 @@ internal class DishRepoImpl(
   override suspend fun deleteDishByName(name: String) = dishLocalDataSource.deleteDishByName(name)
 
   override suspend fun clearAllDishes() = dishLocalDataSource.deleteAllDishes()
+
+  override suspend fun toggleDishFavorite(name: String) = dishLocalDataSource.toggleDishFavorite(name)
 }

@@ -80,6 +80,7 @@ object PreviewData {
     val markdownState = State.Success(rootNode, markdownContent, true)
     DishState(
       dishName = PreviewConstant.dishDetail.name,
+      dishAsync = Success(PreviewConstant.dishDetail),
       contentAsync = Success(markdownState),
     )
   }

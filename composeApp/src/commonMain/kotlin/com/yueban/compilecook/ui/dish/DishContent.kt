@@ -12,6 +12,7 @@ import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.widget.CookMarkdown
+import com.yueban.compilecook.ui.widget.FavoriteButton
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -25,6 +26,14 @@ fun DishContent(component: DishComponent) {
         title = state.dishName,
         enableBack = true,
         onBackClick = component::onBackClicked,
+        actions = {
+          state.dishAsync.value?.let {
+            FavoriteButton(
+              isFavorite = it.isFavorite,
+              onClick = { component.onFavoriteToggle() }
+            )
+          }
+        }
       )
     }
   ) { padding ->
@@ -37,6 +46,7 @@ fun DishContent(component: DishComponent) {
 private class PreviewDishComponent : DishComponent {
   override val uiState = MutableStateFlow(PreviewData.dishState)
   override fun onBackClicked() = Unit
+  override fun onFavoriteToggle() = Unit
 }
 
 @UniversalScreenPreview

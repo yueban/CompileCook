@@ -7,6 +7,7 @@
     <string name="common_network_error">网络错误</string>
     <string name="common_des_back">返回</string>
     <string name="common_des_clear">清空</string>
+    <string name="common_des_toggle_favorite">切换收藏</string>
     <string name="common_search_hint">搜索...</string>
 
     <string name="main_tab_tips">教程</string>
