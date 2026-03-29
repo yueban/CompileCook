@@ -22,8 +22,9 @@ import kotlinx.serialization.Serializable
 data class DishListState(
   val dishCategory: DishCategory?,
   val startInSearchMode: Boolean,
-  val isSearchActive: Boolean = false,
+  val isSearchActive: Boolean,
   val searchQuery: String = "",
+  val isFavorite: Boolean,
   val dishesAsync: Async<List<DishSummary>> = Uninitialized,
 )
 
@@ -44,6 +45,7 @@ class DefaultDishListComponent(
   componentContext: ComponentContext,
   dishCategory: DishCategory?,
   startInSearchMode: Boolean,
+  isFavorite: Boolean,
   private val onOutput: (DishListComponent.Output) -> Unit,
   private val dishRepo: DishRepo,
 ) : DishListComponent, UiStateComponentImpl<DishListState>(
@@ -51,13 +53,14 @@ class DefaultDishListComponent(
   initialState = DishListState(
     dishCategory = dishCategory,
     startInSearchMode = startInSearchMode,
-    isSearchActive = startInSearchMode
+    isSearchActive = startInSearchMode,
+    isFavorite = isFavorite,
   ),
   serializer = DishListState.serializer(),
 ) {
   init {
     val dishesFlow = if (dishCategory == null) {
-      dishRepo.getAllDishes()
+      dishRepo.getAllDishes(isFavorite)
     } else {
       dishRepo.getDishesByCategory(dishCategory)
     }.distinctUntilChanged()

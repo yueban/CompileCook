@@ -57,11 +57,33 @@ object PreviewData {
       dishCategory = PreviewConstant.dishSummary.category,
       dishesAsync = Success(dishes),
       startInSearchMode = false,
+      isSearchActive = false,
+      isFavorite = false,
     )
   }
 
   val dishListSearchState by lazy {
     dishListState.copy(isSearchActive = true)
+  }
+
+  val dishListEmptyState by lazy {
+    DishListState(
+      dishCategory = PreviewConstant.dishSummary.category,
+      dishesAsync = Success(emptyList()),
+      startInSearchMode = false,
+      isSearchActive = false,
+      isFavorite = false,
+    )
+  }
+
+  val dishListFavoriteEmptyState by lazy {
+    DishListState(
+      dishCategory = null,
+      dishesAsync = Success(emptyList()),
+      startInSearchMode = false,
+      isSearchActive = false,
+      isFavorite = true,
+    )
   }
 
   val tipState by lazy {

@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 interface DishRepo {
-  fun getAllDishes(): Flow<List<DishSummary>>
+  fun getAllDishes(isFavorite: Boolean): Flow<List<DishSummary>>
   fun getDishesByCategory(category: DishCategory): Flow<List<DishSummary>>
   fun getDishesByDifficulty(difficult: Long): Flow<List<DishSummary>>
   fun getDishByName(name: String): Flow<DishDetail?>
@@ -45,8 +45,12 @@ internal class DishRepoImpl(
     coroutineScope.launch { updateTips() }
   }
 
-  override fun getAllDishes(): Flow<List<DishSummary>> =
-    dishLocalDataSource.getDishSummaries().map { entities -> entities.map { it.toDishSummary() } }
+  override fun getAllDishes(isFavorite: Boolean): Flow<List<DishSummary>> =
+    if (isFavorite) {
+      dishLocalDataSource.getFavoriteDishSummaries()
+    } else {
+      dishLocalDataSource.getDishSummaries()
+    }.map { entities -> entities.map { it.toDishSummary() } }
 
   override fun getDishesByCategory(category: DishCategory): Flow<List<DishSummary>> =
     dishLocalDataSource.getDishSummariesByCategory(category.name.lowercase())

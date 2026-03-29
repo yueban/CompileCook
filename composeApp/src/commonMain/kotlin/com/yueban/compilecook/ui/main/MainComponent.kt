@@ -43,6 +43,7 @@ interface MainComponent {
   sealed interface Output {
     data class TipClicked(val tipName: String) : Output
     data class DishCategoryClicked(val dishCategory: DishCategory) : Output
+    data object DishFavoriteClicked : Output
     data object DishSearchClicked : Output
     data class RandomDishClicked(val dishName: String) : Output
     data object AboutClicked : Output
@@ -104,6 +105,8 @@ class DefaultMainComponent(
             when (output) {
               is DishCategoryClicked ->
                 onOutput(MainComponent.Output.DishCategoryClicked(output.dishCategory))
+              MainDishComponent.Output.DishFavoriteClicked ->
+                onOutput(MainComponent.Output.DishFavoriteClicked)
             }
           }
         )

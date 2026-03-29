@@ -18,9 +18,11 @@ data class MainDishState(
 interface MainDishComponent : UiStateComponent<MainDishState> {
   fun onRetry()
   fun onDishCategoryClicked(dishCategory: DishCategory)
+  fun onFavoriteClicked()
 
   sealed interface Output {
     data class DishCategoryClicked(val dishCategory: DishCategory) : Output
+    data object DishFavoriteClicked : Output
   }
 }
 
@@ -47,4 +49,7 @@ class DefaultMainDishComponent(
 
   override fun onDishCategoryClicked(dishCategory: DishCategory) =
     onOutput(MainDishComponent.Output.DishCategoryClicked(dishCategory))
+
+  override fun onFavoriteClicked() =
+    onOutput(MainDishComponent.Output.DishFavoriteClicked)
 }

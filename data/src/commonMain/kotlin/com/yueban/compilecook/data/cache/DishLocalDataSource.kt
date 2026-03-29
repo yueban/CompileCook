@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 
 interface DishLocalDataSource {
   fun getDishSummaries(): Flow<List<DishSummaryLocalEntity>>
+  fun getFavoriteDishSummaries(): Flow<List<DishSummaryLocalEntity>>
   fun getDishSummariesByCategory(category: String): Flow<List<DishSummaryLocalEntity>>
   fun getDishSummariesByDifficulty(difficulty: Long): Flow<List<DishSummaryLocalEntity>>
   fun getDishByName(name: String): Flow<DishDetailLocalEntity?>
@@ -60,6 +61,9 @@ class DishLocalDataSourceImpl(
 
   override fun getDishSummaries(): Flow<List<DishSummaryLocalEntity>> =
     dishQueries.getDishSummaries(mapper = ::DishSummaryLocalEntity).asFlow().mapToList(defaultDispatcher)
+
+  override fun getFavoriteDishSummaries(): Flow<List<DishSummaryLocalEntity>> =
+    dishQueries.getFavoriteDishSummaries(mapper = ::DishSummaryLocalEntity).asFlow().mapToList(defaultDispatcher)
 
   override fun getDishSummariesByCategory(category: String): Flow<List<DishSummaryLocalEntity>> =
     dishQueries.getDishSummariesByCategory(category, mapper = ::DishSummaryLocalEntity)

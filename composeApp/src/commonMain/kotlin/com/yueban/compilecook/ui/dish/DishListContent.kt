@@ -54,6 +54,8 @@ import com.yueban.compilecook.ui.widget.SearchTopBar
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.dish_list_empty
+import compilecook.composeapp.generated.resources.dish_list_favorite_empty
+import compilecook.composeapp.generated.resources.dish_list_favorite_title
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
 import compilecook.composeapp.generated.resources.dish_list_res_item_difficulty_t
 import compilecook.composeapp.generated.resources.dish_list_search_hint_t
@@ -67,7 +69,9 @@ import org.jetbrains.compose.resources.stringResource
 fun DishListContent(component: DishListComponent) {
   val state by component.uiState.collectAsStateWithLifecycle()
 
-  val title = state.dishCategory?.displayName ?: stringResource(Res.string.dish_list_title)
+  val title = state.dishCategory?.displayName ?: stringResource(
+    if (state.isFavorite) Res.string.dish_list_favorite_title else Res.string.dish_list_title
+  )
 
   Scaffold(
     topBar = {
@@ -101,7 +105,9 @@ fun DishListContent(component: DishListComponent) {
       async = state.dishesAsync,
       emptyContent = {
         EmptyComposable(
-          message = stringResource(Res.string.dish_list_empty),
+          message = stringResource(
+            if (state.isFavorite) Res.string.dish_list_favorite_empty else Res.string.dish_list_empty
+          ),
           modifier = Modifier.padding(innerPadding)
         )
       }
@@ -272,6 +278,14 @@ private class PreviewDishListSearchComponent : PreviewDishListComponent() {
   override val uiState = MutableStateFlow(PreviewData.dishListSearchState)
 }
 
+private class PreviewDishListEmptyComponent : PreviewDishListComponent() {
+  override val uiState = MutableStateFlow(PreviewData.dishListEmptyState)
+}
+
+private class PreviewDishListFavoriteEmptyComponent : PreviewDishListComponent() {
+  override val uiState = MutableStateFlow(PreviewData.dishListFavoriteEmptyState)
+}
+
 @UniversalScreenPreview
 @Composable
 private fun PreviewDishListContent() = PreviewWrapper {
@@ -282,4 +296,16 @@ private fun PreviewDishListContent() = PreviewWrapper {
 @Composable
 private fun PreviewDishListContent_Search() = PreviewWrapper {
   DishListContent(component = PreviewDishListSearchComponent())
+}
+
+@UniversalScreenPreview
+@Composable
+private fun PreviewDishListContent_Empty() = PreviewWrapper {
+  DishListContent(component = PreviewDishListEmptyComponent())
+}
+
+@UniversalScreenPreview
+@Composable
+private fun PreviewDishListContent_FavoriteEmpty() = PreviewWrapper {
+  DishListContent(component = PreviewDishListFavoriteEmptyComponent())
 }

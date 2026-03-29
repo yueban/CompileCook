@@ -140,7 +140,8 @@ class DefaultRootComponent(
           when (output) {
             is TipClicked -> navigation.push(Tip(output.tipName))
             is DishCategoryClicked -> navigation.push(DishList(output.dishCategory))
-            DishSearchClicked -> navigation.push(DishList(null, true))
+            MainComponent.Output.DishFavoriteClicked -> navigation.push(DishList(null, isFavorite = true))
+            DishSearchClicked -> navigation.push(DishList(null, startInSearchMode = true))
             is RandomDishClicked -> navigation.push(Dish(output.dishName))
             AboutClicked -> navigation.push(About)
           }
@@ -159,6 +160,7 @@ class DefaultRootComponent(
         componentContext = componentContext,
         dishCategory = config.dishCategory,
         startInSearchMode = config.startInSearchMode,
+        isFavorite = config.isFavorite,
         dishRepo = get(),
         onOutput = navigation.onOutput { output ->
           when (output) {
@@ -203,7 +205,7 @@ class DefaultRootComponent(
           // /dishes?category=?
           val categoryName = url.parameters["category"]
           val category = DishCategory.entries.find { it.name.lowercase() == categoryName }
-          listOf(Main(MainTab.DISHES), DishList(dishCategory = category))
+          listOf(Main(MainTab.DISHES), DishList(category))
         } else {
           // /dishes/{dishName}
           listOf(Main(MainTab.DISHES), DishList(null), Dish(nextSegment))
@@ -225,6 +227,7 @@ class DefaultRootComponent(
     @Serializable data class DishList(
       val dishCategory: DishCategory?,
       val startInSearchMode: Boolean = false,
+      val isFavorite: Boolean = false,
     ) : Config
 
     @Serializable data class Dish(val dishName: String) : Config

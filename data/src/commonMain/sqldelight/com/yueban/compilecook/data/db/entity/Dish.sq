@@ -29,6 +29,19 @@ FROM DishLocalEntity AS T
 LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
 ORDER BY T.pinyin;
 
+getFavoriteDishSummaries:
+SELECT
+    T.name,
+    T.pinyin,
+    T.description,
+    T.category,
+    T.difficulty,
+    T.image,
+    F.name IS NOT NULL AS isFavorite
+FROM DishLocalEntity AS T
+INNER JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
+ORDER BY T.pinyin;
+
 getDishSummariesByCategory:
 SELECT
     T.name,

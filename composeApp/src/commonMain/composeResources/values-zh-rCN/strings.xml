@@ -21,6 +21,8 @@
     <string name="main_tip_learn">基础知识</string>
     <string name="main_tip_advanced">进阶技巧</string>
 
+    <string name="main_dish_favorite">收藏</string>
+    <string name="main_dish_section_categories">分类</string>
     <string name="main_dish_category_vegetable_dish">素菜</string>
     <string name="main_dish_category_meat_dish">荤菜</string>
     <string name="main_dish_category_aquatic">水产</string>
@@ -34,9 +36,11 @@
     <string name="main_dish_des_search">搜索菜谱</string>
 
     <string name="dish_list_title">菜品列表</string>
+    <string name="dish_list_favorite_title">收藏的菜品</string>
     <string name="dish_list_search_hint_t">搜索%1$s...</string>
     <string name="dish_list_des_search">搜索菜谱</string>
     <string name="dish_list_empty">未找到菜谱</string>
+    <string name="dish_list_favorite_empty">暂无收藏</string>
     <string name="dish_list_item_difficulty">难度：</string>
     <string name="dish_list_res_item_difficulty_t">难度：%1$s</string>
 

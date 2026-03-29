@@ -21,6 +21,8 @@
     <string name="main_tip_learn">Fundamentals</string>
     <string name="main_tip_advanced">Mastery</string>
 
+    <string name="main_dish_favorite">Favorites</string>
+    <string name="main_dish_section_categories">Categories</string>
     <string name="main_dish_category_vegetable_dish">Vegetables</string>
     <string name="main_dish_category_meat_dish">Meat</string>
     <string name="main_dish_category_aquatic">Seafood</string>
@@ -34,9 +36,11 @@
     <string name="main_dish_des_search">Search menus</string>
 
     <string name="dish_list_title">Dishes</string>
+    <string name="dish_list_favorite_title">Favorite Dishes</string>
     <string name="dish_list_search_hint_t">Search%1$s...</string>
     <string name="dish_list_des_search">Search menus</string>s
     <string name="dish_list_empty">Dishes not found</string>
+    <string name="dish_list_favorite_empty">No favorites yet</string>
     <string name="dish_list_item_difficulty">Difficulty: </string>
     <string name="dish_list_res_item_difficulty_t">Difficulty: %1$s</string>
 
