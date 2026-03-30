@@ -58,8 +58,8 @@ import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_title
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
-import compilecook.composeapp.generated.resources.dish_list_res_item_difficulty_t
-import compilecook.composeapp.generated.resources.dish_list_search_hint_t
+import compilecook.composeapp.generated.resources.dish_list_res_item_difficulty_format
+import compilecook.composeapp.generated.resources.dish_list_search_hint_format
 import compilecook.composeapp.generated.resources.dish_list_title
 import compilecook.composeapp.generated.resources.ic_difficulty_star
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,7 +87,7 @@ fun DishListContent(component: DishListComponent) {
           onQueryChange = component::onSearchQueryChanged,
           onBackClick = component::onBackClicked,
           onClearClick = { component.onSearchQueryChanged("") },
-          placeholderText = stringResource(Res.string.dish_list_search_hint_t, title)
+          placeholderText = stringResource(Res.string.dish_list_search_hint_format, title)
         )
       } else {
         TitleTopBar(
@@ -266,7 +266,7 @@ private fun DifficultyStars(count: Int) {
     repeat(count) {
       Icon(
         painter = painterResource(Res.drawable.ic_difficulty_star),
-        contentDescription = stringResource(Res.string.dish_list_res_item_difficulty_t, count),
+        contentDescription = stringResource(Res.string.dish_list_res_item_difficulty_format, count),
         modifier = Modifier.size(14.dp),
         tint = ExtendedTheme.colors.difficultyStar,
       )
