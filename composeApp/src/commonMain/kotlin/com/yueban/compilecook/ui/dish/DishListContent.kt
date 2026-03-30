@@ -1,7 +1,6 @@
 package com.yueban.compilecook.ui.dish
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -172,8 +171,8 @@ private fun DishItem(
     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     modifier = Modifier
       .fillMaxWidth()
-      .height(110.dp)
-      .clickable(onClick = onClick)
+      .height(110.dp),
+    onClick = onClick,
   ) {
     Box(modifier = Modifier.fillMaxSize()) {
       Row(modifier = Modifier.fillMaxSize()) {

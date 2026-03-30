@@ -2,7 +2,6 @@ package com.yueban.compilecook.ui.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -117,10 +116,11 @@ fun MainDishContent(component: MainDishComponent, extraContentPaddingBottom: Dp)
 @Composable
 private fun FavoriteCard(onClick: () -> Unit) {
   Card(
-    modifier = Modifier.fillMaxWidth().height(110.dp).clickable(onClick = onClick),
     shape = RoundedCornerShape(20.dp),
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    modifier = Modifier.fillMaxWidth().height(110.dp),
+    onClick = onClick,
   ) {
     Row(
       modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
@@ -183,8 +183,8 @@ private fun DishCategoryCard(
     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     modifier = Modifier
       .fillMaxWidth()
-      .aspectRatio(1f)
-      .clickable(onClick = onClick)
+      .aspectRatio(1f),
+    onClick = onClick,
   ) {
     Column(
       modifier = Modifier
@@ -230,8 +230,8 @@ private fun DifficultyCard(level: Int, onClick: () -> Unit) {
     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
     modifier = Modifier
       .fillMaxWidth()
-      .aspectRatio(1f)
-      .clickable(onClick = onClick)
+      .aspectRatio(1f),
+    onClick = onClick,
   ) {
     Column(
       modifier = Modifier.fillMaxSize().padding(12.dp),
