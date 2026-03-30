@@ -44,6 +44,7 @@ interface MainComponent {
     data class TipClicked(val tipName: String) : Output
     data class DishCategoryClicked(val dishCategory: DishCategory) : Output
     data object DishFavoriteClicked : Output
+    data class DishDifficultyClicked(val level: Int) : Output
     data object DishSearchClicked : Output
     data class RandomDishClicked(val dishName: String) : Output
     data object AboutClicked : Output
@@ -107,6 +108,8 @@ class DefaultMainComponent(
                 onOutput(MainComponent.Output.DishCategoryClicked(output.dishCategory))
               MainDishComponent.Output.DishFavoriteClicked ->
                 onOutput(MainComponent.Output.DishFavoriteClicked)
+              is MainDishComponent.Output.DishDifficultyClicked ->
+                onOutput(MainComponent.Output.DishDifficultyClicked(output.level))
             }
           }
         )

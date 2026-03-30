@@ -23,6 +23,7 @@
 
     <string name="main_dish_favorite">收藏</string>
     <string name="main_dish_section_categories">分类</string>
+    <string name="main_dish_section_difficulty">难度</string>
     <string name="main_dish_category_vegetable_dish">素菜</string>
     <string name="main_dish_category_meat_dish">荤菜</string>
     <string name="main_dish_category_aquatic">水产</string>
@@ -34,6 +35,7 @@
     <string name="main_dish_category_condiment">酱料和其它材料</string>
     <string name="main_dish_category_dessert">甜品</string>
     <string name="main_dish_des_search">搜索菜谱</string>
+    <string name="main_dish_difficulty_format">%1$d 星难度</string>
 
     <string name="dish_list_title">菜品列表</string>
     <string name="dish_list_favorite_title">收藏的菜品</string>

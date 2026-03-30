@@ -5,6 +5,8 @@ import com.yueban.compilecook.data.cache.db.entity.DishSummaryLocalEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+const val DISH_DIFFICULTY_MAX_LEVEL = 5
+
 @Serializable
 data class DishSummary(
   val name: String,

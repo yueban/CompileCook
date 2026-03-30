@@ -41,11 +41,13 @@ interface DishListComponent : UiStateComponent<DishListState> {
   }
 }
 
+@Suppress("LongParameterList")
 class DefaultDishListComponent(
   componentContext: ComponentContext,
   dishCategory: DishCategory?,
   startInSearchMode: Boolean,
   isFavorite: Boolean,
+  difficultyLevel: Int,
   private val onOutput: (DishListComponent.Output) -> Unit,
   private val dishRepo: DishRepo,
 ) : DishListComponent, UiStateComponentImpl<DishListState>(
@@ -59,10 +61,10 @@ class DefaultDishListComponent(
   serializer = DishListState.serializer(),
 ) {
   init {
-    val dishesFlow = if (dishCategory == null) {
-      dishRepo.getAllDishes(isFavorite)
-    } else {
-      dishRepo.getDishesByCategory(dishCategory)
+    val dishesFlow = when {
+      dishCategory != null -> dishRepo.getDishesByCategory(dishCategory)
+      difficultyLevel != 0 -> dishRepo.getDishesByDifficulty(difficultyLevel)
+      else -> dishRepo.getAllDishes(isFavorite)
     }.distinctUntilChanged()
 
     val queryFlow = uiState

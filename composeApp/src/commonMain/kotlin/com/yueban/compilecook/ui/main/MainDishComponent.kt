@@ -19,10 +19,12 @@ interface MainDishComponent : UiStateComponent<MainDishState> {
   fun onRetry()
   fun onDishCategoryClicked(dishCategory: DishCategory)
   fun onFavoriteClicked()
+  fun onDifficultyClicked(level: Int)
 
   sealed interface Output {
     data class DishCategoryClicked(val dishCategory: DishCategory) : Output
     data object DishFavoriteClicked : Output
+    data class DishDifficultyClicked(val level: Int) : Output
   }
 }
 
@@ -52,4 +54,7 @@ class DefaultMainDishComponent(
 
   override fun onFavoriteClicked() =
     onOutput(MainDishComponent.Output.DishFavoriteClicked)
+
+  override fun onDifficultyClicked(level: Int) =
+    onOutput(MainDishComponent.Output.DishDifficultyClicked(level))
 }

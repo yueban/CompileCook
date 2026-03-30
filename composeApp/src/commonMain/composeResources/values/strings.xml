@@ -23,6 +23,7 @@
 
     <string name="main_dish_favorite">Favorites</string>
     <string name="main_dish_section_categories">Categories</string>
+    <string name="main_dish_section_difficulty">Difficulty</string>
     <string name="main_dish_category_vegetable_dish">Vegetables</string>
     <string name="main_dish_category_meat_dish">Meat</string>
     <string name="main_dish_category_aquatic">Seafood</string>
@@ -34,6 +35,7 @@
     <string name="main_dish_category_condiment">Sauces &amp; Others</string>
     <string name="main_dish_category_dessert">Dessert</string>
     <string name="main_dish_des_search">Search menus</string>
+    <string name="main_dish_difficulty_format">Level %1$d</string>
 
     <string name="dish_list_title">Dishes</string>
     <string name="dish_list_favorite_title">Favorite Dishes</string>

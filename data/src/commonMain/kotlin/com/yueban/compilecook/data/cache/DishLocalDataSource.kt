@@ -22,7 +22,7 @@ interface DishLocalDataSource {
   fun getDishSummaries(): Flow<List<DishSummaryLocalEntity>>
   fun getFavoriteDishSummaries(): Flow<List<DishSummaryLocalEntity>>
   fun getDishSummariesByCategory(category: String): Flow<List<DishSummaryLocalEntity>>
-  fun getDishSummariesByDifficulty(difficulty: Long): Flow<List<DishSummaryLocalEntity>>
+  fun getDishSummariesByDifficulty(difficulty: Int): Flow<List<DishSummaryLocalEntity>>
   fun getDishByName(name: String): Flow<DishDetailLocalEntity?>
   fun getDishCategories(): Flow<List<String>>
   suspend fun getRandomDishName(): String?
@@ -69,8 +69,8 @@ class DishLocalDataSourceImpl(
     dishQueries.getDishSummariesByCategory(category, mapper = ::DishSummaryLocalEntity)
       .asFlow().mapToList(defaultDispatcher)
 
-  override fun getDishSummariesByDifficulty(difficulty: Long): Flow<List<DishSummaryLocalEntity>> =
-    dishQueries.getDishSummariesByDifficulty(difficulty, mapper = ::DishSummaryLocalEntity)
+  override fun getDishSummariesByDifficulty(difficulty: Int): Flow<List<DishSummaryLocalEntity>> =
+    dishQueries.getDishSummariesByDifficulty(difficulty.toLong(), mapper = ::DishSummaryLocalEntity)
       .asFlow().mapToList(defaultDispatcher)
 
   override fun getDishByName(name: String): Flow<DishDetailLocalEntity?> =

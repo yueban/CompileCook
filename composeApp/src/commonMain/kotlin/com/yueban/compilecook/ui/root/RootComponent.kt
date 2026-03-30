@@ -138,13 +138,14 @@ class DefaultRootComponent(
         initialTab = config.initialTab,
         onOutput = { output ->
           when (output) {
-            is TipClicked -> navigation.push(Tip(output.tipName))
-            is DishCategoryClicked -> navigation.push(DishList(output.dishCategory))
-            MainComponent.Output.DishFavoriteClicked -> navigation.push(DishList(null, isFavorite = true))
-            DishSearchClicked -> navigation.push(DishList(null, startInSearchMode = true))
-            is RandomDishClicked -> navigation.push(Dish(output.dishName))
-            AboutClicked -> navigation.push(About)
-          }
+            is TipClicked -> Tip(output.tipName)
+            is DishCategoryClicked -> DishList(dishCategory = output.dishCategory)
+            MainComponent.Output.DishFavoriteClicked -> DishList(isFavorite = true)
+            is MainComponent.Output.DishDifficultyClicked -> DishList(difficultyLevel = output.level)
+            DishSearchClicked -> DishList(startInSearchMode = true)
+            is RandomDishClicked -> Dish(output.dishName)
+            AboutClicked -> About
+          }.let { navigation.push(it) }
         },
         dishRepo = get(),
       ).let { MainChild(it) }
@@ -167,7 +168,8 @@ class DefaultRootComponent(
             is DishClicked -> navigation.push(Dish(output.dishName))
             else -> {}
           }
-        }
+        },
+        difficultyLevel = config.difficultyLevel,
       ).let { DishListChild(it) }
 
       is Dish -> DefaultDishComponent(
@@ -205,10 +207,10 @@ class DefaultRootComponent(
           // /dishes?category=?
           val categoryName = url.parameters["category"]
           val category = DishCategory.entries.find { it.name.lowercase() == categoryName }
-          listOf(Main(MainTab.DISHES), DishList(category))
+          listOf(Main(MainTab.DISHES), DishList(dishCategory = category))
         } else {
           // /dishes/{dishName}
-          listOf(Main(MainTab.DISHES), DishList(null), Dish(nextSegment))
+          listOf(Main(MainTab.DISHES), DishList(), Dish(nextSegment))
         }
       }
 
@@ -225,9 +227,10 @@ class DefaultRootComponent(
     @Serializable data class Tip(val tipName: String) : Config
 
     @Serializable data class DishList(
-      val dishCategory: DishCategory?,
+      val dishCategory: DishCategory? = null,
       val startInSearchMode: Boolean = false,
       val isFavorite: Boolean = false,
+      val difficultyLevel: Int = 0,
     ) : Config
 
     @Serializable data class Dish(val dishName: String) : Config

@@ -1,5 +1,6 @@
 package com.yueban.compilecook.ui.main
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yueban.compilecook.repo.entity.DISH_DIFFICULTY_MAX_LEVEL
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.ExtendedTheme
@@ -52,9 +55,13 @@ import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
 import com.yueban.compilecook.ui.widget.AnyIcon
 import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.ic_difficulty_star
+import compilecook.composeapp.generated.resources.main_dish_difficulty_format
 import compilecook.composeapp.generated.resources.main_dish_favorite
 import compilecook.composeapp.generated.resources.main_dish_section_categories
+import compilecook.composeapp.generated.resources.main_dish_section_difficulty
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -91,6 +98,17 @@ fun MainDishContent(component: MainDishComponent, extraContentPaddingBottom: Dp)
             onClick = { component.onDishCategoryClicked(category) }
           )
         }
+      }
+
+      item(span = { GridItemSpan(maxLineSpan) }) {
+        SectionHeader(stringResource(Res.string.main_dish_section_difficulty))
+      }
+      items(DISH_DIFFICULTY_MAX_LEVEL, key = { "difficulty_$it" }) { index ->
+        val level = index + 1
+        DifficultyCard(
+          level = level,
+          onClick = { component.onDifficultyClicked(level) }
+        )
       }
     }
   }
@@ -204,11 +222,62 @@ private fun DishCategoryCard(
   }
 }
 
+@Composable
+private fun DifficultyCard(level: Int, onClick: () -> Unit) {
+  Card(
+    shape = RoundedCornerShape(16.dp),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+    modifier = Modifier
+      .fillMaxWidth()
+      .aspectRatio(1f)
+      .clickable(onClick = onClick)
+  ) {
+    Column(
+      modifier = Modifier.fillMaxSize().padding(12.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
+    ) {
+      Box(
+        modifier = Modifier
+          .size(64.dp)
+          .clip(CircleShape)
+          .background(MaterialTheme.colorScheme.secondaryContainer),
+        contentAlignment = Alignment.Center
+      ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Text(
+            text = level.toString(),
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSecondaryContainer
+          )
+          Icon(
+            painter = painterResource(Res.drawable.ic_difficulty_star),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp).offset(y = (-2).dp),
+            tint = ExtendedTheme.colors.difficultyStar
+          )
+        }
+      }
+
+      Spacer(modifier = Modifier.size(12.dp))
+
+      Text(
+        text = stringResource(Res.string.main_dish_difficulty_format, level),
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+        color = ExtendedTheme.colors.titleText,
+        textAlign = TextAlign.Center
+      )
+    }
+  }
+}
+
 class PreviewMainDishComponent : MainDishComponent {
   override val uiState = MutableStateFlow(PreviewData.mainDishState)
   override fun onRetry() = Unit
   override fun onDishCategoryClicked(dishCategory: DishCategory) = Unit
   override fun onFavoriteClicked() = Unit
+  override fun onDifficultyClicked(level: Int) = Unit
 }
 
 @UniversalScreenPreview
