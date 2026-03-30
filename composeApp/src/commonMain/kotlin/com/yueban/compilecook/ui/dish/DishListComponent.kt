@@ -20,13 +20,24 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DishListState(
-  val dishCategory: DishCategory?,
-  val startInSearchMode: Boolean,
-  val isSearchActive: Boolean,
+  val source: DishListSource,
+  val isSearchActive: Boolean = source is DishListSource.Search,
   val searchQuery: String = "",
-  val isFavorite: Boolean,
   val dishesAsync: Async<List<DishSummary>> = Uninitialized,
 )
+
+@Serializable
+sealed interface DishListSource {
+  @Serializable data object All : DishListSource
+
+  @Serializable data object Search : DishListSource
+
+  @Serializable data object Favorite : DishListSource
+
+  @Serializable data class Category(val category: DishCategory) : DishListSource
+
+  @Serializable data class Difficulty(val level: Int) : DishListSource
+}
 
 interface DishListComponent : UiStateComponent<DishListState> {
   fun onBackClicked()
@@ -41,30 +52,24 @@ interface DishListComponent : UiStateComponent<DishListState> {
   }
 }
 
-@Suppress("LongParameterList")
 class DefaultDishListComponent(
   componentContext: ComponentContext,
-  dishCategory: DishCategory?,
-  startInSearchMode: Boolean,
-  isFavorite: Boolean,
-  difficultyLevel: Int,
+  source: DishListSource,
   private val onOutput: (DishListComponent.Output) -> Unit,
   private val dishRepo: DishRepo,
 ) : DishListComponent, UiStateComponentImpl<DishListState>(
   componentContext = componentContext,
-  initialState = DishListState(
-    dishCategory = dishCategory,
-    startInSearchMode = startInSearchMode,
-    isSearchActive = startInSearchMode,
-    isFavorite = isFavorite,
-  ),
+  initialState = DishListState(source = source),
   serializer = DishListState.serializer(),
 ) {
   init {
-    val dishesFlow = when {
-      dishCategory != null -> dishRepo.getDishesByCategory(dishCategory)
-      difficultyLevel != 0 -> dishRepo.getDishesByDifficulty(difficultyLevel)
-      else -> dishRepo.getAllDishes(isFavorite)
+    val dishesFlow = when (source) {
+      DishListSource.All,
+      DishListSource.Search,
+      -> dishRepo.getAllDishes()
+      is DishListSource.Category -> dishRepo.getDishesByCategory(source.category)
+      is DishListSource.Difficulty -> dishRepo.getDishesByDifficulty(source.level)
+      DishListSource.Favorite -> dishRepo.getAllFavoriteDishes()
     }.distinctUntilChanged()
 
     val queryFlow = uiState
@@ -84,7 +89,7 @@ class DefaultDishListComponent(
   }
 
   override fun onBackClicked() {
-    if (uiState.value.startInSearchMode || !uiState.value.isSearchActive) {
+    if (uiState.value.source is DishListSource.Search || !uiState.value.isSearchActive) {
       onOutput(BackClicked)
     } else {
       onSearchActiveChanged(false)

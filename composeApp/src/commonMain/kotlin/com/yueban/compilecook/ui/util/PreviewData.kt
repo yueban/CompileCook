@@ -8,6 +8,7 @@ import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.repo.entity.TipType
 import com.yueban.compilecook.ui.about.AboutState
 import com.yueban.compilecook.ui.base.Success
+import com.yueban.compilecook.ui.dish.DishListSource
 import com.yueban.compilecook.ui.dish.DishListState
 import com.yueban.compilecook.ui.dish.DishState
 import com.yueban.compilecook.ui.main.MainDishState
@@ -54,35 +55,29 @@ object PreviewData {
       )
     }
     DishListState(
-      dishCategory = PreviewConstant.dishSummary.category,
+      source = DishListSource.Category(PreviewConstant.dishSummary.category),
       dishesAsync = Success(dishes),
-      startInSearchMode = false,
-      isSearchActive = false,
-      isFavorite = false,
     )
   }
 
   val dishListSearchState by lazy {
-    dishListState.copy(isSearchActive = true)
+    DishListState(
+      source = DishListSource.Search,
+      dishesAsync = dishListState.dishesAsync,
+    )
   }
 
   val dishListEmptyState by lazy {
     DishListState(
-      dishCategory = PreviewConstant.dishSummary.category,
+      source = DishListSource.Category(PreviewConstant.dishSummary.category),
       dishesAsync = Success(emptyList()),
-      startInSearchMode = false,
-      isSearchActive = false,
-      isFavorite = false,
     )
   }
 
   val dishListFavoriteEmptyState by lazy {
     DishListState(
-      dishCategory = null,
+      source = DishListSource.Favorite,
       dishesAsync = Success(emptyList()),
-      startInSearchMode = false,
-      isSearchActive = false,
-      isFavorite = true,
     )
   }
 

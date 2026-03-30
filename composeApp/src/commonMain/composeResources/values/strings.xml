@@ -39,6 +39,7 @@
 
     <string name="dish_list_title">Dishes</string>
     <string name="dish_list_favorite_title">Favorite Dishes</string>
+    <string name="dish_list_difficulty_title_format">Level %1$d</string>
     <string name="dish_list_search_hint_t">Search%1$s...</string>
     <string name="dish_list_des_search">Search menus</string>s
     <string name="dish_list_empty">Dishes not found</string>

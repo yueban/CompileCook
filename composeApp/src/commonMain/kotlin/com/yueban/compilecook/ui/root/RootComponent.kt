@@ -26,6 +26,7 @@ import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
+import com.yueban.compilecook.ui.dish.DishListSource
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
@@ -95,8 +96,14 @@ class DefaultRootComponent(
         About -> "/about"
         is Tip -> "/tips/${config.tipName}"
         is DishList -> {
-          val cat = config.dishCategory?.name?.lowercase()
-          if (cat == null) "/dishes" else "/dishes?category=$cat"
+          when (config.source) {
+            DishListSource.All,
+            DishListSource.Search,
+            -> "/dishes"
+            is DishListSource.Category -> "/dishes?category=${config.source.category.name.lowercase()}"
+            is DishListSource.Difficulty -> "/dishes?difficulty=${config.source.level}"
+            DishListSource.Favorite -> "/dishes?favorite=true"
+          }
         }
         is Dish -> "/dishes/${config.dishName}"
       }
@@ -139,10 +146,10 @@ class DefaultRootComponent(
         onOutput = { output ->
           when (output) {
             is TipClicked -> Tip(output.tipName)
-            is DishCategoryClicked -> DishList(dishCategory = output.dishCategory)
-            MainComponent.Output.DishFavoriteClicked -> DishList(isFavorite = true)
-            is MainComponent.Output.DishDifficultyClicked -> DishList(difficultyLevel = output.level)
-            DishSearchClicked -> DishList(startInSearchMode = true)
+            is DishCategoryClicked -> DishList(DishListSource.Category(output.dishCategory))
+            MainComponent.Output.DishFavoriteClicked -> DishList(DishListSource.Favorite)
+            is MainComponent.Output.DishDifficultyClicked -> DishList(DishListSource.Difficulty(output.level))
+            DishSearchClicked -> DishList(DishListSource.Search)
             is RandomDishClicked -> Dish(output.dishName)
             AboutClicked -> About
           }.let { navigation.push(it) }
@@ -159,9 +166,7 @@ class DefaultRootComponent(
 
       is DishList -> DefaultDishListComponent(
         componentContext = componentContext,
-        dishCategory = config.dishCategory,
-        startInSearchMode = config.startInSearchMode,
-        isFavorite = config.isFavorite,
+        source = config.source,
         dishRepo = get(),
         onOutput = navigation.onOutput { output ->
           when (output) {
@@ -169,7 +174,6 @@ class DefaultRootComponent(
             else -> {}
           }
         },
-        difficultyLevel = config.difficultyLevel,
       ).let { DishListChild(it) }
 
       is Dish -> DefaultDishComponent(
@@ -207,10 +211,13 @@ class DefaultRootComponent(
           // /dishes?category=?
           val categoryName = url.parameters["category"]
           val category = DishCategory.entries.find { it.name.lowercase() == categoryName }
-          listOf(Main(MainTab.DISHES), DishList(dishCategory = category))
+          listOf(
+            Main(MainTab.DISHES),
+            DishList(if (category != null) DishListSource.Category(category) else DishListSource.All)
+          )
         } else {
           // /dishes/{dishName}
-          listOf(Main(MainTab.DISHES), DishList(), Dish(nextSegment))
+          listOf(Main(MainTab.DISHES), DishList(DishListSource.All), Dish(nextSegment))
         }
       }
 
@@ -226,12 +233,7 @@ class DefaultRootComponent(
 
     @Serializable data class Tip(val tipName: String) : Config
 
-    @Serializable data class DishList(
-      val dishCategory: DishCategory? = null,
-      val startInSearchMode: Boolean = false,
-      val isFavorite: Boolean = false,
-      val difficultyLevel: Int = 0,
-    ) : Config
+    @Serializable data class DishList(val source: DishListSource) : Config
 
     @Serializable data class Dish(val dishName: String) : Config
 

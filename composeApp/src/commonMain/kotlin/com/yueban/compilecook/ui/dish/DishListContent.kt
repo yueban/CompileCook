@@ -53,6 +53,7 @@ import com.yueban.compilecook.ui.widget.FavoriteButton
 import com.yueban.compilecook.ui.widget.SearchTopBar
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.dish_list_difficulty_title_format
 import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_title
@@ -69,9 +70,14 @@ import org.jetbrains.compose.resources.stringResource
 fun DishListContent(component: DishListComponent) {
   val state by component.uiState.collectAsStateWithLifecycle()
 
-  val title = state.dishCategory?.displayName ?: stringResource(
-    if (state.isFavorite) Res.string.dish_list_favorite_title else Res.string.dish_list_title
-  )
+  val title = when (val source = state.source) {
+    DishListSource.All,
+    DishListSource.Search,
+    -> stringResource(Res.string.dish_list_title)
+    is DishListSource.Category -> source.category.displayName ?: stringResource(Res.string.dish_list_title)
+    is DishListSource.Difficulty -> stringResource(Res.string.dish_list_difficulty_title_format, source.level)
+    DishListSource.Favorite -> stringResource(Res.string.dish_list_favorite_title)
+  }
 
   Scaffold(
     topBar = {
@@ -106,7 +112,11 @@ fun DishListContent(component: DishListComponent) {
       emptyContent = {
         EmptyComposable(
           message = stringResource(
-            if (state.isFavorite) Res.string.dish_list_favorite_empty else Res.string.dish_list_empty
+            if (state.source is DishListSource.Favorite) {
+              Res.string.dish_list_favorite_empty
+            } else {
+              Res.string.dish_list_empty
+            }
           ),
           modifier = Modifier.padding(innerPadding)
         )
