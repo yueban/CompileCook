@@ -2,6 +2,7 @@ package com.yueban.compilecook
 
 import com.yueban.compilecook.di.appModule
 import com.yueban.compilecook.di.coroutineModule
+import com.yueban.compilecook.di.uiModule
 import com.yueban.compilecook.logger.CustomKoinLogger
 import com.yueban.compilecook.repo.di.databaseModule
 import com.yueban.compilecook.repo.di.loadDataModules
@@ -45,6 +46,7 @@ object AppInitializer {
         initialAppModule,
         databaseModule,
         appModule,
+        uiModule,
       )
     }.koin
     MainScope().launch {

@@ -17,16 +17,12 @@ import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.about.AboutComponent
-import com.yueban.compilecook.ui.about.DefaultAboutComponent
 import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.BaseComponent
-import com.yueban.compilecook.ui.dish.DefaultDishComponent
-import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import com.yueban.compilecook.ui.dish.DishListSource
-import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
 import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
@@ -46,12 +42,12 @@ import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
-import com.yueban.compilecook.ui.tip.DefaultTipComponent
 import com.yueban.compilecook.ui.tip.TipComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.core.component.get
+import org.koin.core.parameter.parametersOf
 
 interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   val stack: Value<ChildStack<Config, Child>>
@@ -123,54 +119,35 @@ class DefaultRootComponent(
 
   private fun child(config: Config, componentContext: ComponentContext): RootComponent.Child =
     when (config) {
-      is Main -> DefaultMainComponent(
-        componentContext = componentContext,
-        initialTab = config.initialTab,
-        onOutput = { output ->
-          when (output) {
-            is TipClicked -> Tip(output.tipName)
-            is DishCategoryClicked -> DishList(DishListSource.Category(output.dishCategory))
-            MainComponent.Output.DishFavoriteClicked -> DishList(DishListSource.Favorite)
-            is MainComponent.Output.DishDifficultyClicked -> DishList(DishListSource.Difficulty(output.level))
-            DishSearchClicked -> DishList(DishListSource.Search)
-            is RandomDishClicked -> Dish(output.dishName)
-            AboutClicked -> About
-          }.let { navigation.push(it) }
-        },
-        dishRepo = get(),
-      ).let { MainChild(it) }
-
-      is Tip -> DefaultTipComponent(
-        componentContext = componentContext,
-        tipName = config.tipName,
-        onOutput = navigation.onOutput(),
-        dishRepo = get(),
-      ).let { TipChild(it) }
-
-      is DishList -> DefaultDishListComponent(
-        componentContext = componentContext,
-        source = config.source,
-        dishRepo = get(),
-        onOutput = navigation.onOutput { output ->
-          when (output) {
-            is DishClicked -> navigation.push(Dish(output.dishName))
-            else -> {}
-          }
-        },
-      ).let { DishListChild(it) }
-
-      is Dish -> DefaultDishComponent(
-        componentContext = componentContext,
-        dishName = config.dishName,
-        dishRepo = get(),
-        onOutput = navigation.onOutput()
-      ).let { DishChild(it) }
-
-      About -> DefaultAboutComponent(
-        componentContext = componentContext,
-        onOutput = navigation.onOutput()
-      ).let { AboutChild(it) }
+      is Main -> get<MainChild> { parametersOf(componentContext, config, ::onMainOutput) }
+      is Tip -> get<TipChild> { parametersOf(componentContext, config, ::onTipOutput) }
+      is DishList -> get<DishListChild> { parametersOf(componentContext, config, ::onDishListOutput) }
+      is Dish -> get<DishChild> { parametersOf(componentContext, config, ::onDishOutput) }
+      About -> get<AboutChild> { parametersOf(componentContext, ::onAboutOutput) }
     }
+
+  private fun onMainOutput(output: MainComponent.Output) {
+    when (output) {
+      is TipClicked -> Tip(output.tipName)
+      is DishCategoryClicked -> DishList(DishListSource.Category(output.dishCategory))
+      MainComponent.Output.DishFavoriteClicked -> DishList(DishListSource.Favorite)
+      is MainComponent.Output.DishDifficultyClicked -> DishList(DishListSource.Difficulty(output.level))
+      DishSearchClicked -> DishList(DishListSource.Search)
+      is RandomDishClicked -> Dish(output.dishName)
+      AboutClicked -> About
+    }.let { navigation.push(it) }
+  }
+
+  private fun onDishListOutput(output: DishListComponent.Output) = navigation.onOutput(output) { output ->
+    when (output) {
+      is DishClicked -> navigation.push(Dish(output.dishName))
+      else -> {}
+    }
+  }
+
+  private fun onTipOutput(output: TipComponent.Output) = navigation.onOutput(output)
+  private fun onDishOutput(output: DishComponent.Output) = navigation.onOutput(output)
+  private fun onAboutOutput(output: AboutComponent.Output) = navigation.onOutput(output)
 
   override fun onBackClicked() = navigation.pop()
 
@@ -189,8 +166,9 @@ class DefaultRootComponent(
 }
 
 private inline fun <T> StackNavigation<*>.onOutput(
+  event: T,
   crossinline handler: (T) -> Unit = {},
-): (T) -> Unit = { event ->
+) {
   if (event is BackOutput) {
     pop()
   } else {
