@@ -56,29 +56,22 @@ object PreviewData {
     }
     DishListState(
       source = DishListSource.Category(PreviewConstant.dishSummary.category),
+      filterCategory = DishCategory.AQUATIC,
+      filterDifficulty = 3,
       dishesAsync = Success(dishes),
     )
   }
 
   val dishListSearchState by lazy {
-    DishListState(
-      source = DishListSource.Search,
-      dishesAsync = dishListState.dishesAsync,
-    )
+    dishListState.copy(source = DishListSource.Search)
   }
 
   val dishListEmptyState by lazy {
-    DishListState(
-      source = DishListSource.Category(PreviewConstant.dishSummary.category),
-      dishesAsync = Success(emptyList()),
-    )
+    dishListState.copy(dishesAsync = Success(emptyList()))
   }
 
   val dishListFavoriteEmptyState by lazy {
-    DishListState(
-      source = DishListSource.Favorite,
-      dishesAsync = Success(emptyList()),
-    )
+    dishListState.copy(source = DishListSource.Favorite, dishesAsync = Success(emptyList()))
   }
 
   val tipState by lazy {

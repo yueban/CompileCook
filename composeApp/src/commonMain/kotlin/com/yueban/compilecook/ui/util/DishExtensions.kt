@@ -15,16 +15,27 @@ import com.yueban.compilecook.repo.entity.DishCategory.UNKNOWN
 import com.yueban.compilecook.repo.entity.DishCategory.VEGETABLE_DISH
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ic_category_aquatic
+import compilecook.composeapp.generated.resources.ic_category_aquatic_monochrome
 import compilecook.composeapp.generated.resources.ic_category_breakfast
+import compilecook.composeapp.generated.resources.ic_category_breakfast_monochrome
 import compilecook.composeapp.generated.resources.ic_category_condiment
+import compilecook.composeapp.generated.resources.ic_category_condiment_monochrome
 import compilecook.composeapp.generated.resources.ic_category_dessert
+import compilecook.composeapp.generated.resources.ic_category_dessert_monochrome
 import compilecook.composeapp.generated.resources.ic_category_drink
+import compilecook.composeapp.generated.resources.ic_category_drink_monochrome
 import compilecook.composeapp.generated.resources.ic_category_meat_dish
+import compilecook.composeapp.generated.resources.ic_category_meat_dish_monochrome
 import compilecook.composeapp.generated.resources.ic_category_semi_finished
+import compilecook.composeapp.generated.resources.ic_category_semi_finished_monochrome
 import compilecook.composeapp.generated.resources.ic_category_soup
+import compilecook.composeapp.generated.resources.ic_category_soup_monochrome
 import compilecook.composeapp.generated.resources.ic_category_staple
+import compilecook.composeapp.generated.resources.ic_category_staple_monochrome
 import compilecook.composeapp.generated.resources.ic_category_unknown
+import compilecook.composeapp.generated.resources.ic_category_unknown_monochrome
 import compilecook.composeapp.generated.resources.ic_category_vegetable_dish
+import compilecook.composeapp.generated.resources.ic_category_vegetable_dish_monochrome
 import compilecook.composeapp.generated.resources.main_dish_category_aquatic
 import compilecook.composeapp.generated.resources.main_dish_category_breakfast
 import compilecook.composeapp.generated.resources.main_dish_category_condiment
@@ -51,6 +62,21 @@ val DishCategory.icon: DrawableResource
     CONDIMENT -> Res.drawable.ic_category_condiment
     DESSERT -> Res.drawable.ic_category_dessert
     UNKNOWN -> Res.drawable.ic_category_unknown
+  }
+
+val DishCategory.monochromeIcon: DrawableResource
+  get() = when (this) {
+    VEGETABLE_DISH -> Res.drawable.ic_category_vegetable_dish_monochrome
+    MEAT_DISH -> Res.drawable.ic_category_meat_dish_monochrome
+    AQUATIC -> Res.drawable.ic_category_aquatic_monochrome
+    BREAKFAST -> Res.drawable.ic_category_breakfast_monochrome
+    STAPLE -> Res.drawable.ic_category_staple_monochrome
+    SEMI_FINISHED -> Res.drawable.ic_category_semi_finished_monochrome
+    SOUP -> Res.drawable.ic_category_soup_monochrome
+    DRINK -> Res.drawable.ic_category_drink_monochrome
+    CONDIMENT -> Res.drawable.ic_category_condiment_monochrome
+    DESSERT -> Res.drawable.ic_category_dessert_monochrome
+    UNKNOWN -> Res.drawable.ic_category_unknown_monochrome
   }
 
 val DishCategory.displayName: String?

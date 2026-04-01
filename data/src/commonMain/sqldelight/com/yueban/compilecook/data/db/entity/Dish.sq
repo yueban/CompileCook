@@ -27,47 +27,9 @@ SELECT
     F.name IS NOT NULL AS isFavorite
 FROM DishLocalEntity AS T
 LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
-ORDER BY T.pinyin;
-
-getFavoriteDishSummaries:
-SELECT
-    T.name,
-    T.pinyin,
-    T.description,
-    T.category,
-    T.difficulty,
-    T.image,
-    F.name IS NOT NULL AS isFavorite
-FROM DishLocalEntity AS T
-INNER JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
-ORDER BY T.pinyin;
-
-getDishSummariesByCategory:
-SELECT
-    T.name,
-    T.pinyin,
-    T.description,
-    T.category,
-    T.difficulty,
-    T.image,
-    F.name IS NOT NULL AS isFavorite
-FROM DishLocalEntity AS T
-LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
-WHERE category = ?
-ORDER BY T.pinyin;
-
-getDishSummariesByDifficulty:
-SELECT
-    T.name,
-    T.pinyin,
-    T.description,
-    T.category,
-    T.difficulty,
-    T.image,
-    F.name IS NOT NULL AS isFavorite
-FROM DishLocalEntity AS T
-LEFT JOIN DishFavoriteLocalEntity AS F ON T.name = F.name
-WHERE difficulty = ?
+WHERE (:category IS NULL OR T.category = :category)
+  AND (:difficulty IS NULL OR T.difficulty = :difficulty)
+  AND (:onlyFavorite = 0 OR F.name IS NOT NULL)
 ORDER BY T.pinyin;
 
 getDishDetail:

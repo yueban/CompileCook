@@ -177,7 +177,7 @@ complexity:
     ignorePrivate: false
     ignoreOverridden: false
     ignoreAnnotated: ['androidx.room.Dao']
-    ignoreAnnotatedFunctions: ['Preview']
+    ignoreAnnotatedFunctions: ['Preview', 'UniversalScreenPreview', 'UniversalWidgetPreview']
 
 coroutines:
   active: true

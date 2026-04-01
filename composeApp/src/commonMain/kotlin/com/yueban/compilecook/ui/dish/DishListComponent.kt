@@ -15,12 +15,15 @@ import com.yueban.compilecook.ui.util.SmartMatcher
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class DishListState(
   val source: DishListSource,
+  val filterCategory: DishCategory? = null,
+  val filterDifficulty: Int? = null,
   val isSearchActive: Boolean = source is DishListSource.Search,
   val searchQuery: String = "",
   val dishesAsync: Async<List<DishSummary>> = Uninitialized,
@@ -41,6 +44,8 @@ sealed interface DishListSource {
 
 interface DishListComponent : UiStateComponent<DishListState> {
   fun onBackClicked()
+  fun onFilterCategoryChanged(category: DishCategory?)
+  fun onFilterDifficultyChanged(level: Int?)
   fun onDishClicked(dish: DishSummary)
   fun onDishFavoriteClick(dish: DishSummary)
   fun onSearchActiveChanged(active: Boolean)
@@ -63,21 +68,23 @@ class DefaultDishListComponent(
   serializer = DishListState.serializer(),
 ) {
   init {
-    val dishesFlow = when (source) {
-      DishListSource.All,
-      DishListSource.Search,
-      -> dishRepo.getAllDishes()
-      is DishListSource.Category -> dishRepo.getDishesByCategory(source.category)
-      is DishListSource.Difficulty -> dishRepo.getDishesByDifficulty(source.level)
-      DishListSource.Favorite -> dishRepo.getAllFavoriteDishes()
-    }.distinctUntilChanged()
+    combine(
+      uiState.flatMapLatest { currentState ->
+        val fixedCategory = (currentState.source as? DishListSource.Category)?.category
+        val fixedDifficulty = (currentState.source as? DishListSource.Difficulty)?.level
+        val onlyFavorite = currentState.source is DishListSource.Favorite
 
-    val queryFlow = uiState
-      .map { state -> state.searchQuery.takeIf { state.isSearchActive } }
-      .distinctUntilChanged()
-      .debounce(100)
-
-    combine(dishesFlow, queryFlow) { dishes, query ->
+        dishRepo.getDishes(
+          category = (fixedCategory ?: currentState.filterCategory)?.name?.lowercase(),
+          difficulty = fixedDifficulty ?: currentState.filterDifficulty,
+          onlyFavorite = onlyFavorite
+        ).distinctUntilChanged()
+      },
+      uiState
+        .map { state -> state.searchQuery.takeIf { state.isSearchActive } }
+        .distinctUntilChanged()
+        .debounce(100)
+    ) { dishes, query ->
       if (query.isNullOrBlank()) {
         dishes
       } else {
@@ -94,6 +101,14 @@ class DefaultDishListComponent(
     } else {
       onSearchActiveChanged(false)
     }
+  }
+
+  override fun onFilterCategoryChanged(category: DishCategory?) = setState {
+    copy(filterCategory = category)
+  }
+
+  override fun onFilterDifficultyChanged(level: Int?) = setState {
+    copy(filterDifficulty = level)
   }
 
   override fun onDishClicked(dish: DishSummary) = onOutput(DishClicked(dish.name))

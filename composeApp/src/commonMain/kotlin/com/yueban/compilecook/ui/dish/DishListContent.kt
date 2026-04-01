@@ -1,6 +1,7 @@
 package com.yueban.compilecook.ui.dish
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,11 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.yueban.compilecook.repo.entity.DISH_DIFFICULTY_MAX_LEVEL
+import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.ExtendedTheme
@@ -47,6 +53,7 @@ import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
+import com.yueban.compilecook.ui.util.monochromeIcon
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import com.yueban.compilecook.ui.widget.FavoriteButton
 import com.yueban.compilecook.ui.widget.SearchTopBar
@@ -57,6 +64,7 @@ import compilecook.composeapp.generated.resources.dish_list_difficulty_title_for
 import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_title
+import compilecook.composeapp.generated.resources.dish_list_filter_difficulty_format
 import compilecook.composeapp.generated.resources.dish_list_item_difficulty
 import compilecook.composeapp.generated.resources.dish_list_search_hint_format
 import compilecook.composeapp.generated.resources.dish_list_title
@@ -106,26 +114,72 @@ fun DishListContent(component: DishListComponent) {
       }
     }
   ) { innerPadding ->
-    AsyncContent(
-      async = state.dishesAsync,
-      emptyContent = {
-        EmptyComposable(
-          message = stringResource(
-            if (state.source is DishListSource.Favorite) {
-              Res.string.dish_list_favorite_empty
-            } else {
-              Res.string.dish_list_empty
-            }
-          ),
-          modifier = Modifier.padding(innerPadding)
+    Column(Modifier.padding(innerPadding)) {
+      if (state.source !is DishListSource.Category) {
+        CategoryFilterBar(state = state, onCategoryToggle = component::onFilterCategoryChanged)
+      }
+      if (state.source !is DishListSource.Difficulty) {
+        DifficultyFilterBar(state = state, onDifficultyToggle = component::onFilterDifficultyChanged)
+      }
+      AsyncContent(
+        async = state.dishesAsync,
+        emptyContent = {
+          EmptyComposable(
+            message = stringResource(
+              if (state.source is DishListSource.Favorite) {
+                Res.string.dish_list_favorite_empty
+              } else {
+                Res.string.dish_list_empty
+              }
+            ),
+          )
+        }
+      ) { dishes ->
+        DishList(
+          dishes = dishes,
+          onDishClick = component::onDishClicked,
+          onDishFavoriteClick = component::onDishFavoriteClick,
         )
       }
-    ) { dishes ->
-      DishList(
-        dishes = dishes,
-        contentPadding = innerPadding,
-        onDishClick = component::onDishClicked,
-        onDishFavoriteClick = component::onDishFavoriteClick,
+    }
+  }
+}
+
+@Composable
+private fun CategoryFilterBar(
+  state: DishListState,
+  onCategoryToggle: (DishCategory?) -> Unit,
+) {
+  Row(
+    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp)
+  ) {
+    DishCategory.entries.filter { it != DishCategory.UNKNOWN }.forEach { category ->
+      FilterChip(
+        selected = state.filterCategory == category,
+        onClick = { onCategoryToggle(if (state.filterCategory == category) null else category) },
+        label = { Text(category.displayName ?: "") },
+        leadingIcon = { Icon(painterResource(category.monochromeIcon), null, modifier = Modifier.size(18.dp)) },
+      )
+    }
+  }
+}
+
+@Composable
+private fun DifficultyFilterBar(
+  state: DishListState,
+  onDifficultyToggle: (Int?) -> Unit,
+) {
+  Row(
+    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp)
+  ) {
+    for (level in 1..DISH_DIFFICULTY_MAX_LEVEL) {
+      FilterChip(
+        selected = state.filterDifficulty == level,
+        onClick = { onDifficultyToggle(if (state.filterDifficulty == level) null else level) },
+        label = { Text(stringResource(Res.string.dish_list_filter_difficulty_format, level)) },
+        leadingIcon = { Icon(Icons.Default.Star, null, modifier = Modifier.size(16.dp)) },
       )
     }
   }
@@ -134,17 +188,11 @@ fun DishListContent(component: DishListComponent) {
 @Composable
 private fun DishList(
   dishes: List<DishSummary>,
-  contentPadding: PaddingValues,
   onDishClick: (dish: DishSummary) -> Unit,
   onDishFavoriteClick: (dish: DishSummary) -> Unit,
 ) {
   LazyColumn(
-    contentPadding = PaddingValues(
-      top = contentPadding.calculateTopPadding() + 16.dp,
-      bottom = contentPadding.calculateBottomPadding() + 16.dp,
-      start = 16.dp,
-      end = 16.dp
-    ),
+    contentPadding = PaddingValues(16.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
     items(dishes, key = { it.name }) { dish ->
@@ -277,6 +325,8 @@ private fun DifficultyStars(count: Int) {
 private abstract class PreviewDishListComponent : DishListComponent {
   override val uiState = MutableStateFlow(PreviewData.dishListState)
   override fun onBackClicked() = Unit
+  override fun onFilterCategoryChanged(category: DishCategory?) = Unit
+  override fun onFilterDifficultyChanged(level: Int?) = Unit
   override fun onDishClicked(dish: DishSummary) = Unit
   override fun onDishFavoriteClick(dish: DishSummary) = Unit
   override fun onSearchActiveChanged(active: Boolean) = Unit

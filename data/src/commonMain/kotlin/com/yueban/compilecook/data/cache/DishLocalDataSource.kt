@@ -19,10 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 interface DishLocalDataSource {
-  fun getDishSummaries(): Flow<List<DishSummaryLocalEntity>>
-  fun getFavoriteDishSummaries(): Flow<List<DishSummaryLocalEntity>>
-  fun getDishSummariesByCategory(category: String): Flow<List<DishSummaryLocalEntity>>
-  fun getDishSummariesByDifficulty(difficulty: Int): Flow<List<DishSummaryLocalEntity>>
+  fun getDishSummaries(category: String?, difficulty: Int?, onlyFavorite: Boolean): Flow<List<DishSummaryLocalEntity>>
   fun getDishByName(name: String): Flow<DishDetailLocalEntity?>
   fun getDishCategories(): Flow<List<String>>
   suspend fun getRandomDishName(): String?
@@ -59,19 +56,17 @@ class DishLocalDataSourceImpl(
   private suspend inline fun <T> transactionWrite(crossinline block: suspend () -> T): T =
     withContext(defaultDispatcher) { transactionLock.withLock { block() } }
 
-  override fun getDishSummaries(): Flow<List<DishSummaryLocalEntity>> =
-    dishQueries.getDishSummaries(mapper = ::DishSummaryLocalEntity).asFlow().mapToList(defaultDispatcher)
-
-  override fun getFavoriteDishSummaries(): Flow<List<DishSummaryLocalEntity>> =
-    dishQueries.getFavoriteDishSummaries(mapper = ::DishSummaryLocalEntity).asFlow().mapToList(defaultDispatcher)
-
-  override fun getDishSummariesByCategory(category: String): Flow<List<DishSummaryLocalEntity>> =
-    dishQueries.getDishSummariesByCategory(category, mapper = ::DishSummaryLocalEntity)
-      .asFlow().mapToList(defaultDispatcher)
-
-  override fun getDishSummariesByDifficulty(difficulty: Int): Flow<List<DishSummaryLocalEntity>> =
-    dishQueries.getDishSummariesByDifficulty(difficulty.toLong(), mapper = ::DishSummaryLocalEntity)
-      .asFlow().mapToList(defaultDispatcher)
+  override fun getDishSummaries(
+    category: String?,
+    difficulty: Int?,
+    onlyFavorite: Boolean,
+  ): Flow<List<DishSummaryLocalEntity>> =
+    dishQueries.getDishSummaries(
+      category = category,
+      difficulty = difficulty?.toLong(),
+      onlyFavorite = if (onlyFavorite) 1L else 0L,
+      mapper = ::DishSummaryLocalEntity,
+    ).asFlow().mapToList(defaultDispatcher)
 
   override fun getDishByName(name: String): Flow<DishDetailLocalEntity?> =
     dishQueries.getDishDetail(name, mapper = ::DishDetailLocalEntity).asFlow().mapToOneOrNull(defaultDispatcher)
