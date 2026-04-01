@@ -96,13 +96,12 @@ class DefaultRootComponent(
         About -> "/about"
         is Tip -> "/tips/${config.tipName}"
         is DishList -> {
-          when (config.source) {
-            DishListSource.All,
-            DishListSource.Search,
-            -> "/dishes"
-            is DishListSource.Category -> "/dishes?category=${config.source.category.name.lowercase()}"
-            is DishListSource.Difficulty -> "/dishes?difficulty=${config.source.level}"
-            DishListSource.Favorite -> "/dishes?favorite=true"
+          when (val source = config.source) {
+            DishListSource.All -> "/dishes"
+            DishListSource.Search -> "/dishes?search=true"
+            DishListSource.Favorite -> "/dishes/favorite"
+            is DishListSource.Category -> "/dishes/category/${source.category.name.lowercase()}"
+            is DishListSource.Difficulty -> "/dishes/difficulty/${source.level}"
           }
         }
         is Dish -> "/dishes/${config.dishName}"
@@ -190,34 +189,55 @@ class DefaultRootComponent(
     }
 
   private fun getInitialStack(deepLinkUrl: String?): List<Config> {
-    Logger.d("deepLinkUrl: $deepLinkUrl")
     val url = deepLinkUrl?.let { Url(it) } ?: return listOf(Main(MainTab.TIPS))
     val segments = url.segments.filter { it.isNotEmpty() }
+    val first = segments.firstOrNull()
 
-    return when {
-      // /about
-      segments.firstOrNull() == "about" -> listOf(Main(MainTab.TIPS), About)
+    return when (first) {
+      "about" -> listOf(Main(MainTab.TIPS), About)
 
-      // /tips/{name}
-      segments.firstOrNull() == "tips" -> {
+      "tips" -> {
         val tipName = segments.getOrNull(1)
-        if (tipName != null) listOf(Main(MainTab.TIPS), Tip(tipName)) else listOf(Main(MainTab.TIPS))
+        if (tipName != null) {
+          listOf(Main(MainTab.TIPS), Tip(tipName))
+        } else {
+          listOf(Main(MainTab.TIPS))
+        }
       }
 
-      // /dishes
-      segments.firstOrNull() == "dishes" -> {
-        val nextSegment = segments.getOrNull(1)
-        if (nextSegment == null) {
-          // /dishes?category=?
-          val categoryName = url.parameters["category"]
-          val category = DishCategory.entries.find { it.name.lowercase() == categoryName }
-          listOf(
-            Main(MainTab.DISHES),
-            DishList(if (category != null) DishListSource.Category(category) else DishListSource.All)
-          )
-        } else {
-          // /dishes/{dishName}
-          listOf(Main(MainTab.DISHES), DishList(DishListSource.All), Dish(nextSegment))
+      "dishes" -> {
+        val second = segments.getOrNull(1)
+        val mainDishes = Main(MainTab.DISHES)
+
+        when (second) {
+          "favorite" -> listOf(mainDishes, DishList(DishListSource.Favorite))
+
+          "category" -> {
+            val catName = segments.getOrNull(2)
+            val category = DishCategory.entries.find { it.name.lowercase() == catName }
+            listOf(mainDishes, DishList(category?.let { DishListSource.Category(it) } ?: DishListSource.All))
+          }
+
+          "difficulty" -> {
+            val level = segments.getOrNull(2)?.toIntOrNull() ?: 1
+            listOf(mainDishes, DishList(DishListSource.Difficulty(level)))
+          }
+
+          null -> {
+            // Check for ?search=true
+            val source = if (url.parameters["search"] == "true") {
+              DishListSource.Search
+            } else {
+              DishListSource.All
+            }
+            listOf(mainDishes, DishList(source))
+          }
+
+          else -> {
+            // It's a specific dish name: /dishes/mapodoufu
+            // Standard Rule: Main -> List(All) -> DishDetail
+            listOf(mainDishes, DishList(DishListSource.All), Dish(second))
+          }
         }
       }
 
