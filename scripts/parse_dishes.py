@@ -121,11 +121,15 @@ def convert_md_to_json(output_file):
                 difficulty_match = re.search(r"预估烹饪难度：(★+)", raw_markdown)
                 image_match = re.search(r"!\[.*?\]\((.*?)\)", content_fixed)
 
+                # Logic for category with hyphen to underscore conversion
+                raw_cat = os.path.basename(os.path.dirname(root)) if contains_chinese(os.path.basename(root)) else os.path.basename(root)
+                category = raw_cat.replace('-', '_')
+
                 all_dishes.append({
                     "name": name,
                     "pinyin": pinyin_value,
                     "description": description,
-                    "category": os.path.basename(os.path.dirname(root)) if contains_chinese(os.path.basename(root)) else os.path.basename(root),
+                    "category": category,
                     "difficulty": len(difficulty_match.group(1)) if difficulty_match else 0,
                     "image": image_match.group(1) if image_match else "",
                     "content": content_field
