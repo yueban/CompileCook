@@ -14,7 +14,6 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.yueban.compilecook.logger.Logger
-import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.about.AboutComponent
@@ -49,7 +48,6 @@ import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
 import com.yueban.compilecook.ui.tip.DefaultTipComponent
 import com.yueban.compilecook.ui.tip.TipComponent
-import io.ktor.http.Url
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -81,7 +79,7 @@ class DefaultRootComponent(
     childStack(
       source = navigation,
       serializer = Config.serializer(),
-      initialStack = { getInitialStack(deepLinkUrl) },
+      initialStack = { PathMapper.pathToStack(deepLinkUrl) },
       handleBackButton = true,
       childFactory = ::child
     )
@@ -91,22 +89,8 @@ class DefaultRootComponent(
     serializer = Config.serializer(),
     pathMapper = { (config, child, any) ->
       Logger.d("config: $config, child: $child, any: $any")
-      when (config) {
-        is Main -> "/"
-        About -> "/about"
-        is Tip -> "/tips/${config.tipName}"
-        is DishList -> {
-          when (val source = config.source) {
-            DishListSource.All -> "/dishes"
-            DishListSource.Search -> "/dishes?search=true"
-            DishListSource.Favorite -> "/dishes/favorite"
-            is DishListSource.Category -> "/dishes/category/${source.category.name.lowercase()}"
-            is DishListSource.Difficulty -> "/dishes/difficulty/${source.level}"
-          }
-        }
-        is Dish -> "/dishes/${config.dishName}"
-      }
-    }
+      PathMapper.configToPath(config)
+    },
   )
   override val messages: Flow<UiMessage> = get<MessageService>().messageFlow
 
@@ -121,7 +105,7 @@ class DefaultRootComponent(
   }
 
   override fun onDeepLink(url: String) {
-    navigation.navigate { getInitialStack(url) }
+    navigation.navigate { PathMapper.pathToStack(url) }
   }
 
   override fun onUriClicked(uri: String): Boolean =
@@ -187,63 +171,6 @@ class DefaultRootComponent(
         onOutput = navigation.onOutput()
       ).let { AboutChild(it) }
     }
-
-  private fun getInitialStack(deepLinkUrl: String?): List<Config> {
-    val url = deepLinkUrl?.let { Url(it) } ?: return listOf(Main(MainTab.TIPS))
-    val segments = url.segments.filter { it.isNotEmpty() }
-    val first = segments.firstOrNull()
-
-    return when (first) {
-      "about" -> listOf(Main(MainTab.TIPS), About)
-
-      "tips" -> {
-        val tipName = segments.getOrNull(1)
-        if (tipName != null) {
-          listOf(Main(MainTab.TIPS), Tip(tipName))
-        } else {
-          listOf(Main(MainTab.TIPS))
-        }
-      }
-
-      "dishes" -> {
-        val second = segments.getOrNull(1)
-        val mainDishes = Main(MainTab.DISHES)
-
-        when (second) {
-          "favorite" -> listOf(mainDishes, DishList(DishListSource.Favorite))
-
-          "category" -> {
-            val catName = segments.getOrNull(2)
-            val category = DishCategory.entries.find { it.name.lowercase() == catName }
-            listOf(mainDishes, DishList(category?.let { DishListSource.Category(it) } ?: DishListSource.All))
-          }
-
-          "difficulty" -> {
-            val level = segments.getOrNull(2)?.toIntOrNull() ?: 1
-            listOf(mainDishes, DishList(DishListSource.Difficulty(level)))
-          }
-
-          null -> {
-            // Check for ?search=true
-            val source = if (url.parameters["search"] == "true") {
-              DishListSource.Search
-            } else {
-              DishListSource.All
-            }
-            listOf(mainDishes, DishList(source))
-          }
-
-          else -> {
-            // It's a specific dish name: /dishes/mapodoufu
-            // Standard Rule: Main -> List(All) -> DishDetail
-            listOf(mainDishes, DishList(DishListSource.All), Dish(second))
-          }
-        }
-      }
-
-      else -> listOf(Main(MainTab.TIPS))
-    }
-  }
 
   override fun onBackClicked() = navigation.pop()
 
