@@ -1,4 +1,4 @@
-package com.yueban.compilecook.ui.widget
+package com.yueban.compilecook.ui.widget.markdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
+import com.mikepenz.markdown.compose.LazyMarkdownSuccess
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.components.MarkdownComponent
 import com.mikepenz.markdown.compose.components.markdownComponents
@@ -32,26 +33,12 @@ import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.State
+import com.mikepenz.markdown.model.markdownAnimations
+import com.mikepenz.markdown.model.rememberMarkdownState
 import com.yueban.compilecook.ui.theme.ExtendedTheme
 import com.yueban.compilecook.ui.util.PreviewConstant
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
-
-@Composable
-fun CookMarkdown(
-  content: String,
-  modifier: Modifier = Modifier,
-) {
-  Markdown(
-    content = content,
-    colors = cookMarkdownColors(),
-    typography = cookMarkdownTypography(),
-    components = cookMarkdownComponents(),
-    imageTransformer = Coil3ImageTransformerImpl,
-    modifier = modifier.fillMaxSize()
-      .verticalScroll(rememberScrollState()),
-  )
-}
 
 @Composable
 fun CookMarkdown(
@@ -63,9 +50,13 @@ fun CookMarkdown(
     colors = cookMarkdownColors(),
     typography = cookMarkdownTypography(),
     components = cookMarkdownComponents(),
+    // disable animation
+    animations = markdownAnimations(animateTextSize = { this }),
+    success = { state, components, modifier ->
+      LazyMarkdownSuccess(state, components, modifier)
+    },
     imageTransformer = Coil3ImageTransformerImpl,
-    modifier = modifier.fillMaxSize()
-      .verticalScroll(rememberScrollState()),
+    modifier = modifier.fillMaxSize(),
   )
 }
 
@@ -151,7 +142,7 @@ private fun cookMarkdownComponents() = markdownComponents(
  * A custom Image component that adds Rounded Corners and fills width.
  * Perfect for Dish photos.
  */
-val CustomImageComponent: MarkdownComponent = { model ->
+private val CustomImageComponent: MarkdownComponent = { model ->
   val imageUrl = model.content
 
   Box(
@@ -179,5 +170,9 @@ val CustomImageComponent: MarkdownComponent = { model ->
 @UniversalScreenPreview
 @Composable
 private fun PreviewCookMarkdown() = PreviewWrapper {
-  CookMarkdown(content = PreviewConstant.dishDetail.content.trimIndent())
+  val markdownState = rememberMarkdownState(
+    content = PreviewConstant.dishDetail.content.trimIndent(),
+  )
+  val state by markdownState.state.collectAsState()
+  CookMarkdown(state = state)
 }

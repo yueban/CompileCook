@@ -11,9 +11,9 @@ import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
-import com.yueban.compilecook.ui.widget.CookMarkdown
 import com.yueban.compilecook.ui.widget.FavoriteButton
 import com.yueban.compilecook.ui.widget.TitleTopBar
+import com.yueban.compilecook.ui.widget.markdown.CookMarkdown
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
@@ -38,7 +38,7 @@ fun DishContent(component: DishComponent) {
     }
   ) { padding ->
     AsyncContent(async = state.contentAsync, modifier = Modifier.padding(padding)) {
-      CookMarkdown(state = it, modifier = Modifier.padding(16.dp))
+      CookMarkdown(state = it, modifier = Modifier.padding(horizontal = 16.dp))
     }
   }
 }
