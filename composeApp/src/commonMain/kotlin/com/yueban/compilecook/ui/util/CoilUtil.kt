@@ -20,6 +20,9 @@ object CoilUtil : CoilLogger {
       ImageLoader.Builder(context)
         .crossfade(true)
         .logger(this)
+        .components {
+          add(CoilImageProxyInterceptor())
+        }
         .build()
     }
   }
