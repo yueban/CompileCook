@@ -9,6 +9,8 @@
     <string name="common_des_clear">清空</string>
     <string name="common_des_toggle_favorite">切换收藏</string>
     <string name="common_search_hint">搜索...</string>
+    <string name="common_toc_title">目录</string>
+    <string name="common_des_toc_fab">目录</string>
 
     <string name="main_tab_tips">教程</string>
     <string name="main_tab_dishes">菜谱</string>

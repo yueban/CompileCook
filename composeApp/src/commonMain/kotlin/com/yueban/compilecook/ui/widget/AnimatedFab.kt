@@ -1,0 +1,58 @@
+package com.yueban.compilecook.ui.widget
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.yueban.compilecook.ui.util.PreviewWrapper
+import com.yueban.compilecook.ui.util.UniversalWidgetPreview
+import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.common_des_toc_fab
+import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun AnimatedFab(
+  isVisible: Boolean,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) = AnimatedVisibility(
+  visible = isVisible,
+  enter = scaleIn() + fadeIn(),
+  exit = scaleOut() + fadeOut(),
+  // compensate for the inner padding to maintain the FAB's original screen position
+  modifier = modifier.offset(x = 16.dp, y = 16.dp)
+) {
+  // expand the animation canvas bounds to prevent shadow from being clipped
+  Box(modifier = Modifier.padding(16.dp)) {
+    FloatingActionButton(
+      onClick = onClick,
+      containerColor = MaterialTheme.colorScheme.primaryContainer,
+      contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+      shape = CircleShape,
+    ) {
+      Icon(
+        Icons.AutoMirrored.Filled.List,
+        contentDescription = stringResource(Res.string.common_des_toc_fab)
+      )
+    }
+  }
+}
+
+@UniversalWidgetPreview
+@Composable
+private fun PreviewAnimatedFab() = PreviewWrapper {
+  AnimatedFab(isVisible = true, onClick = {}, modifier = Modifier.padding(16.dp))
+}

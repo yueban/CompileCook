@@ -7,14 +7,18 @@ import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.DishDetail
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
+import com.yueban.compilecook.ui.base.Success
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishComponent.Output.BackClicked
+import com.yueban.compilecook.ui.widget.markdown.TocItem
+import com.yueban.compilecook.ui.widget.markdown.extractToc
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -24,6 +28,8 @@ data class DishState(
   val dishAsync: Async<DishDetail?> = Uninitialized,
   @Transient
   val contentAsync: Async<State> = Uninitialized,
+  @Transient
+  val tocAsync: Async<List<TocItem>> = Uninitialized,
 )
 
 interface DishComponent : UiStateComponent<DishState> {
@@ -58,6 +64,13 @@ class DefaultDishComponent(
       .flatMapLatest { parseMarkdownFlow(it) }
       .execute(retainValue = DishState::contentAsync) {
         copy(contentAsync = it)
+      }
+
+    uiState.mapNotNull { it.contentAsync as? Success }
+      .mapNotNull { it.value as? State.Success }
+      .map { extractToc(it) }
+      .execute(retainValue = DishState::tocAsync) {
+        copy(tocAsync = it)
       }
   }
 

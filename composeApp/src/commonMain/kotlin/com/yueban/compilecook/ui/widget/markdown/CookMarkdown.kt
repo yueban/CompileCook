@@ -3,14 +3,20 @@ package com.yueban.compilecook.ui.widget.markdown
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -24,9 +30,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
-import com.mikepenz.markdown.compose.LazyMarkdownSuccess
 import com.mikepenz.markdown.compose.Markdown
+import com.mikepenz.markdown.compose.MarkdownElement
 import com.mikepenz.markdown.compose.components.MarkdownComponent
+import com.mikepenz.markdown.compose.components.MarkdownComponents
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
@@ -44,6 +51,7 @@ import com.yueban.compilecook.ui.util.UniversalScreenPreview
 fun CookMarkdown(
   state: State,
   modifier: Modifier = Modifier,
+  listState: LazyListState,
 ) {
   Markdown(
     state = state,
@@ -52,12 +60,34 @@ fun CookMarkdown(
     components = cookMarkdownComponents(),
     // disable animation
     animations = markdownAnimations(animateTextSize = { this }),
-    success = { state, components, modifier ->
-      LazyMarkdownSuccess(state, components, modifier)
+    success = { successState, components, mod ->
+      MarkdownSuccess(successState, listState, mod, components)
     },
     imageTransformer = Coil3ImageTransformerImpl,
     modifier = modifier.fillMaxSize(),
   )
+}
+
+@Composable
+private fun MarkdownSuccess(
+  state: State.Success,
+  listState: LazyListState,
+  modifier: Modifier,
+  components: MarkdownComponents,
+) {
+  val nodes = remember(state.node) { state.node.children }
+  LazyColumn(
+    state = listState,
+    modifier = modifier,
+    contentPadding = PaddingValues(0.dp)
+  ) {
+    items(
+      items = nodes,
+      key = { node -> node.startOffset }
+    ) { node ->
+      MarkdownElement(node, components, state.content)
+    }
+  }
 }
 
 /**
@@ -174,5 +204,5 @@ private fun PreviewCookMarkdown() = PreviewWrapper {
     content = PreviewConstant.dishDetail.content.trimIndent(),
   )
   val state by markdownState.state.collectAsState()
-  CookMarkdown(state = state)
+  CookMarkdown(state = state, listState = rememberLazyListState())
 }

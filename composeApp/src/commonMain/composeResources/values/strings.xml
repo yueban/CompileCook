@@ -9,6 +9,8 @@
     <string name="common_des_clear">Clear</string>
     <string name="common_des_toggle_favorite">Toggle favorite</string>
     <string name="common_search_hint">Search...</string>
+    <string name="common_toc_title">Table of Contents</string>
+    <string name="common_des_toc_fab">Table of Contents</string>
 
     <string name="main_tab_tips">Tips</string>
     <string name="main_tab_dishes">Dishes</string>
