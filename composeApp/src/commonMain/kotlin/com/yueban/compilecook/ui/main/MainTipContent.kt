@@ -18,7 +18,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,7 +37,7 @@ import com.yueban.compilecook.repo.entity.TipType.LEARN
 import com.yueban.compilecook.repo.entity.TipType.UNKNOWN
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.base.Fail
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
@@ -111,8 +110,8 @@ fun TipTypeHeader(type: TipType) {
     Box(
       modifier = Modifier
         .size(4.dp, 16.dp)
-        .clip(MaterialTheme.shapes.extraSmall)
-        .background(MaterialTheme.colorScheme.primary)
+        .clip(AppTheme.shapes.extraSmall)
+        .background(AppTheme.colorScheme.primary)
     )
 
     Spacer(modifier = Modifier.width(8.dp))
@@ -124,8 +123,8 @@ fun TipTypeHeader(type: TipType) {
         ADVANCED -> Res.string.main_tip_advanced
         UNKNOWN -> null
       }?.let { stringResource(it) } ?: "",
-      style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-      color = ExtendedTheme.colors.titleText
+      style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+      color = AppTheme.colors.titleText
     )
   }
 }
@@ -133,9 +132,9 @@ fun TipTypeHeader(type: TipType) {
 @Composable
 fun TipItem(tip: TipSummary, onClick: () -> Unit) {
   Card(
-    shape = MaterialTheme.shapes.medium,
+    shape = AppTheme.shapes.medium,
     colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface,
+      containerColor = AppTheme.colorScheme.surface,
     ),
     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     onClick = onClick,
@@ -151,15 +150,15 @@ fun TipItem(tip: TipSummary, onClick: () -> Unit) {
       Column(modifier = Modifier.weight(1f)) {
         Text(
           text = tip.name,
-          style = MaterialTheme.typography.bodyLarge,
-          color = ExtendedTheme.colors.titleText
+          style = AppTheme.typography.bodyLarge,
+          color = AppTheme.colors.titleText
         )
       }
 
       Icon(
         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
         contentDescription = tip.name,
-        tint = ExtendedTheme.colors.subTitleText.copy(alpha = 0.5f),
+        tint = AppTheme.colors.subTitleText.copy(alpha = 0.5f),
         modifier = Modifier.size(20.dp)
       )
     }

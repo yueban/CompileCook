@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,7 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.DISH_DIFFICULTY_MAX_LEVEL
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.AsyncContent
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.IconSource
 import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
@@ -115,8 +114,8 @@ fun MainDishContent(component: MainDishComponent, extraContentPaddingBottom: Dp)
 @Composable
 private fun FavoriteCard(onClick: () -> Unit) {
   Card(
-    shape = MaterialTheme.shapes.extraLarge,
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+    shape = AppTheme.shapes.extraLarge,
+    colors = CardDefaults.cardColors(containerColor = AppTheme.colorScheme.tertiaryContainer),
     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     modifier = Modifier.fillMaxWidth().height(110.dp),
     onClick = onClick,
@@ -128,14 +127,14 @@ private fun FavoriteCard(onClick: () -> Unit) {
       Box(
         modifier = Modifier.size(60.dp)
           .clip(CircleShape)
-          .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)),
+          .background(AppTheme.colorScheme.surface.copy(alpha = 0.4f)),
         contentAlignment = Alignment.Center,
       ) {
         Icon(
           imageVector = Icons.Filled.Favorite,
           contentDescription = stringResource(Res.string.main_dish_favorite),
           modifier = Modifier.size(32.dp),
-          tint = ExtendedTheme.colors.favorite,
+          tint = AppTheme.colors.favorite,
         )
       }
 
@@ -144,14 +143,14 @@ private fun FavoriteCard(onClick: () -> Unit) {
       Text(
         modifier = Modifier.weight(1f),
         text = stringResource(Res.string.main_dish_favorite),
-        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-        color = MaterialTheme.colorScheme.onTertiaryContainer,
+        style = AppTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+        color = AppTheme.colorScheme.onTertiaryContainer,
       )
 
       Icon(
         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
         contentDescription = null,
-        tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.5f)
+        tint = AppTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.5f)
       )
     }
   }
@@ -161,8 +160,8 @@ private fun FavoriteCard(onClick: () -> Unit) {
 private fun SectionHeader(title: String) {
   Text(
     text = title,
-    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-    color = ExtendedTheme.colors.titleText,
+    style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+    color = AppTheme.colors.titleText,
     modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
   )
 }
@@ -175,9 +174,9 @@ private fun DishCategoryCard(
   onClick: () -> Unit,
 ) {
   Card(
-    shape = MaterialTheme.shapes.large,
+    shape = AppTheme.shapes.large,
     colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface,
+      containerColor = AppTheme.colorScheme.surface,
     ),
     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     modifier = Modifier
@@ -209,11 +208,11 @@ private fun DishCategoryCard(
 
       Text(
         text = name,
-        style = MaterialTheme.typography.titleMedium.copy(
+        style = AppTheme.typography.titleMedium.copy(
           fontWeight = FontWeight.Medium,
           fontSize = 16.sp
         ),
-        color = ExtendedTheme.colors.titleText,
+        color = AppTheme.colors.titleText,
         textAlign = TextAlign.Center,
         maxLines = 1
       )
@@ -224,9 +223,9 @@ private fun DishCategoryCard(
 @Composable
 private fun DifficultyCard(level: Int, onClick: () -> Unit) {
   Card(
-    shape = MaterialTheme.shapes.large,
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+    shape = AppTheme.shapes.large,
+    colors = CardDefaults.cardColors(containerColor = AppTheme.colorScheme.surface),
+    border = BorderStroke(1.dp, AppTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
     modifier = Modifier
       .fillMaxWidth()
       .aspectRatio(1f),
@@ -241,20 +240,20 @@ private fun DifficultyCard(level: Int, onClick: () -> Unit) {
         modifier = Modifier
           .size(64.dp)
           .clip(CircleShape)
-          .background(MaterialTheme.colorScheme.secondaryContainer),
+          .background(AppTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
       ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text(
             text = level.toString(),
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSecondaryContainer
+            style = AppTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = AppTheme.colorScheme.onSecondaryContainer
           )
           Icon(
             painter = painterResource(Res.drawable.ic_difficulty_star),
             contentDescription = null,
             modifier = Modifier.size(18.dp).offset(y = (-2).dp),
-            tint = ExtendedTheme.colors.difficultyStar
+            tint = AppTheme.colors.difficultyStar
           )
         }
       }
@@ -263,8 +262,8 @@ private fun DifficultyCard(level: Int, onClick: () -> Unit) {
 
       Text(
         text = stringResource(Res.string.main_dish_difficulty_format, level),
-        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-        color = ExtendedTheme.colors.titleText,
+        style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+        color = AppTheme.colors.titleText,
         textAlign = TextAlign.Center
       )
     }

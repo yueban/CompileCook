@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.yueban.compilecook.BuildKonfig
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
@@ -69,15 +68,15 @@ private fun AboutHeader() {
     Spacer(modifier = Modifier.height(16.dp))
     Text(
       text = stringResource(Res.string.app_name),
-      style = MaterialTheme.typography.headlineSmall,
+      style = AppTheme.typography.headlineSmall,
       fontWeight = FontWeight.Bold,
-      color = ExtendedTheme.colors.titleText
+      color = AppTheme.colors.titleText
     )
     Spacer(modifier = Modifier.height(4.dp))
     Text(
       text = BuildKonfig.APP_VERSION,
-      style = MaterialTheme.typography.bodyMedium,
-      color = ExtendedTheme.colors.subTitleText
+      style = AppTheme.typography.bodyMedium,
+      color = AppTheme.colors.subTitleText
     )
     Spacer(modifier = Modifier.height(32.dp))
   }

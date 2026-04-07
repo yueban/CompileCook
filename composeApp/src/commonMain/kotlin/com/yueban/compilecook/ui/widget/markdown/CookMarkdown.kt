@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,7 +40,7 @@ import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.rememberMarkdownState
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewConstant
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
@@ -94,14 +93,14 @@ private fun MarkdownSuccess(
  */
 @Composable
 private fun cookMarkdownColors(): MarkdownColors {
-  val colors = ExtendedTheme.colors
+  val colors = AppTheme.colors
   return markdownColor(
-    text = MaterialTheme.colorScheme.onSurface,
-    codeBackground = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-    inlineCodeBackground = MaterialTheme.colorScheme.surfaceVariant,
+    text = AppTheme.colorScheme.onSurface,
+    codeBackground = AppTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+    inlineCodeBackground = AppTheme.colorScheme.surfaceVariant,
     dividerColor = colors.divider,
     // Make tables look clean
-    tableBackground = MaterialTheme.colorScheme.surface,
+    tableBackground = AppTheme.colorScheme.surface,
   )
 }
 
@@ -111,28 +110,28 @@ private fun cookMarkdownColors(): MarkdownColors {
  */
 @Composable
 private fun cookMarkdownTypography(): MarkdownTypography {
-  val typography = MaterialTheme.typography
-  val primaryColor = MaterialTheme.colorScheme.primary
+  val typography = AppTheme.typography
+  val primaryColor = AppTheme.colorScheme.primary
 
   return markdownTypography(
     // H1 - Dish Title
     h1 = typography.headlineMedium.copy(
       fontWeight = FontWeight.Bold,
-      color = ExtendedTheme.colors.titleText
+      color = AppTheme.colors.titleText
     ),
     // H2 - Section (Ingredients, Steps)
     h2 = typography.titleLarge.copy(
       fontWeight = FontWeight.Bold,
-      color = ExtendedTheme.colors.titleText
+      color = AppTheme.colors.titleText
     ),
     // H3 - Sub-section
     h3 = typography.titleMedium.copy(
       fontWeight = FontWeight.Bold,
-      color = ExtendedTheme.colors.subTitleText
+      color = AppTheme.colors.subTitleText
     ),
     // Normal text
     text = typography.bodyLarge.copy(
-      color = MaterialTheme.colorScheme.onSurface
+      color = AppTheme.colorScheme.onSurface
     ),
     // Bullet points (Ingredients)
     bullet = typography.bodyLarge,
@@ -140,13 +139,13 @@ private fun cookMarkdownTypography(): MarkdownTypography {
     // Quotes (Tips/Notes) - Made italic and slightly lighter
     quote = typography.bodyMedium.copy(
       fontStyle = FontStyle.Italic,
-      color = ExtendedTheme.colors.bodyMedium
+      color = AppTheme.colors.bodyMedium
     ),
     // Code - Monospace
     code = TextStyle(
       fontFamily = FontFamily.Monospace,
       fontSize = typography.bodyMedium.fontSize,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
+      color = AppTheme.colorScheme.onSurfaceVariant
     ),
     // Links
     textLink = TextLinkStyles(
@@ -184,13 +183,13 @@ private val CustomImageComponent: MarkdownComponent = { model ->
       contentDescription = null,
       modifier = Modifier
         .fillMaxWidth()
-        .clip(MaterialTheme.shapes.medium)
+        .clip(AppTheme.shapes.medium)
         .border(
           width = 1.dp,
-          color = ExtendedTheme.colors.divider,
-          shape = MaterialTheme.shapes.medium
+          color = AppTheme.colors.divider,
+          shape = AppTheme.shapes.medium
         )
-        .background(MaterialTheme.colorScheme.surfaceVariant),
+        .background(AppTheme.colorScheme.surfaceVariant),
       contentScale = ContentScale.FillWidth
     )
   }

@@ -1,7 +1,6 @@
 package com.yueban.compilecook
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,7 +17,7 @@ fun App(rootFactory: @Composable () -> RootComponent) {
   AppTheme {
     Surface(
       modifier = Modifier.fillMaxSize(),
-      color = MaterialTheme.colorScheme.background
+      color = AppTheme.colorScheme.background
     ) {
       val appInitializerSignal: AppInitializerSignal = koinInject()
       val isReady by appInitializerSignal.isReady.collectAsState()

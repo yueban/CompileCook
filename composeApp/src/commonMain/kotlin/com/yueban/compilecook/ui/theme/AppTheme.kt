@@ -1,15 +1,40 @@
 package com.yueban.compilecook.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.text.font.FontFamily
 import coil3.compose.LocalAsyncImagePreviewHandler
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.noto_sans_sc_regular
 import org.jetbrains.compose.resources.Font
+
+object AppTheme {
+  val colors: ExtendedColorScheme
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalExtendedColorScheme.current
+
+  val colorScheme: ColorScheme
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.colorScheme
+
+  val typography: Typography
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.typography
+
+  val shapes: Shapes
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.shapes
+}
 
 @Composable
 fun AppTheme(

@@ -8,11 +8,11 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import compilecook.composeapp.generated.resources.Res
@@ -33,7 +33,7 @@ fun TitleTopBar(
         text = title,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        style = MaterialTheme.typography.titleLarge
+        style = AppTheme.typography.titleLarge
       )
     },
     navigationIcon = {
@@ -48,11 +48,11 @@ fun TitleTopBar(
     },
     actions = actions,
     colors = topAppBarColors(
-      containerColor = MaterialTheme.colorScheme.background,
-      scrolledContainerColor = MaterialTheme.colorScheme.background,
-      titleContentColor = MaterialTheme.colorScheme.onBackground,
-      navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-      actionIconContentColor = MaterialTheme.colorScheme.onBackground
+      containerColor = AppTheme.colorScheme.background,
+      scrolledContainerColor = AppTheme.colorScheme.background,
+      titleContentColor = AppTheme.colorScheme.onBackground,
+      navigationIconContentColor = AppTheme.colorScheme.onBackground,
+      actionIconContentColor = AppTheme.colorScheme.onBackground
     )
   )
 }

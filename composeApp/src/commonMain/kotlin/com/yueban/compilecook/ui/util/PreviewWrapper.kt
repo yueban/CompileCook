@@ -1,6 +1,5 @@
 package com.yueban.compilecook.ui.util
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import com.yueban.compilecook.ui.theme.AppTheme
@@ -9,7 +8,7 @@ import com.yueban.compilecook.ui.theme.AppTheme
 fun PreviewWrapper(content: @Composable () -> Unit) {
   AppTheme {
     Surface(
-      color = MaterialTheme.colorScheme.background,
+      color = AppTheme.colorScheme.background,
       content = content
     )
   }

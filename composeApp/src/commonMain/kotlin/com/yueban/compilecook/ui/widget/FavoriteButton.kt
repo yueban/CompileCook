@@ -5,10 +5,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import compilecook.composeapp.generated.resources.Res
@@ -25,7 +24,7 @@ fun FavoriteButton(
     Icon(
       imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
       contentDescription = stringResource(Res.string.common_des_toggle_favorite),
-      tint = if (isFavorite) ExtendedTheme.colors.favorite else MaterialTheme.colorScheme.onSurfaceVariant
+      tint = if (isFavorite) AppTheme.colors.favorite else AppTheme.colorScheme.onSurfaceVariant
     )
   }
 }

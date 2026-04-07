@@ -14,7 +14,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import com.yueban.compilecook.ui.util.stringRes
@@ -50,7 +50,7 @@ fun ErrorComposable(
   InfoStateComposable(
     icon = Icons.Filled.ErrorOutline,
     message = displayMessage,
-    color = MaterialTheme.colorScheme.error,
+    color = AppTheme.colorScheme.error,
     modifier = modifier,
     action = if (onRetry != null) {
       { Button(onClick = onRetry) { Text(stringResource(Res.string.common_retry)) } }
@@ -71,7 +71,7 @@ fun EmptyComposable(
   InfoStateComposable(
     icon = Icons.Outlined.Info,
     message = displayMessage,
-    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    color = AppTheme.colorScheme.onSurfaceVariant,
     modifier = modifier,
     action = action
   )
@@ -92,7 +92,7 @@ private fun InfoStateComposable(
   ) {
     Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(64.dp), tint = color)
     Spacer(Modifier.height(16.dp))
-    Text(text = message, style = MaterialTheme.typography.titleMedium, color = color, textAlign = TextAlign.Center)
+    Text(text = message, style = AppTheme.typography.titleMedium, color = color, textAlign = TextAlign.Center)
     if (action != null) {
       Spacer(Modifier.height(24.dp))
       action()

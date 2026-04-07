@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
@@ -27,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.mikepenz.markdown.model.State
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewData.dishState
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
@@ -60,7 +59,7 @@ fun TocBottomSheet(
   ModalBottomSheet(
     onDismissRequest = onDismiss,
     sheetState = sheetState,
-    containerColor = MaterialTheme.colorScheme.surface,
+    containerColor = AppTheme.colorScheme.surface,
   ) {
     LazyColumn(
       modifier = Modifier.fillMaxWidth(),
@@ -74,8 +73,8 @@ fun TocBottomSheet(
       item {
         Text(
           text = stringResource(Res.string.common_toc_title),
-          style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-          color = ExtendedTheme.colors.titleText,
+          style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+          color = AppTheme.colors.titleText,
           modifier = Modifier.padding(bottom = 16.dp)
         )
       }
@@ -86,7 +85,7 @@ fun TocBottomSheet(
 
         Text(
           text = item.title,
-          color = if (isActive) MaterialTheme.colorScheme.primary else ExtendedTheme.colors.titleText,
+          color = if (isActive) AppTheme.colorScheme.primary else AppTheme.colors.titleText,
           fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
           modifier = Modifier
             .fillMaxWidth()

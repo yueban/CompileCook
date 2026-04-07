@@ -19,7 +19,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
@@ -45,6 +44,7 @@ import com.yueban.compilecook.ui.main.MainComponent.Child
 import com.yueban.compilecook.ui.main.MainComponent.Child.Dishes
 import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.widget.TitleTopBar
@@ -151,8 +151,8 @@ private fun ArchNavigationBar(
         FloatingActionButton(
           onClick = onRandomDishClicked,
           shape = CircleShape,
-          containerColor = MaterialTheme.colorScheme.primary,
-          contentColor = MaterialTheme.colorScheme.onPrimary,
+          containerColor = AppTheme.colorScheme.primary,
+          contentColor = AppTheme.colorScheme.onPrimary,
           elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
           modifier = Modifier.size(56.dp)
         ) {

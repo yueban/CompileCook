@@ -13,10 +13,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import compilecook.composeapp.generated.resources.Res
@@ -39,8 +39,8 @@ fun AnimatedFab(
   Box(modifier = Modifier.padding(16.dp)) {
     FloatingActionButton(
       onClick = onClick,
-      containerColor = MaterialTheme.colorScheme.primaryContainer,
-      contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+      containerColor = AppTheme.colorScheme.primaryContainer,
+      contentColor = AppTheme.colorScheme.onPrimaryContainer,
       shape = CircleShape,
     ) {
       Icon(

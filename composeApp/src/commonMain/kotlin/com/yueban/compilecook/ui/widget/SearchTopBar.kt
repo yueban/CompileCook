@@ -8,7 +8,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -22,7 +21,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import compilecook.composeapp.generated.resources.Res
@@ -52,20 +51,20 @@ fun SearchTopBar(
         placeholder = {
           Text(
             text = placeholderText,
-            style = MaterialTheme.typography.bodyLarge,
-            color = ExtendedTheme.colors.subTitleText
+            style = AppTheme.typography.bodyLarge,
+            color = AppTheme.colors.subTitleText
           )
         },
         singleLine = true,
-        textStyle = MaterialTheme.typography.bodyLarge.copy(
-          color = ExtendedTheme.colors.titleText
+        textStyle = AppTheme.typography.bodyLarge.copy(
+          color = AppTheme.colors.titleText
         ),
         colors = TextFieldDefaults.colors(
           focusedContainerColor = Color.Transparent,
           unfocusedContainerColor = Color.Transparent,
           focusedIndicatorColor = Color.Transparent,
           unfocusedIndicatorColor = Color.Transparent,
-          cursorColor = MaterialTheme.colorScheme.primary
+          cursorColor = AppTheme.colorScheme.primary
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
@@ -79,7 +78,7 @@ fun SearchTopBar(
         Icon(
           imageVector = Icons.AutoMirrored.Filled.ArrowBack,
           contentDescription = stringResource(Res.string.common_des_back),
-          tint = ExtendedTheme.colors.titleText
+          tint = AppTheme.colors.titleText
         )
       }
     },
@@ -89,7 +88,7 @@ fun SearchTopBar(
           Icon(
             imageVector = Icons.Default.Close,
             contentDescription = stringResource(Res.string.common_des_clear),
-            tint = ExtendedTheme.colors.subTitleText
+            tint = AppTheme.colors.subTitleText
           )
         }
       }

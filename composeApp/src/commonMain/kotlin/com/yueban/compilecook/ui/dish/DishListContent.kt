@@ -26,7 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,7 +45,7 @@ import com.yueban.compilecook.repo.entity.DISH_DIFFICULTY_MAX_LEVEL
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.AsyncContent
-import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.startOnly
 import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
@@ -106,7 +105,7 @@ fun DishListContent(component: DishListComponent) {
               Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = ExtendedTheme.colors.titleText
+                tint = AppTheme.colors.titleText
               )
             }
           }
@@ -212,9 +211,9 @@ private fun DishItem(
   onFavoriteClick: () -> Unit,
 ) {
   Card(
-    shape = MaterialTheme.shapes.medium,
+    shape = AppTheme.shapes.medium,
     colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface,
+      containerColor = AppTheme.colorScheme.surface,
     ),
     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     modifier = Modifier
@@ -237,8 +236,8 @@ private fun DishItem(
             Text(
               modifier = Modifier.padding(end = 30.dp),
               text = dish.name,
-              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-              color = ExtendedTheme.colors.titleText,
+              style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+              color = AppTheme.colors.titleText,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
             )
@@ -247,8 +246,8 @@ private fun DishItem(
 
             Text(
               text = dish.description.replace("\n", " "),
-              style = MaterialTheme.typography.bodySmall,
-              color = ExtendedTheme.colors.bodyMedium,
+              style = AppTheme.typography.bodySmall,
+              color = AppTheme.colors.bodyMedium,
               maxLines = 2,
               overflow = TextOverflow.Ellipsis,
               lineHeight = 16.sp
@@ -258,8 +257,8 @@ private fun DishItem(
           Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
               text = stringResource(Res.string.dish_list_item_difficulty),
-              style = MaterialTheme.typography.labelSmall,
-              color = ExtendedTheme.colors.subTitleText
+              style = AppTheme.typography.labelSmall,
+              color = AppTheme.colors.subTitleText
             )
             DifficultyStars(count = dish.difficulty.toInt())
           }
@@ -280,18 +279,18 @@ private fun DishImage(dish: DishSummary) {
   val modifier = Modifier
     .width(110.dp)
     .fillMaxHeight()
-    .clip(MaterialTheme.shapes.medium.startOnly)
+    .clip(AppTheme.shapes.medium.startOnly)
 
   if (dish.image.isNotBlank()) {
     AsyncImage(
       model = dish.image,
       contentDescription = dish.name,
       contentScale = ContentScale.Crop,
-      modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant)
+      modifier = modifier.background(AppTheme.colorScheme.surfaceVariant)
     )
   } else {
     Box(
-      modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
+      modifier = modifier.background(AppTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
       contentAlignment = Alignment.Center
     ) {
       Icon(
@@ -315,7 +314,7 @@ private fun DifficultyStars(count: Int) {
         painter = painterResource(Res.drawable.ic_difficulty_star),
         contentDescription = stringResource(Res.string.dish_list_des_item_difficulty_format, count),
         modifier = Modifier.size(14.dp),
-        tint = ExtendedTheme.colors.difficultyStar,
+        tint = AppTheme.colors.difficultyStar,
       )
       Spacer(Modifier.width(1.dp))
     }
