@@ -24,8 +24,8 @@ data class ExtendedColorScheme(
   val divider: Color,
   val textFieldHint: Color,
   val bodyMedium: Color,
-  val difficultyStar: Color = Color(0xFFFFB300),
-  val favorite: Color = Color(0xFFE91E63),
+  val difficultyStar: Color,
+  val favorite: Color,
 )
 
 private val DarkColorScheme = darkColorScheme(
@@ -62,6 +62,8 @@ private val DarkColorScheme = darkColorScheme(
     divider = Color(0xFF303030),
     textFieldHint = Color(0xFF70777C),
     bodyMedium = Color(0xFF9BA1A7),
+    difficultyStar = Color(0xFFFFD54F),
+    favorite = Color(0xFFF48FB1),
   )
 }
 
@@ -99,5 +101,7 @@ private val LightColorScheme = lightColorScheme(
     divider = Color(0xFFF0F2F5),
     textFieldHint = Color(0xFF637387),
     bodyMedium = Color(0xFF637387),
+    difficultyStar = Color(0xFFFFB300),
+    favorite = Color(0xFFE91E63),
   )
 }
