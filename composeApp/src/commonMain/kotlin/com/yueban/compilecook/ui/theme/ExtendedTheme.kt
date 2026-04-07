@@ -6,8 +6,4 @@ object ExtendedTheme {
   val colors: ExtendedColorScheme
     @Composable
     get() = LocalExtendedColorScheme.current
-
-  val typos: ExtendedTypography
-    @Composable
-    get() = LocalExtendedTypography.current
 }

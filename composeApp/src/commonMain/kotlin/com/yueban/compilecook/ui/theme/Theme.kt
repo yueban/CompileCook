@@ -19,16 +19,14 @@ fun AppTheme(
   PlatformSpecificThemeEffects(darkTheme)
 
   val extendedColorScheme = extendedColorScheme(darkTheme)
-  val extendedTypography = extendedTypography()
 
   CompositionLocalProvider(
     LocalExtendedColorScheme provides extendedColorScheme,
-    LocalExtendedTypography provides extendedTypography,
     LocalAsyncImagePreviewHandler provides coilPreviewHandler,
   ) {
     MaterialTheme(
       colorScheme = extendedColorScheme.colorScheme,
-      typography = extendedTypography.typography.withCustomFont(),
+      typography = DefaultTypography.withCustomFont(),
       content = content
     )
   }

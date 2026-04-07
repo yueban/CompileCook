@@ -1,28 +1,12 @@
 package com.yueban.compilecook.ui.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-internal fun extendedTypography() = DefaultExtendedTypography
-
-internal val LocalExtendedTypography = staticCompositionLocalOf<ExtendedTypography> {
-  error("no extended typography specified")
-}
-
-@Stable
-data class ExtendedTypography(
-  val typography: Typography,
-  val defaultIconSize: Dp,
-)
-
-private val DefaultTypography = Typography(
+internal val DefaultTypography = Typography(
   titleLarge = TextStyle(
     fontFamily = FontFamily.SansSerif,
     fontWeight = FontWeight.Bold,
@@ -72,9 +56,4 @@ private val DefaultTypography = Typography(
     lineHeight = 16.sp,
     letterSpacing = 0.sp
   ),
-)
-
-private val DefaultExtendedTypography = ExtendedTypography(
-  typography = DefaultTypography,
-  defaultIconSize = 24.dp,
 )
