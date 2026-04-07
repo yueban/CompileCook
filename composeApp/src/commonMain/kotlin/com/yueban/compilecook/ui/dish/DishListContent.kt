@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
@@ -48,6 +47,7 @@ import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.ExtendedTheme
+import com.yueban.compilecook.ui.theme.startOnly
 import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
@@ -212,7 +212,7 @@ private fun DishItem(
   onFavoriteClick: () -> Unit,
 ) {
   Card(
-    shape = RoundedCornerShape(12.dp),
+    shape = MaterialTheme.shapes.medium,
     colors = CardDefaults.cardColors(
       containerColor = MaterialTheme.colorScheme.surface,
     ),
@@ -280,7 +280,7 @@ private fun DishImage(dish: DishSummary) {
   val modifier = Modifier
     .width(110.dp)
     .fillMaxHeight()
-    .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
+    .clip(MaterialTheme.shapes.medium.startOnly)
 
   if (dish.image.isNotBlank()) {
     AsyncImage(

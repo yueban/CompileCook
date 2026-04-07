@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Favorite
@@ -116,7 +115,7 @@ fun MainDishContent(component: MainDishComponent, extraContentPaddingBottom: Dp)
 @Composable
 private fun FavoriteCard(onClick: () -> Unit) {
   Card(
-    shape = RoundedCornerShape(20.dp),
+    shape = MaterialTheme.shapes.extraLarge,
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     modifier = Modifier.fillMaxWidth().height(110.dp),
@@ -176,7 +175,7 @@ private fun DishCategoryCard(
   onClick: () -> Unit,
 ) {
   Card(
-    shape = RoundedCornerShape(16.dp),
+    shape = MaterialTheme.shapes.large,
     colors = CardDefaults.cardColors(
       containerColor = MaterialTheme.colorScheme.surface,
     ),
@@ -225,7 +224,7 @@ private fun DishCategoryCard(
 @Composable
 private fun DifficultyCard(level: Int, onClick: () -> Unit) {
   Card(
-    shape = RoundedCornerShape(16.dp),
+    shape = MaterialTheme.shapes.large,
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
     modifier = Modifier

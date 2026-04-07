@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -185,11 +184,11 @@ private val CustomImageComponent: MarkdownComponent = { model ->
       contentDescription = null,
       modifier = Modifier
         .fillMaxWidth()
-        .clip(RoundedCornerShape(12.dp))
+        .clip(MaterialTheme.shapes.medium)
         .border(
           width = 1.dp,
           color = ExtendedTheme.colors.divider,
-          shape = RoundedCornerShape(12.dp)
+          shape = MaterialTheme.shapes.medium
         )
         .background(MaterialTheme.colorScheme.surfaceVariant),
       contentScale = ContentScale.FillWidth

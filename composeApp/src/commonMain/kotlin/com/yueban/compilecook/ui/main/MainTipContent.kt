@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
@@ -112,7 +111,7 @@ fun TipTypeHeader(type: TipType) {
     Box(
       modifier = Modifier
         .size(4.dp, 16.dp)
-        .clip(RoundedCornerShape(2.dp))
+        .clip(MaterialTheme.shapes.extraSmall)
         .background(MaterialTheme.colorScheme.primary)
     )
 
@@ -134,7 +133,7 @@ fun TipTypeHeader(type: TipType) {
 @Composable
 fun TipItem(tip: TipSummary, onClick: () -> Unit) {
   Card(
-    shape = RoundedCornerShape(12.dp),
+    shape = MaterialTheme.shapes.medium,
     colors = CardDefaults.cardColors(
       containerColor = MaterialTheme.colorScheme.surface,
     ),

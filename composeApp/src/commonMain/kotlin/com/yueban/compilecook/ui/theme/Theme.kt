@@ -27,6 +27,7 @@ fun AppTheme(
     MaterialTheme(
       colorScheme = extendedColorScheme.colorScheme,
       typography = DefaultTypography.withCustomFont(),
+      shapes = DefaultShapes,
       content = content
     )
   }
