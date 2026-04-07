@@ -10,10 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.base.Success
+import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewData
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
@@ -57,7 +57,7 @@ fun TipContent(component: TipComponent) {
     AsyncContent(async = state.contentAsync, modifier = Modifier.padding(padding)) {
       CookMarkdown(
         state = it,
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = Modifier.padding(horizontal = AppTheme.dimens.screenPadding),
         listState = listState
       )
     }

@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
@@ -34,7 +33,10 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun LoadingComposable(modifier: Modifier = Modifier) {
   Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    CircularProgressIndicator(modifier = Modifier.size(48.dp), strokeWidth = 4.dp)
+    CircularProgressIndicator(
+      modifier = Modifier.size(AppTheme.dimens.iconLarge),
+      strokeWidth = AppTheme.dimens.indicatorWidth
+    )
   }
 }
 
@@ -86,15 +88,20 @@ private fun InfoStateComposable(
   action: (@Composable () -> Unit)? = null,
 ) {
   Column(
-    modifier = modifier.fillMaxSize().padding(32.dp),
+    modifier = modifier.fillMaxSize().padding(AppTheme.dimens.extraLargeGap),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
   ) {
-    Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(64.dp), tint = color)
-    Spacer(Modifier.height(16.dp))
+    Icon(
+      imageVector = icon,
+      contentDescription = null,
+      modifier = Modifier.size(AppTheme.dimens.categoryIconBox),
+      tint = color
+    )
+    Spacer(Modifier.height(AppTheme.dimens.screenPadding))
     Text(text = message, style = AppTheme.typography.titleMedium, color = color, textAlign = TextAlign.Center)
     if (action != null) {
-      Spacer(Modifier.height(24.dp))
+      Spacer(Modifier.height(AppTheme.dimens.largeGap))
       action()
     }
   }

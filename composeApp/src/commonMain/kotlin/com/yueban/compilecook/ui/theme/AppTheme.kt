@@ -34,6 +34,11 @@ object AppTheme {
     @Composable
     @ReadOnlyComposable
     get() = MaterialTheme.shapes
+
+  val dimens: ExtendedDimens
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalExtendedDimens.current
 }
 
 @Composable
@@ -47,6 +52,7 @@ fun AppTheme(
 
   CompositionLocalProvider(
     LocalExtendedColorScheme provides extendedColorScheme,
+    LocalExtendedDimens provides ExtendedDimens(),
     LocalAsyncImagePreviewHandler provides coilPreviewHandler,
   ) {
     MaterialTheme(

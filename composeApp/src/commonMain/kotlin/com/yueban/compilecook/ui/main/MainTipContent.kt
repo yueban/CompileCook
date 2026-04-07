@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.TipSummary
 import com.yueban.compilecook.repo.entity.TipType
@@ -81,12 +80,12 @@ fun TipList(
 ) {
   LazyColumn(
     contentPadding = PaddingValues(
-      top = 16.dp,
-      start = 16.dp,
-      end = 16.dp,
-      bottom = 16.dp + extraContentPaddingBottom
+      top = AppTheme.dimens.screenPadding,
+      start = AppTheme.dimens.screenPadding,
+      end = AppTheme.dimens.screenPadding,
+      bottom = AppTheme.dimens.screenPadding + extraContentPaddingBottom
     ),
-    verticalArrangement = Arrangement.spacedBy(8.dp)
+    verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap)
   ) {
     groupedTips.forEach { (type, tips) ->
       item(key = type) {
@@ -104,17 +103,17 @@ fun TipTypeHeader(type: TipType) {
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(top = 16.dp, bottom = 8.dp),
+      .padding(top = AppTheme.dimens.screenPadding, bottom = AppTheme.dimens.smallGap),
     verticalAlignment = Alignment.CenterVertically
   ) {
     Box(
       modifier = Modifier
-        .size(4.dp, 16.dp)
+        .size(AppTheme.dimens.indicatorWidth, AppTheme.dimens.screenPadding)
         .clip(AppTheme.shapes.extraSmall)
         .background(AppTheme.colorScheme.primary)
     )
 
-    Spacer(modifier = Modifier.width(8.dp))
+    Spacer(modifier = Modifier.width(AppTheme.dimens.smallGap))
 
     Text(
       text = when (type) {
@@ -136,14 +135,14 @@ fun TipItem(tip: TipSummary, onClick: () -> Unit) {
     colors = CardDefaults.cardColors(
       containerColor = AppTheme.colorScheme.surface,
     ),
-    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+    elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.elevationNone),
     onClick = onClick,
     modifier = Modifier.fillMaxWidth()
   ) {
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(16.dp),
+        .padding(AppTheme.dimens.screenPadding),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -159,7 +158,7 @@ fun TipItem(tip: TipSummary, onClick: () -> Unit) {
         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
         contentDescription = tip.name,
         tint = AppTheme.colors.subTitleText.copy(alpha = 0.5f),
-        modifier = Modifier.size(20.dp)
+        modifier = Modifier.size(AppTheme.dimens.heroCardIconGap)
       )
     }
   }
@@ -174,5 +173,5 @@ class PreviewMainTipComponent : MainTipComponent {
 @UniversalScreenPreview
 @Composable
 private fun PreviewMainTipContent() = PreviewWrapper {
-  MainTipContent(component = PreviewMainTipComponent(), extraContentPaddingBottom = 0.dp)
+  MainTipContent(component = PreviewMainTipComponent(), extraContentPaddingBottom = AppTheme.dimens.zero)
 }

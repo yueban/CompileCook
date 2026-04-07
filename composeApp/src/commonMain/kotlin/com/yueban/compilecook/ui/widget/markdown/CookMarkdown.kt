@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.compose.Markdown
@@ -77,7 +76,7 @@ private fun MarkdownSuccess(
   LazyColumn(
     state = listState,
     modifier = modifier,
-    contentPadding = PaddingValues(0.dp)
+    contentPadding = PaddingValues(AppTheme.dimens.elevationNone)
   ) {
     items(
       items = nodes,
@@ -176,7 +175,7 @@ private val CustomImageComponent: MarkdownComponent = { model ->
   Box(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(vertical = 8.dp)
+      .padding(vertical = AppTheme.dimens.smallGap)
   ) {
     AsyncImage(
       model = imageUrl,
@@ -185,7 +184,7 @@ private val CustomImageComponent: MarkdownComponent = { model ->
         .fillMaxWidth()
         .clip(AppTheme.shapes.medium)
         .border(
-          width = 1.dp,
+          width = AppTheme.dimens.borderThickness,
           color = AppTheme.colors.divider,
           shape = AppTheme.shapes.medium
         )

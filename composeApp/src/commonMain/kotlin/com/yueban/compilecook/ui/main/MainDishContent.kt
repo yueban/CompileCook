@@ -36,8 +36,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.DISH_DIFFICULTY_MAX_LEVEL
 import com.yueban.compilecook.repo.entity.DishCategory
@@ -70,15 +68,15 @@ fun MainDishContent(component: MainDishComponent, extraContentPaddingBottom: Dp)
     onRetry = component::onRetry
   ) { categories ->
     LazyVerticalGrid(
-      columns = GridCells.Adaptive(minSize = 140.dp),
+      columns = GridCells.Adaptive(minSize = AppTheme.dimens.categoryCardMinSize),
       contentPadding = PaddingValues(
-        top = 16.dp,
-        start = 16.dp,
-        end = 16.dp,
-        bottom = 16.dp + extraContentPaddingBottom
+        top = AppTheme.dimens.screenPadding,
+        start = AppTheme.dimens.screenPadding,
+        end = AppTheme.dimens.screenPadding,
+        bottom = AppTheme.dimens.screenPadding + extraContentPaddingBottom
       ),
-      horizontalArrangement = Arrangement.spacedBy(16.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp)
+      horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.screenPadding),
+      verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.screenPadding)
     ) {
       item(key = "dish_favorite", span = { GridItemSpan(maxLineSpan) }) {
         FavoriteCard(onClick = { component.onFavoriteClicked() })
@@ -116,16 +114,16 @@ private fun FavoriteCard(onClick: () -> Unit) {
   Card(
     shape = AppTheme.shapes.extraLarge,
     colors = CardDefaults.cardColors(containerColor = AppTheme.colorScheme.tertiaryContainer),
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    modifier = Modifier.fillMaxWidth().height(110.dp),
+    elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.elevationSmall),
+    modifier = Modifier.fillMaxWidth().height(AppTheme.dimens.heroCardHeight),
     onClick = onClick,
   ) {
     Row(
-      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+      modifier = Modifier.fillMaxSize().padding(horizontal = AppTheme.dimens.heroCardHorizontalPadding),
       verticalAlignment = Alignment.CenterVertically
     ) {
       Box(
-        modifier = Modifier.size(60.dp)
+        modifier = Modifier.size(AppTheme.dimens.categoryIconBox)
           .clip(CircleShape)
           .background(AppTheme.colorScheme.surface.copy(alpha = 0.4f)),
         contentAlignment = Alignment.Center,
@@ -133,12 +131,12 @@ private fun FavoriteCard(onClick: () -> Unit) {
         Icon(
           imageVector = Icons.Filled.Favorite,
           contentDescription = stringResource(Res.string.main_dish_favorite),
-          modifier = Modifier.size(32.dp),
+          modifier = Modifier.size(AppTheme.dimens.heroCardIconSize).offset(y = AppTheme.dimens.favoriteIconOffsetY),
           tint = AppTheme.colors.favorite,
         )
       }
 
-      Spacer(modifier = Modifier.width(20.dp))
+      Spacer(modifier = Modifier.width(AppTheme.dimens.heroCardIconGap))
 
       Text(
         modifier = Modifier.weight(1f),
@@ -162,7 +160,7 @@ private fun SectionHeader(title: String) {
     text = title,
     style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
     color = AppTheme.colors.titleText,
-    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+    modifier = Modifier.padding(top = AppTheme.dimens.smallGap, bottom = AppTheme.dimens.tinyGap)
   )
 }
 
@@ -178,7 +176,7 @@ private fun DishCategoryCard(
     colors = CardDefaults.cardColors(
       containerColor = AppTheme.colorScheme.surface,
     ),
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.elevationSmall),
     modifier = Modifier
       .fillMaxWidth()
       .aspectRatio(1f),
@@ -187,31 +185,28 @@ private fun DishCategoryCard(
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .padding(12.dp),
+        .padding(AppTheme.dimens.mediumGap),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
       Box(
         modifier = Modifier
-          .size(64.dp)
+          .size(AppTheme.dimens.categoryIconBox)
           .clip(CircleShape),
         contentAlignment = Alignment.Center
       ) {
         AnyIcon(
           source = icon,
           contentDescription = name,
-          modifier = Modifier.size(48.dp),
+          modifier = Modifier.size(AppTheme.dimens.iconLarge),
         )
       }
 
-      Spacer(modifier = Modifier.size(8.dp))
+      Spacer(modifier = Modifier.size(AppTheme.dimens.smallGap))
 
       Text(
         text = name,
-        style = AppTheme.typography.titleMedium.copy(
-          fontWeight = FontWeight.Medium,
-          fontSize = 16.sp
-        ),
+        style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
         color = AppTheme.colors.titleText,
         textAlign = TextAlign.Center,
         maxLines = 1
@@ -225,40 +220,41 @@ private fun DifficultyCard(level: Int, onClick: () -> Unit) {
   Card(
     shape = AppTheme.shapes.large,
     colors = CardDefaults.cardColors(containerColor = AppTheme.colorScheme.surface),
-    border = BorderStroke(1.dp, AppTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+    border = BorderStroke(AppTheme.dimens.borderThickness, AppTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
     modifier = Modifier
       .fillMaxWidth()
       .aspectRatio(1f),
     onClick = onClick,
   ) {
     Column(
-      modifier = Modifier.fillMaxSize().padding(12.dp),
+      modifier = Modifier.fillMaxSize().padding(AppTheme.dimens.mediumGap),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
       Box(
         modifier = Modifier
-          .size(64.dp)
+          .size(AppTheme.dimens.categoryIconBox)
           .clip(CircleShape)
           .background(AppTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
       ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+          val label = level.toString()
           Text(
-            text = level.toString(),
+            text = label,
             style = AppTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             color = AppTheme.colorScheme.onSecondaryContainer
           )
           Icon(
             painter = painterResource(Res.drawable.ic_difficulty_star),
-            contentDescription = null,
-            modifier = Modifier.size(18.dp).offset(y = (-2).dp),
+            contentDescription = label,
+            modifier = Modifier.size(AppTheme.dimens.iconSmall).offset(y = -AppTheme.dimens.difficultyStarOffsetY),
             tint = AppTheme.colors.difficultyStar
           )
         }
       }
 
-      Spacer(modifier = Modifier.size(12.dp))
+      Spacer(modifier = Modifier.size(AppTheme.dimens.smallGap))
 
       Text(
         text = stringResource(Res.string.main_dish_difficulty_format, level),
@@ -281,5 +277,5 @@ class PreviewMainDishComponent : MainDishComponent {
 @UniversalScreenPreview
 @Composable
 private fun PreviewMainDishContent() = PreviewWrapper {
-  MainDishContent(component = PreviewMainDishComponent(), extraContentPaddingBottom = 0.dp)
+  MainDishContent(component = PreviewMainDishComponent(), extraContentPaddingBottom = AppTheme.dimens.zero)
 }

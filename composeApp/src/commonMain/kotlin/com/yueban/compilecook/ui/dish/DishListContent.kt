@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -150,15 +149,24 @@ private fun CategoryFilterBar(
   onCategoryToggle: (DishCategory?) -> Unit,
 ) {
   Row(
-    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp)
+    modifier = Modifier.fillMaxWidth()
+      .horizontalScroll(rememberScrollState())
+      .padding(horizontal = AppTheme.dimens.screenPadding),
+    horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap)
   ) {
     DishCategory.entries.filter { it != DishCategory.UNKNOWN }.forEach { category ->
+      val label = category.displayName ?: ""
       FilterChip(
         selected = state.filterCategory == category,
         onClick = { onCategoryToggle(if (state.filterCategory == category) null else category) },
-        label = { Text(category.displayName ?: "") },
-        leadingIcon = { Icon(painterResource(category.monochromeIcon), null, modifier = Modifier.size(18.dp)) },
+        label = { Text(label) },
+        leadingIcon = {
+          Icon(
+            painter = painterResource(category.monochromeIcon),
+            contentDescription = label,
+            modifier = Modifier.size(AppTheme.dimens.iconSmall)
+          )
+        },
       )
     }
   }
@@ -170,15 +178,24 @@ private fun DifficultyFilterBar(
   onDifficultyToggle: (Int?) -> Unit,
 ) {
   Row(
-    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp)
+    modifier = Modifier.fillMaxWidth()
+      .horizontalScroll(rememberScrollState())
+      .padding(horizontal = AppTheme.dimens.screenPadding),
+    horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap)
   ) {
     for (level in 1..DISH_DIFFICULTY_MAX_LEVEL) {
+      val label = stringResource(Res.string.dish_list_filter_difficulty_format, level)
       FilterChip(
         selected = state.filterDifficulty == level,
         onClick = { onDifficultyToggle(if (state.filterDifficulty == level) null else level) },
-        label = { Text(stringResource(Res.string.dish_list_filter_difficulty_format, level)) },
-        leadingIcon = { Icon(Icons.Default.Star, null, modifier = Modifier.size(16.dp)) },
+        label = { Text(label) },
+        leadingIcon = {
+          Icon(
+            imageVector = Icons.Default.Star,
+            contentDescription = label,
+            modifier = Modifier.size(AppTheme.dimens.iconSmall)
+          )
+        },
       )
     }
   }
@@ -191,8 +208,8 @@ private fun DishList(
   onDishFavoriteClick: (dish: DishSummary) -> Unit,
 ) {
   LazyColumn(
-    contentPadding = PaddingValues(16.dp),
-    verticalArrangement = Arrangement.spacedBy(12.dp)
+    contentPadding = PaddingValues(AppTheme.dimens.screenPadding),
+    verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.mediumGap)
   ) {
     items(dishes, key = { it.name }) { dish ->
       DishItem(
@@ -215,10 +232,10 @@ private fun DishItem(
     colors = CardDefaults.cardColors(
       containerColor = AppTheme.colorScheme.surface,
     ),
-    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.elevationExtraSmall),
     modifier = Modifier
       .fillMaxWidth()
-      .height(110.dp),
+      .height(AppTheme.dimens.dishListItemHeight),
     onClick = onClick,
   ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -228,13 +245,13 @@ private fun DishItem(
         Column(
           modifier = Modifier
             .weight(1f)
-            .padding(12.dp)
+            .padding(AppTheme.dimens.mediumGap)
             .fillMaxHeight(),
           verticalArrangement = Arrangement.SpaceBetween
         ) {
           Column {
             Text(
-              modifier = Modifier.padding(end = 30.dp),
+              modifier = Modifier.padding(end = AppTheme.dimens.iconLarge),
               text = dish.name,
               style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
               color = AppTheme.colors.titleText,
@@ -242,7 +259,7 @@ private fun DishItem(
               overflow = TextOverflow.Ellipsis,
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(AppTheme.dimens.tinyGap))
 
             Text(
               text = dish.description.replace("\n", " "),
@@ -268,7 +285,7 @@ private fun DishItem(
       FavoriteButton(
         isFavorite = dish.isFavorite,
         onClick = onFavoriteClick,
-        modifier = Modifier.align(Alignment.TopEnd).size(40.dp)
+        modifier = Modifier.align(Alignment.TopEnd).size(AppTheme.dimens.iconLarge)
       )
     }
   }
@@ -277,7 +294,7 @@ private fun DishItem(
 @Composable
 private fun DishImage(dish: DishSummary) {
   val modifier = Modifier
-    .width(110.dp)
+    .width(AppTheme.dimens.dishListItemHeight)
     .fillMaxHeight()
     .clip(AppTheme.shapes.medium.startOnly)
 
@@ -296,7 +313,7 @@ private fun DishImage(dish: DishSummary) {
       Icon(
         painter = painterResource(dish.category.icon),
         contentDescription = dish.category.displayName,
-        modifier = Modifier.size(48.dp),
+        modifier = Modifier.size(AppTheme.dimens.iconLarge),
         tint = Color.Unspecified
       )
     }
@@ -306,17 +323,17 @@ private fun DishImage(dish: DishSummary) {
 @Composable
 private fun DifficultyStars(count: Int) {
   Row(
-    modifier = Modifier.padding(start = 2.dp),
+    modifier = Modifier.padding(start = AppTheme.dimens.smallGap),
     verticalAlignment = Alignment.CenterVertically
   ) {
     repeat(count) {
       Icon(
         painter = painterResource(Res.drawable.ic_difficulty_star),
         contentDescription = stringResource(Res.string.dish_list_des_item_difficulty_format, count),
-        modifier = Modifier.size(14.dp),
+        modifier = Modifier.size(AppTheme.dimens.iconExtraSmall),
         tint = AppTheme.colors.difficultyStar,
       )
-      Spacer(Modifier.width(1.dp))
+      Spacer(Modifier.width(AppTheme.dimens.borderThickness))
     }
   }
 }

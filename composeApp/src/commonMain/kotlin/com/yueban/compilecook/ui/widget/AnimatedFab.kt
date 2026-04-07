@@ -15,7 +15,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
@@ -33,10 +32,10 @@ fun AnimatedFab(
   enter = scaleIn() + fadeIn(),
   exit = scaleOut() + fadeOut(),
   // compensate for the inner padding to maintain the FAB's original screen position
-  modifier = modifier.offset(x = 16.dp, y = 16.dp)
+  modifier = modifier.offset(x = AppTheme.dimens.screenPadding, y = AppTheme.dimens.screenPadding)
 ) {
   // expand the animation canvas bounds to prevent shadow from being clipped
-  Box(modifier = Modifier.padding(16.dp)) {
+  Box(modifier = Modifier.padding(AppTheme.dimens.screenPadding)) {
     FloatingActionButton(
       onClick = onClick,
       containerColor = AppTheme.colorScheme.primaryContainer,
@@ -54,5 +53,5 @@ fun AnimatedFab(
 @UniversalWidgetPreview
 @Composable
 private fun PreviewAnimatedFab() = PreviewWrapper {
-  AnimatedFab(isVisible = true, onClick = {}, modifier = Modifier.padding(16.dp))
+  AnimatedFab(isVisible = true, onClick = {}, modifier = Modifier.padding(AppTheme.dimens.screenPadding))
 }

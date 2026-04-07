@@ -23,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.mikepenz.markdown.model.State
 import com.yueban.compilecook.ui.theme.AppTheme
@@ -34,8 +33,6 @@ import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_toc_title
 import org.jetbrains.compose.resources.stringResource
 
-private val tocIndentPadding = 16.dp
-
 @Composable
 fun TocBottomSheet(
   toc: List<TocItem>,
@@ -44,6 +41,7 @@ fun TocBottomSheet(
   onTocItemClick: (TocItem) -> Unit,
   onDismiss: () -> Unit,
 ) {
+  val tocIndentPadding = AppTheme.dimens.screenPadding
   val activeNodeIndex by remember(listState, toc) {
     derivedStateOf {
       val firstVisible = listState.firstVisibleItemIndex
@@ -64,10 +62,10 @@ fun TocBottomSheet(
     LazyColumn(
       modifier = Modifier.fillMaxWidth(),
       contentPadding = PaddingValues(
-        start = 24.dp,
-        end = 24.dp,
-        top = 8.dp,
-        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 24.dp
+        start = AppTheme.dimens.largeGap,
+        end = AppTheme.dimens.largeGap,
+        top = AppTheme.dimens.smallGap,
+        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + AppTheme.dimens.largeGap
       )
     ) {
       item {
@@ -75,7 +73,7 @@ fun TocBottomSheet(
           text = stringResource(Res.string.common_toc_title),
           style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
           color = AppTheme.colors.titleText,
-          modifier = Modifier.padding(bottom = 16.dp)
+          modifier = Modifier.padding(bottom = AppTheme.dimens.screenPadding)
         )
       }
 
@@ -90,7 +88,7 @@ fun TocBottomSheet(
           modifier = Modifier
             .fillMaxWidth()
             .clickable { onTocItemClick(item) }
-            .padding(start = paddingStart, top = 12.dp, bottom = 12.dp),
+            .padding(start = paddingStart, top = AppTheme.dimens.mediumGap, bottom = AppTheme.dimens.mediumGap),
         )
       }
     }

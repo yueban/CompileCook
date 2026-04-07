@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.yueban.compilecook.BuildKonfig
@@ -57,28 +56,28 @@ fun AboutContent(component: AboutComponent) {
 @Composable
 private fun AboutHeader() {
   Column(
-    modifier = Modifier.fillMaxWidth().padding(24.dp),
+    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.largeGap),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Image(
       painter = painterResource(Res.drawable.app_icon),
       contentDescription = stringResource(Res.string.about_des_app_icon),
-      modifier = Modifier.size(100.dp)
+      modifier = Modifier.size(AppTheme.dimens.aboutIconSize)
     )
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(AppTheme.dimens.screenPadding))
     Text(
       text = stringResource(Res.string.app_name),
       style = AppTheme.typography.headlineSmall,
       fontWeight = FontWeight.Bold,
       color = AppTheme.colors.titleText
     )
-    Spacer(modifier = Modifier.height(4.dp))
+    Spacer(modifier = Modifier.height(AppTheme.dimens.tinyGap))
     Text(
       text = BuildKonfig.APP_VERSION,
       style = AppTheme.typography.bodyMedium,
       color = AppTheme.colors.subTitleText
     )
-    Spacer(modifier = Modifier.height(32.dp))
+    Spacer(modifier = Modifier.height(AppTheme.dimens.extraLargeGap))
   }
 }
 

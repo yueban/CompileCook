@@ -32,7 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
@@ -59,12 +59,12 @@ import compilecook.composeapp.generated.resources.main_tab_tips
 import org.jetbrains.compose.resources.stringResource
 
 private const val FAB_SPACER_WEIGHT = 0.5f
-private val BOTTOM_FAB_OFFSET = 24.dp
 
 @Composable
 fun MainContent(component: MainComponent) {
   val stack by component.stack.subscribeAsState()
   val activeChild = stack.active.instance
+  val bottomFabOffset = AppTheme.dimens.bottomFabOffset
 
   Scaffold(
     topBar = {
@@ -83,7 +83,8 @@ fun MainContent(component: MainComponent) {
       ArchNavigationBar(
         activeChild = activeChild,
         onTabSelected = component::onTabSelected,
-        onRandomDishClicked = component::onRandomDishClicked
+        onRandomDishClicked = component::onRandomDishClicked,
+        bottomFabOffset = bottomFabOffset
       )
     }
   ) { padding ->
@@ -93,8 +94,8 @@ fun MainContent(component: MainComponent) {
       animation = stackAnimation(fade())
     ) {
       when (val child = it.instance) {
-        is Dishes -> MainDishContent(child.component, BOTTOM_FAB_OFFSET)
-        is Tips -> MainTipContent(child.component, BOTTOM_FAB_OFFSET)
+        is Dishes -> MainDishContent(child.component, bottomFabOffset)
+        is Tips -> MainTipContent(child.component, bottomFabOffset)
       }
     }
   }
@@ -105,10 +106,11 @@ private fun ArchNavigationBar(
   activeChild: Child,
   onTabSelected: (MainTab) -> Unit,
   onRandomDishClicked: () -> Unit,
+  bottomFabOffset: Dp
 ) {
   // unify container color and elevation to make a seamless shape.
   val barColor = NavigationBarDefaults.containerColor
-  val barElevation = 3.dp
+  val barElevation = AppTheme.dimens.elevationMedium
 
   Box(
     modifier = Modifier.fillMaxWidth(),
@@ -140,12 +142,12 @@ private fun ArchNavigationBar(
     Surface(
       modifier = Modifier
         .align(Alignment.TopCenter)
-        .offset(y = -BOTTOM_FAB_OFFSET)
-        .size(76.dp),
+        .offset(y = -bottomFabOffset)
+        .size(AppTheme.dimens.fabContainerSize),
       shape = CircleShape,
       color = barColor,
       tonalElevation = barElevation,
-      shadowElevation = 0.dp
+      shadowElevation = AppTheme.dimens.elevationNone
     ) {
       Box(contentAlignment = Alignment.Center) {
         FloatingActionButton(
@@ -153,13 +155,13 @@ private fun ArchNavigationBar(
           shape = CircleShape,
           containerColor = AppTheme.colorScheme.primary,
           contentColor = AppTheme.colorScheme.onPrimary,
-          elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
-          modifier = Modifier.size(56.dp)
+          elevation = FloatingActionButtonDefaults.elevation(defaultElevation = AppTheme.dimens.elevationSmall),
+          modifier = Modifier.size(AppTheme.dimens.fabSize)
         ) {
           Icon(
             imageVector = Icons.Outlined.Restaurant,
             contentDescription = stringResource(Res.string.main_des_random_dish),
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(AppTheme.dimens.fabIconSize)
           )
         }
       }
