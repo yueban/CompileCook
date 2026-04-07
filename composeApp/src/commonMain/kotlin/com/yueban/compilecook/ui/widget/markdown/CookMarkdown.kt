@@ -89,7 +89,7 @@ private fun MarkdownSuccess(
 }
 
 /**
- * Custom Colors matching ExtendedTheme
+ * Custom Colors matching ColorScheme
  */
 @Composable
 private fun cookMarkdownColors(): MarkdownColors {
