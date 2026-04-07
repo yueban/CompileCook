@@ -45,8 +45,8 @@ import com.yueban.compilecook.ui.main.MainComponent.Child.Dishes
 import com.yueban.compilecook.ui.main.MainComponent.Child.Tips
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name

@@ -13,8 +13,8 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
 import compilecook.composeapp.generated.resources.common_des_back

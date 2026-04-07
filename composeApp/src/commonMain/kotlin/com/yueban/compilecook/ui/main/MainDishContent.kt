@@ -42,12 +42,12 @@ import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.IconSource
-import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.asSource
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
+import com.yueban.compilecook.ui.util.preview.PreviewData
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import com.yueban.compilecook.ui.widget.AnyIcon
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ic_difficulty_star

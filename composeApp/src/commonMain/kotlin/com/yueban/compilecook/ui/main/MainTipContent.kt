@@ -37,9 +37,9 @@ import com.yueban.compilecook.repo.entity.TipType.UNKNOWN
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.base.Fail
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
+import com.yueban.compilecook.ui.util.preview.PreviewData
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.main_tip_advanced

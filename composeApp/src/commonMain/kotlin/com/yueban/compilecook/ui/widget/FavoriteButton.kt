@@ -8,8 +8,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_des_toggle_favorite
 import org.jetbrains.compose.resources.stringResource

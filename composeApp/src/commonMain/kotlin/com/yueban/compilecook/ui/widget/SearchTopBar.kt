@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalWidgetPreview
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_des_back
 import compilecook.composeapp.generated.resources.common_des_clear

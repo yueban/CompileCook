@@ -1,4 +1,4 @@
-package com.yueban.compilecook.ui.util
+package com.yueban.compilecook.ui.util.preview
 
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.repo.entity.DishDetail

@@ -1,6 +1,6 @@
 @file:Suppress("MaximumLineLength", "MaxLineLength", "MagicNumber")
 
-package com.yueban.compilecook.ui.util
+package com.yueban.compilecook.ui.util.preview
 
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.markdown.model.State

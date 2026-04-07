@@ -46,12 +46,12 @@ import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.theme.startOnly
-import com.yueban.compilecook.ui.util.PreviewData
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
 import com.yueban.compilecook.ui.util.monochromeIcon
+import com.yueban.compilecook.ui.util.preview.PreviewData
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import com.yueban.compilecook.ui.widget.EmptyComposable
 import com.yueban.compilecook.ui.widget.FavoriteButton
 import com.yueban.compilecook.ui.widget.SearchTopBar

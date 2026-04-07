@@ -10,6 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.text.font.FontFamily
 import coil3.compose.LocalAsyncImagePreviewHandler
+import com.yueban.compilecook.ui.util.preview.coilPreviewHandler
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.noto_sans_sc_regular
 import org.jetbrains.compose.resources.Font

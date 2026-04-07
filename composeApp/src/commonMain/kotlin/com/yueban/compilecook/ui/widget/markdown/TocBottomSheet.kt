@@ -26,9 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.times
 import com.mikepenz.markdown.model.State
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.PreviewData.dishState
-import com.yueban.compilecook.ui.util.PreviewWrapper
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
+import com.yueban.compilecook.ui.util.preview.PreviewData.dishState
+import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.common_toc_title
 import org.jetbrains.compose.resources.stringResource

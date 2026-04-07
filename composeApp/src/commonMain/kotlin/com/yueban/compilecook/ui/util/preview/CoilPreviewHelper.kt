@@ -1,4 +1,4 @@
-package com.yueban.compilecook.ui.theme
+package com.yueban.compilecook.ui.util.preview
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb

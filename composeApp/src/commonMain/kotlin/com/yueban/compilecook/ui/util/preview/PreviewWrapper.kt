@@ -1,4 +1,4 @@
-package com.yueban.compilecook.ui.util
+package com.yueban.compilecook.ui.util.preview
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
