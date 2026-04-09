@@ -86,7 +86,6 @@ kotlin {
       implementation(libs.coil.network.ktor3)
       implementation(libs.markdown.renderer)
       implementation(libs.markdown.renderer.m3)
-      implementation(libs.markdown.renderer.coil3)
       implementation(libs.decompose.extensions.compose)
       implementation(libs.decompose.extensions.compose.experimental)
       implementation(libs.aboutlibraries.core)

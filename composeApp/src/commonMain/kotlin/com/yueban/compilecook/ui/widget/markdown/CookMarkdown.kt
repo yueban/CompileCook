@@ -1,11 +1,10 @@
 package com.yueban.compilecook.ui.widget.markdown
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -25,8 +24,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import coil3.compose.AsyncImage
-import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
+import com.mikepenz.markdown.compose.LocalImageTransformer
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.MarkdownElement
 import com.mikepenz.markdown.compose.components.MarkdownComponent
@@ -34,6 +32,7 @@ import com.mikepenz.markdown.compose.components.MarkdownComponents
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.ImageData
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.State
@@ -162,36 +161,47 @@ private fun cookMarkdownTypography(): MarkdownTypography {
  */
 @Composable
 private fun cookMarkdownComponents() = markdownComponents(
-  image = CustomImageComponent
+  image = CustomImageComponent,
+  inlineImage = CustomInlineImageComponent,
 )
 
 /**
  * A custom Image component that adds Rounded Corners and fills width.
  * Perfect for Dish photos.
  */
-private val CustomImageComponent: MarkdownComponent = { model ->
-  val imageUrl = model.content
-
-  Box(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(vertical = AppTheme.dimens.smallGap)
-  ) {
-    AsyncImage(
-      model = imageUrl,
-      contentDescription = null,
-      modifier = Modifier
-        .fillMaxWidth()
-        .clip(AppTheme.shapes.medium)
-        .border(
-          width = AppTheme.dimens.borderThickness,
-          color = AppTheme.colors.divider,
-          shape = AppTheme.shapes.medium
-        )
-        .background(AppTheme.colorScheme.surfaceVariant),
-      contentScale = ContentScale.FillWidth
-    )
+private val CustomImageComponent: MarkdownComponent = {
+  LocalImageTransformer.current.transform(it.content)?.let { imageData ->
+    MarkdownImage(imageData, Modifier.fillMaxWidth())
   }
+}
+
+/**
+ * A custom Inline Image component for images within text.
+ */
+private val CustomInlineImageComponent: MarkdownComponent = {
+  LocalImageTransformer.current.transform(it.content)?.let { imageData ->
+    MarkdownImage(imageData)
+  }
+}
+
+@Composable
+private fun MarkdownImage(imageData: ImageData, modifier: Modifier = Modifier) {
+  Image(
+    painter = imageData.painter,
+    contentDescription = imageData.contentDescription,
+    modifier = modifier
+      .height(AppTheme.dimens.markdownImageHeight)
+      .padding(
+        vertical = AppTheme.dimens.markdownImageVerticalPadding,
+        horizontal = AppTheme.dimens.markdownImageHorizontalPadding
+      )
+      .clip(AppTheme.shapes.small)
+      .then(imageData.modifier),
+    alignment = imageData.alignment,
+    contentScale = ContentScale.Crop,
+    alpha = imageData.alpha,
+    colorFilter = imageData.colorFilter
+  )
 }
 
 @UniversalScreenPreview

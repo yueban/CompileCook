@@ -54,6 +54,11 @@ data class ExtendedDimens(
   val fabContainerSize: Dp = 76.dp,
   val bottomFabOffset: Dp = 24.dp,
 
+  // markdown
+  val markdownImageHeight: Dp = 180.dp,
+  val markdownImageVerticalPadding: Dp = 4.dp,
+  val markdownImageHorizontalPadding: Dp = 2.dp,
+
   // alignment & offsets
   val favoriteIconOffsetY: Dp = 2.dp,
   val difficultyStarOffsetY: Dp = 2.dp,
