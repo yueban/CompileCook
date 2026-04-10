@@ -1,6 +1,8 @@
 package com.yueban.compilecook.ui.widget.markdown
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +29,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import com.mikepenz.markdown.compose.LocalImageTransformer
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.MarkdownElement
-import com.mikepenz.markdown.compose.components.MarkdownComponent
+import com.mikepenz.markdown.compose.components.MarkdownComponentModel
 import com.mikepenz.markdown.compose.components.MarkdownComponents
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.m3.markdownColor
@@ -38,22 +40,27 @@ import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.rememberMarkdownState
+import com.yueban.compilecook.ui.root.LocalNavAnimatedVisibilityScope
+import com.yueban.compilecook.ui.root.LocalSharedTransitionScope
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.preview.PreviewConstant
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
+
+private const val TRANSITION_DURATION = 300
 
 @Composable
 fun CookMarkdown(
   state: State,
   modifier: Modifier = Modifier,
   listState: LazyListState,
+  onImageClick: (String) -> Unit = {},
 ) {
   Markdown(
     state = state,
     colors = cookMarkdownColors(),
     typography = cookMarkdownTypography(),
-    components = cookMarkdownComponents(),
+    components = cookMarkdownComponents(onImageClick),
     // disable animation
     animations = markdownAnimations(animateTextSize = { this }),
     success = { successState, components, mod ->
@@ -86,106 +93,86 @@ private fun MarkdownSuccess(
   }
 }
 
-/**
- * Custom Colors matching ColorScheme
- */
 @Composable
-private fun cookMarkdownColors(): MarkdownColors {
-  val colors = AppTheme.colors
-  return markdownColor(
-    text = AppTheme.colorScheme.onSurface,
-    codeBackground = AppTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-    inlineCodeBackground = AppTheme.colorScheme.surfaceVariant,
+private fun cookMarkdownColors(): MarkdownColors = with(AppTheme) {
+  markdownColor(
+    text = colorScheme.onSurface,
+    codeBackground = colorScheme.surfaceVariant.copy(alpha = 0.5f),
+    inlineCodeBackground = colorScheme.surfaceVariant,
     dividerColor = colors.divider,
-    // Make tables look clean
-    tableBackground = AppTheme.colorScheme.surface,
+    tableBackground = colorScheme.surface,
   )
 }
 
-/**
- * Custom Typography
- * Maps standard Markdown headers to Material 3 styles, but tweaked for recipe reading.
- */
 @Composable
-private fun cookMarkdownTypography(): MarkdownTypography {
-  val typography = AppTheme.typography
-  val primaryColor = AppTheme.colorScheme.primary
-
+private fun cookMarkdownTypography(): MarkdownTypography = with(AppTheme) {
   return markdownTypography(
-    // H1 - Dish Title
-    h1 = typography.headlineMedium.copy(
-      fontWeight = FontWeight.Bold,
-      color = AppTheme.colors.titleText
-    ),
-    // H2 - Section (Ingredients, Steps)
-    h2 = typography.titleLarge.copy(
-      fontWeight = FontWeight.Bold,
-      color = AppTheme.colors.titleText
-    ),
-    // H3 - Sub-section
-    h3 = typography.titleMedium.copy(
-      fontWeight = FontWeight.Bold,
-      color = AppTheme.colors.subTitleText
-    ),
-    // Normal text
-    text = typography.bodyLarge.copy(
-      color = AppTheme.colorScheme.onSurface
-    ),
-    // Bullet points (Ingredients)
+    h1 = typography.headlineMedium.copy(fontWeight = FontWeight.Bold, color = colors.titleText),
+    h2 = typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = colors.titleText),
+    h3 = typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = colors.subTitleText),
+    text = typography.bodyLarge.copy(color = colorScheme.onSurface),
     bullet = typography.bodyLarge,
     list = typography.bodyLarge,
-    // Quotes (Tips/Notes) - Made italic and slightly lighter
-    quote = typography.bodyMedium.copy(
-      fontStyle = FontStyle.Italic,
-      color = AppTheme.colors.bodyMedium
-    ),
-    // Code - Monospace
+    quote = typography.bodyMedium.copy(fontStyle = FontStyle.Italic, color = colors.bodyMedium),
     code = TextStyle(
       fontFamily = FontFamily.Monospace,
       fontSize = typography.bodyMedium.fontSize,
-      color = AppTheme.colorScheme.onSurfaceVariant
+      color = colorScheme.onSurfaceVariant
     ),
-    // Links
     textLink = TextLinkStyles(
       style = SpanStyle(
-        color = primaryColor,
+        color = colorScheme.primary,
         textDecoration = TextDecoration.Underline
       )
     )
   )
 }
 
-/**
- * Custom Components
- * Overrides specific renderers. Here we customize the Image renderer.
- */
 @Composable
-private fun cookMarkdownComponents() = markdownComponents(
-  image = CustomImageComponent,
-  inlineImage = CustomInlineImageComponent,
+private fun cookMarkdownComponents(onImageClick: (String) -> Unit) = markdownComponents(
+  image = { CustomImageComponent(model = it, onImageClick = onImageClick) },
+  inlineImage = { CustomInlineImageComponent(model = it, onImageClick = onImageClick) },
 )
 
-/**
- * A custom Image component that adds Rounded Corners and fills width.
- * Perfect for Dish photos.
- */
-private val CustomImageComponent: MarkdownComponent = {
-  LocalImageTransformer.current.transform(it.content)?.let { imageData ->
-    MarkdownImage(imageData, Modifier.fillMaxWidth())
-  }
-}
-
-/**
- * A custom Inline Image component for images within text.
- */
-private val CustomInlineImageComponent: MarkdownComponent = {
-  LocalImageTransformer.current.transform(it.content)?.let { imageData ->
-    MarkdownImage(imageData)
+@Composable
+private fun CustomImageComponent(
+  model: MarkdownComponentModel,
+  onImageClick: (String) -> Unit,
+) {
+  LocalImageTransformer.current.transform(model.content)?.let { imageData ->
+    MarkdownImage(
+      imageData = imageData,
+      modifier = Modifier.fillMaxWidth(),
+      imageUrl = model.content,
+      onClick = { onImageClick(model.content) }
+    )
   }
 }
 
 @Composable
-private fun MarkdownImage(imageData: ImageData, modifier: Modifier = Modifier) {
+private fun CustomInlineImageComponent(
+  model: MarkdownComponentModel,
+  onImageClick: (String) -> Unit,
+) {
+  LocalImageTransformer.current.transform(model.content)?.let { imageData ->
+    MarkdownImage(
+      imageData = imageData,
+      imageUrl = model.content,
+      onClick = { onImageClick(model.content) }
+    )
+  }
+}
+
+@Composable
+private fun MarkdownImage(
+  imageData: ImageData,
+  modifier: Modifier = Modifier,
+  imageUrl: String,
+  onClick: (() -> Unit),
+) {
+  val sharedTransitionScope = LocalSharedTransitionScope.current
+  val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+
   Image(
     painter = imageData.painter,
     contentDescription = imageData.contentDescription,
@@ -196,6 +183,16 @@ private fun MarkdownImage(imageData: ImageData, modifier: Modifier = Modifier) {
         horizontal = AppTheme.dimens.markdownImageHorizontalPadding
       )
       .clip(AppTheme.shapes.small)
+      .clickable(onClick = onClick)
+      .then(
+        with(sharedTransitionScope) {
+          Modifier.sharedElement(
+            rememberSharedContentState(key = "image_$imageUrl"),
+            animatedVisibilityScope = animatedVisibilityScope,
+            boundsTransform = { _, _ -> tween(durationMillis = TRANSITION_DURATION) }
+          )
+        }
+      )
       .then(imageData.modifier),
     alignment = imageData.alignment,
     contentScale = ContentScale.Crop,

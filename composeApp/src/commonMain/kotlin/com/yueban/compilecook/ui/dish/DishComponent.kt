@@ -12,6 +12,7 @@ import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishComponent.Output.BackClicked
+import com.yueban.compilecook.ui.dish.DishComponent.Output.ImageClicked
 import com.yueban.compilecook.ui.widget.markdown.TocItem
 import com.yueban.compilecook.ui.widget.markdown.extractToc
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,9 +36,11 @@ data class DishState(
 interface DishComponent : UiStateComponent<DishState> {
   fun onBackClicked()
   fun onFavoriteToggle()
+  fun onImageClicked(imageUrl: String)
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
+    data class ImageClicked(val dishName: String, val imageUrl: String) : Output
   }
 }
 
@@ -75,6 +78,8 @@ class DefaultDishComponent(
   }
 
   override fun onBackClicked() = onOutput(BackClicked)
+
+  override fun onImageClicked(imageUrl: String) = onOutput(ImageClicked(dishName, imageUrl))
 
   override fun onFavoriteToggle() {
     launch { dishRepo.toggleDishFavorite(dishName) }

@@ -58,7 +58,8 @@ fun TipContent(component: TipComponent) {
       CookMarkdown(
         state = it,
         modifier = Modifier.padding(horizontal = AppTheme.dimens.screenPadding),
-        listState = listState
+        listState = listState,
+        onImageClick = component::onImageClicked,
       )
     }
   }
@@ -85,6 +86,7 @@ fun TipContent(component: TipComponent) {
 private class PreviewTipComponent : TipComponent {
   override val uiState = MutableStateFlow(PreviewData.tipState)
   override fun onBackClicked() = Unit
+  override fun onImageClicked(imageUrl: String) = Unit
 }
 
 @UniversalScreenPreview

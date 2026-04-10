@@ -23,6 +23,7 @@ import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import com.yueban.compilecook.ui.dish.DishListSource
+import com.yueban.compilecook.ui.image.ImageComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
 import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
@@ -39,6 +40,7 @@ import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Tip
 import com.yueban.compilecook.ui.root.RootComponent.Child.AboutChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.ImageChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
@@ -62,9 +64,11 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
     class DishListChild(val component: DishListComponent) : Child()
     class DishChild(val component: DishComponent) : Child()
     class AboutChild(val component: AboutComponent) : Child()
+    class ImageChild(val component: ImageComponent) : Child()
   }
 }
 
+@Suppress("TooManyFunctions")
 class DefaultRootComponent(
   componentContext: ComponentContext,
   deepLinkUrl: String? = null,
@@ -124,6 +128,7 @@ class DefaultRootComponent(
       is DishList -> get<DishListChild> { parametersOf(componentContext, config, ::onDishListOutput) }
       is Dish -> get<DishChild> { parametersOf(componentContext, config, ::onDishOutput) }
       About -> get<AboutChild> { parametersOf(componentContext, ::onAboutOutput) }
+      is Config.Image -> get<ImageChild> { parametersOf(componentContext, config, ::onImageOutput) }
     }
 
   private fun onMainOutput(output: MainComponent.Output) {
@@ -145,9 +150,35 @@ class DefaultRootComponent(
     }
   }
 
-  private fun onTipOutput(output: TipComponent.Output) = navigation.onOutput(output)
-  private fun onDishOutput(output: DishComponent.Output) = navigation.onOutput(output)
+  private fun onTipOutput(output: TipComponent.Output) = navigation.onOutput(output) { output ->
+    when (output) {
+      is TipComponent.Output.ImageClicked -> navigation.push(
+        Config.Image(
+          imageUrl = output.imageUrl,
+          source = Config.ImageSource.Tip(output.tipName)
+        )
+      )
+
+      else -> {}
+    }
+  }
+
+  private fun onDishOutput(output: DishComponent.Output) = navigation.onOutput(output) { output ->
+    when (output) {
+      is DishComponent.Output.ImageClicked -> navigation.push(
+        Config.Image(
+          imageUrl = output.imageUrl,
+          source = Config.ImageSource.Dish(output.dishName)
+        )
+      )
+
+      else -> {}
+    }
+  }
+
   private fun onAboutOutput(output: AboutComponent.Output) = navigation.onOutput(output)
+
+  private fun onImageOutput(output: ImageComponent.Output) = navigation.onOutput(output)
 
   override fun onBackClicked() = navigation.pop()
 
@@ -162,6 +193,18 @@ class DefaultRootComponent(
     @Serializable data class Dish(val dishName: String) : Config
 
     @Serializable data object About : Config
+
+    @Serializable data class Image(
+      val imageUrl: String,
+      val source: ImageSource,
+    ) : Config
+
+    @Serializable
+    sealed interface ImageSource {
+      @Serializable data class Dish(val dishName: String) : ImageSource
+
+      @Serializable data class Tip(val tipName: String) : ImageSource
+    }
   }
 }
 

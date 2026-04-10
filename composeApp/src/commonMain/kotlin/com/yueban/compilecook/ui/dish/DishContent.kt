@@ -67,7 +67,8 @@ fun DishContent(component: DishComponent) {
       CookMarkdown(
         state = it,
         modifier = Modifier.padding(horizontal = AppTheme.dimens.screenPadding),
-        listState = listState
+        listState = listState,
+        onImageClick = component::onImageClicked,
       )
     }
   }
@@ -95,6 +96,7 @@ private class PreviewDishComponent : DishComponent {
   override val uiState = MutableStateFlow(PreviewData.dishState)
   override fun onBackClicked() = Unit
   override fun onFavoriteToggle() = Unit
+  override fun onImageClicked(imageUrl: String) = Unit
 }
 
 @UniversalScreenPreview

@@ -11,6 +11,7 @@ import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.tip.TipComponent.Output.BackClicked
+import com.yueban.compilecook.ui.tip.TipComponent.Output.ImageClicked
 import com.yueban.compilecook.ui.widget.markdown.TocItem
 import com.yueban.compilecook.ui.widget.markdown.extractToc
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -32,15 +33,17 @@ data class TipState(
 
 interface TipComponent : UiStateComponent<TipState> {
   fun onBackClicked()
+  fun onImageClicked(imageUrl: String)
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
+    data class ImageClicked(val tipName: String, val imageUrl: String) : Output
   }
 }
 
 class DefaultTipComponent(
   componentContext: ComponentContext,
-  tipName: String,
+  private val tipName: String,
   private val onOutput: (TipComponent.Output) -> Unit,
   dishRepo: DishRepo,
 ) : TipComponent, UiStateComponentImpl<TipState>(
@@ -49,6 +52,8 @@ class DefaultTipComponent(
   serializer = TipState.serializer(),
 ) {
   override fun onBackClicked() = onOutput(BackClicked)
+
+  override fun onImageClicked(imageUrl: String) = onOutput(ImageClicked(tipName, imageUrl))
 
   init {
     dishRepo.getTipByName(tipName)

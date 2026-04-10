@@ -9,12 +9,15 @@ import com.yueban.compilecook.ui.dish.DefaultDishComponent
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
+import com.yueban.compilecook.ui.image.DefaultImageComponent
+import com.yueban.compilecook.ui.image.ImageComponent
 import com.yueban.compilecook.ui.main.DefaultMainComponent
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.RootComponent.Child.AboutChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
+import com.yueban.compilecook.ui.root.RootComponent.Child.ImageChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.tip.DefaultTipComponent
@@ -53,6 +56,12 @@ val uiModule = module {
   factory { (ctx: ComponentContext, onOut: (AboutComponent.Output) -> Unit) ->
     AboutChild(
       DefaultAboutComponent(ctx, onOut)
+    )
+  }
+
+  factory { (ctx: ComponentContext, config: Config.Image, onOut: (ImageComponent.Output) -> Unit) ->
+    ImageChild(
+      DefaultImageComponent(ctx, config.imageUrl, onOut)
     )
   }
 }

@@ -7,9 +7,12 @@ import com.yueban.compilecook.ui.root.DefaultRootComponent.Config
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.About
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Dish
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.DishList
+import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Image
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Main
 import com.yueban.compilecook.ui.root.DefaultRootComponent.Config.Tip
 import io.ktor.http.Url
+import io.ktor.http.decodeURLQueryComponent
+import io.ktor.http.encodeURLQueryComponent
 
 object PathMapper {
   fun configToPath(config: Config): String? =
@@ -25,6 +28,13 @@ object PathMapper {
         is DishListSource.Difficulty -> "/dishes/difficulty/${source.level}"
       }
       is Dish -> "/dishes/${config.dishName}"
+      is Image -> {
+        val baseUrl = when (val source = config.source) {
+          is Config.ImageSource.Dish -> "/dishes/${source.dishName}"
+          is Config.ImageSource.Tip -> "/tips/${source.tipName}"
+        }
+        "$baseUrl?image=${config.imageUrl.encodeURLQueryComponent()}"
+      }
     }
 
   fun pathToStack(deepLinkUrl: String?): List<Config> {
@@ -38,7 +48,13 @@ object PathMapper {
       "tips" -> {
         val tipName = segments.getOrNull(1)
         if (tipName != null) {
-          listOf(Main(MainTab.TIPS), Tip(tipName))
+          buildList {
+            add(Main(MainTab.TIPS))
+            add(Tip(tipName))
+            url.parameters["image"]?.decodeURLQueryComponent()?.let {
+              Image(imageUrl = it, source = Config.ImageSource.Tip(tipName))
+            }
+          }
         } else {
           listOf(Main(MainTab.TIPS))
         }
@@ -71,8 +87,14 @@ object PathMapper {
 
           else -> {
             // It's a specific dish name: /dishes/mapodoufu
-            // Standard Rule: Main -> List(All) -> DishDetail
-            listOf(mainDishes, DishList(DishListSource.All), Dish(second))
+            buildList {
+              add(mainDishes)
+              add(DishList(DishListSource.All))
+              add(Dish(second))
+              url.parameters["image"]?.decodeURLQueryComponent()?.let {
+                Image(imageUrl = it, source = Config.ImageSource.Dish(second))
+              }
+            }
           }
         }
       }
