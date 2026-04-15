@@ -1,8 +1,5 @@
 package com.yueban.compilecook.ui.root
 
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -10,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
@@ -24,25 +20,15 @@ import com.yueban.compilecook.service.UiMessage.Text
 import com.yueban.compilecook.ui.about.AboutContent
 import com.yueban.compilecook.ui.dish.DishContent
 import com.yueban.compilecook.ui.dish.DishListContent
-import com.yueban.compilecook.ui.image.ImageContent
 import com.yueban.compilecook.ui.main.MainContent
 import com.yueban.compilecook.ui.root.RootComponent.Child.AboutChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
-import com.yueban.compilecook.ui.root.RootComponent.Child.ImageChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.tip.TipContent
 import com.yueban.compilecook.ui.util.stringRes
 import org.jetbrains.compose.resources.getString
-
-val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope> {
-  error("No SharedTransitionScope found")
-}
-
-val LocalNavAnimatedVisibilityScope = staticCompositionLocalOf<AnimatedVisibilityScope> {
-  error("No AnimatedVisibilityScope found")
-}
 
 @Composable
 fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
@@ -79,25 +65,18 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
   }
 
   CompositionLocalProvider(LocalUriHandler provides customUriHandler) {
-    SharedTransitionLayout {
-      Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-      ) { _ ->
-        ChildStack(
-          stack = component.stack,
-          modifier = modifier,
-          animation = backAnimation(
-            backHandler = component.backHandler,
-            onBack = component::onBackClicked,
-          ),
-        ) { child ->
-          CompositionLocalProvider(
-            LocalSharedTransitionScope provides this@SharedTransitionLayout,
-            LocalNavAnimatedVisibilityScope provides this
-          ) {
-            RootChild(child.instance)
-          }
-        }
+    Scaffold(
+      snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { _ ->
+      ChildStack(
+        stack = component.stack,
+        modifier = modifier,
+        animation = backAnimation(
+          backHandler = component.backHandler,
+          onBack = component::onBackClicked,
+        ),
+      ) { child ->
+        RootChild(child.instance)
       }
     }
   }
@@ -111,7 +90,6 @@ private fun RootChild(child: RootComponent.Child) {
     is DishListChild -> DishListContent(child.component)
     is DishChild -> DishContent(child.component)
     is AboutChild -> AboutContent(child.component)
-    is ImageChild -> ImageContent(child.component)
   }
 }
 

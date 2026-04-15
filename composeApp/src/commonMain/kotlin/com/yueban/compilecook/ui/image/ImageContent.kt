@@ -2,7 +2,6 @@ package com.yueban.compilecook.ui.image
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
-import com.yueban.compilecook.ui.root.LocalNavAnimatedVisibilityScope
-import com.yueban.compilecook.ui.root.LocalSharedTransitionScope
+import com.yueban.compilecook.ui.util.LocalNavAnimatedVisibilityScope
+import com.yueban.compilecook.ui.util.LocalSharedTransitionScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -43,18 +43,24 @@ private const val DISMISS_THRESHOLD_FACTOR = 4f
 private const val SENSITIVITY_FACTOR = 3f
 private const val SCALE_FRACTION = 0.5f
 private const val TRANSITION_DURATION = 300
+private const val OVERLAY_MAX_ALPHA = 1f
 
 @Composable
-fun ImageContent(component: ImageComponent) {
+fun ImageContent(
+  component: ImageComponent,
+  modifier: Modifier = Modifier,
+) {
   val state by component.uiState.collectAsStateWithLifecycle()
 
   val dragToDismissState = rememberDragToDismissState(onDismiss = component::onBackClicked)
   var imagePainterState by remember { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
 
   BoxWithConstraints(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxSize()
-      .background(Color.Black)
+      .drawBehind {
+        drawRect(Color.Black.copy(alpha = dragToDismissState.alpha))
+      }
       .pointerInput(Unit) {
         detectDragGestures(
           onDrag = { change, dragAmount ->
@@ -92,6 +98,19 @@ private fun FullscreenImage(
   val sharedTransitionScope = LocalSharedTransitionScope.current
   val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
 
+  val sharedElementModifier =
+    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+      with(sharedTransitionScope) {
+        Modifier.sharedElement(
+          rememberSharedContentState(key = "image_$imageUrl"),
+          animatedVisibilityScope = animatedVisibilityScope,
+          boundsTransform = { _, _ -> tween(durationMillis = TRANSITION_DURATION) }
+        )
+      }
+    } else {
+      Modifier
+    }
+
   Box(
     modifier = Modifier
       .offset { IntOffset(dragToDismissState.offsetX.roundToInt(), dragToDismissState.offsetY.roundToInt()) }
@@ -106,15 +125,7 @@ private fun FullscreenImage(
           Modifier.fillMaxSize()
         }
       )
-      .then(
-        with(sharedTransitionScope) {
-          Modifier.sharedElement(
-            rememberSharedContentState(key = "image_$imageUrl"),
-            animatedVisibilityScope = animatedVisibilityScope,
-            boundsTransform = { _, _ -> tween(durationMillis = TRANSITION_DURATION) }
-          )
-        }
-      )
+      .then(sharedElementModifier)
   ) {
     AsyncImage(
       model = imageUrl,
@@ -134,10 +145,12 @@ private class DragToDismissState(
   private val _offsetX = Animatable(0f)
   private val _offsetY = Animatable(0f)
   private val _scale = Animatable(1f)
+  private val _alpha = Animatable(OVERLAY_MAX_ALPHA)
 
   val offsetX: Float get() = _offsetX.value
   val offsetY: Float get() = _offsetY.value
   val scale: Float get() = _scale.value
+  val alpha: Float get() = _alpha.value
 
   fun onDrag(dragAmount: Offset, containerSize: IntSize) {
     scope.launch {
@@ -152,6 +165,7 @@ private class DragToDismissState(
       ).coerceIn(0f, 1f)
 
       _scale.snapTo((1f - progress * SCALE_FRACTION).coerceIn(1f - SCALE_FRACTION, 1f))
+      _alpha.snapTo(((1f - progress) * OVERLAY_MAX_ALPHA).coerceIn(0f, OVERLAY_MAX_ALPHA))
     }
   }
 
@@ -166,6 +180,7 @@ private class DragToDismissState(
         launch { _offsetX.animateTo(0f) }
         launch { _offsetY.animateTo(0f) }
         launch { _scale.animateTo(1f) }
+        launch { _alpha.animateTo(OVERLAY_MAX_ALPHA) }
       }
     }
   }

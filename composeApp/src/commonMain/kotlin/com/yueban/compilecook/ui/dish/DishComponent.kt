@@ -1,6 +1,8 @@
 package com.yueban.compilecook.ui.dish
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.router.slot.ChildSlot
+import com.arkivanov.decompose.value.Value
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.yueban.compilecook.repo.DishRepo
@@ -12,7 +14,8 @@ import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.dish.DishComponent.Output.BackClicked
-import com.yueban.compilecook.ui.dish.DishComponent.Output.ImageClicked
+import com.yueban.compilecook.ui.image.ImageComponent
+import com.yueban.compilecook.ui.image.ImageSlotHolder
 import com.yueban.compilecook.ui.widget.markdown.TocItem
 import com.yueban.compilecook.ui.widget.markdown.extractToc
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,6 +25,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+
+private const val KEY_DISH_IMAGE_CHILD_SLOT = "DISH_IMAGE_CHILD_SLOT"
 
 @Serializable
 data class DishState(
@@ -34,13 +39,13 @@ data class DishState(
 )
 
 interface DishComponent : UiStateComponent<DishState> {
+  val imageSlot: Value<ChildSlot<String, ImageComponent>>
   fun onBackClicked()
   fun onFavoriteToggle()
   fun onImageClicked(imageUrl: String)
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
-    data class ImageClicked(val dishName: String, val imageUrl: String) : Output
   }
 }
 
@@ -54,6 +59,9 @@ class DefaultDishComponent(
   initialState = DishState(dishName = dishName),
   serializer = DishState.serializer(),
 ) {
+  private val imageSlotHolder = ImageSlotHolder(componentContext = componentContext, key = KEY_DISH_IMAGE_CHILD_SLOT)
+  override val imageSlot: Value<ChildSlot<String, ImageComponent>> = imageSlotHolder.slot
+
   init {
     dishRepo.getDishByName(dishName)
       .execute(retainValue = DishState::dishAsync) {
@@ -79,7 +87,7 @@ class DefaultDishComponent(
 
   override fun onBackClicked() = onOutput(BackClicked)
 
-  override fun onImageClicked(imageUrl: String) = onOutput(ImageClicked(dishName, imageUrl))
+  override fun onImageClicked(imageUrl: String) = imageSlotHolder.show(imageUrl)
 
   override fun onFavoriteToggle() {
     launch { dishRepo.toggleDishFavorite(dishName) }
