@@ -51,6 +51,8 @@ import kotlinx.serialization.Serializable
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 
+private const val KEY_ROOT_CHILD_STACK = "ROOT_CHILD_STACK"
+
 interface RootComponent : BackHandlerOwner, WebNavigationOwner {
   val stack: Value<ChildStack<Config, Child>>
   val messages: Flow<UiMessage>
@@ -77,6 +79,7 @@ class DefaultRootComponent(
   private val navigation = StackNavigation<Config>()
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
     childStack(
+      key = KEY_ROOT_CHILD_STACK,
       source = navigation,
       serializer = Config.serializer(),
       initialStack = { PathMapper.pathToStack(deepLinkUrl) },
