@@ -1,6 +1,5 @@
 package com.yueban.compilecook.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
@@ -13,6 +12,7 @@ import coil3.compose.LocalAsyncImagePreviewHandler
 import com.yueban.compilecook.ui.util.preview.coilPreviewHandler
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.noto_sans_sc_regular
+import io.github.kdroidfilter.platformtools.darkmodedetector.isSystemInDarkMode
 import org.jetbrains.compose.resources.Font
 
 object AppTheme {
@@ -44,7 +44,7 @@ object AppTheme {
 
 @Composable
 fun AppTheme(
-  darkTheme: Boolean = isSystemInDarkTheme(),
+  darkTheme: Boolean = isSystemInDarkMode(),
   content: @Composable () -> Unit,
 ) {
   PlatformSpecificThemeEffects(darkTheme)

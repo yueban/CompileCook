@@ -90,6 +90,7 @@ kotlin {
       implementation(libs.decompose.extensions.compose.experimental)
       implementation(libs.aboutlibraries.core)
       implementation(libs.aboutlibraries.compose.m3)
+      implementation(libs.platformtools.darkmodedetector)
     }
     androidMain.dependencies {
       implementation(libs.compose.uiToolingPreview)

@@ -24,6 +24,8 @@ import com.yueban.compilecook.util.writeToFile
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_icon
 import compilecook.composeapp.generated.resources.app_name
+import io.github.kdroidfilter.platformtools.darkmodedetector.mac.setMacOsAdaptiveTitleBar
+import io.github.kdroidfilter.platformtools.darkmodedetector.windows.setWindowsAdaptiveTitleBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.io.File
@@ -31,6 +33,10 @@ import java.io.File
 private const val SAVED_STATE_FILE_NAME = "saved_state.dat"
 
 fun main() {
+  // must be called before AppInitializer.init() because MainScope() triggers AWT initialization,
+  // which reads startup system properties like "apple.awt.application.appearance" only once.
+  setMacOsAdaptiveTitleBar()
+
   AppInitializer.init()
 
   val lifecycle = LifecycleRegistry()
@@ -57,6 +63,8 @@ fun main() {
       title = stringResource(Res.string.app_name),
       icon = painterResource(Res.drawable.app_icon)
     ) {
+      window.setWindowsAdaptiveTitleBar()
+
       LifecycleController(
         lifecycleRegistry = lifecycle,
         windowState = windowState,
