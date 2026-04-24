@@ -67,8 +67,7 @@ fun AppTheme(
 
 @Composable
 fun Typography.withCustomFont(): Typography {
-  // TODO: temporary solution for CJK characters display in web browser
-  // TODO: browser font should be officially supported by KMP
+  // TODO: temp solution for CJK characters display in web browser, browser font should be officially supported by KMP
   val notoSansSC = FontFamily(Font(Res.font.noto_sans_sc_regular))
   return copy(
     displayLarge = displayLarge.copy(fontFamily = notoSansSC),
