@@ -1,7 +1,9 @@
 package com.yueban.compilecook.ui.base
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.statekeeper.StateKeeper
 import com.yueban.compilecook.di.DispatcherType
+import com.yueban.compilecook.json.json
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.MessageService
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.serializer
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.koin.mp.KoinPlatform
@@ -93,7 +96,7 @@ abstract class UiStateComponentImpl<S : Any>(
         onException?.invoke(t)
         if (showError) showGlobalError(t)
       }
-    } + context
+    } + context,
   ) {
     block.invoke(this)
   }
@@ -113,14 +116,7 @@ abstract class UiStateComponentImpl<S : Any>(
   ): MutableStateFlow<S> {
     // Auto-Restore
     val restored = if (serializer != null) {
-      try {
-        // the json instance used by Essenty library doesn't support ignoreUnknownKeys, which may cause crash.
-        // TODO: replace with our own json instance when Essenty adds support for this.
-        stateKeeper.consume(KEY_SAVED_STATE, serializer) ?: initialState
-      } catch (e: Exception) {
-        Logger.e("Error restoring state: ${e.message}")
-        initialState
-      }
+      stateKeeper.consumeSafe(KEY_SAVED_STATE, serializer) ?: initialState
     } else {
       initialState
     }
@@ -129,11 +125,33 @@ abstract class UiStateComponentImpl<S : Any>(
 
     // Auto-Save
     if (serializer != null) {
-      stateKeeper.register(KEY_SAVED_STATE, serializer) { flow.value }
+      stateKeeper.registerSafe(KEY_SAVED_STATE, serializer) { flow.value }
     }
 
     return flow
   }
+
+  /**
+   * Consumes state as a JSON string to bypass Essenty's strict internal JSON configuration.
+   * This allows using our project's [json] instance which supports `ignoreUnknownKeys`.
+   */
+  @Suppress("TooGenericExceptionCaught")
+  fun <T : Any> StateKeeper.consumeSafe(key: String, serializer: KSerializer<T>): T? =
+    try {
+      consume(key, String.serializer())?.let { json.decodeFromString(serializer, it) }
+    } catch (e: Exception) {
+      Logger.e("Error consuming state for key $key: ${e.message}")
+      null
+    }
+
+  /**
+   * Registers state as a JSON string to bypass Essenty's strict internal JSON configuration.
+   * @see consumeSafe
+   */
+  fun <T : Any> StateKeeper.registerSafe(key: String, serializer: KSerializer<T>, supplier: () -> T) =
+    register(key, String.serializer()) {
+      json.encodeToString(serializer, supplier())
+    }
 
   companion object Companion {
     private const val KEY_SAVED_STATE = "SAVED_STATE"
