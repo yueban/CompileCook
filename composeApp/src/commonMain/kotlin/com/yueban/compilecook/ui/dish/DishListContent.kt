@@ -1,6 +1,7 @@
 package com.yueban.compilecook.ui.dish
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,21 +9,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yueban.compilecook.repo.entity.DISH_DIFFICULTY_MAX_LEVEL
@@ -45,7 +46,6 @@ import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.AsyncContent
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.theme.startOnly
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.displayName
 import com.yueban.compilecook.ui.util.icon
@@ -53,17 +53,16 @@ import com.yueban.compilecook.ui.util.monochromeIcon
 import com.yueban.compilecook.ui.util.preview.PreviewData
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import com.yueban.compilecook.ui.widget.EmptyComposable
-import com.yueban.compilecook.ui.widget.FavoriteButton
 import com.yueban.compilecook.ui.widget.SearchTopBar
 import com.yueban.compilecook.ui.widget.TitleTopBar
 import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.common_des_toggle_favorite
 import compilecook.composeapp.generated.resources.dish_list_des_item_difficulty_format
 import compilecook.composeapp.generated.resources.dish_list_difficulty_title_format
 import compilecook.composeapp.generated.resources.dish_list_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_empty
 import compilecook.composeapp.generated.resources.dish_list_favorite_title
 import compilecook.composeapp.generated.resources.dish_list_filter_difficulty_format
-import compilecook.composeapp.generated.resources.dish_list_item_difficulty
 import compilecook.composeapp.generated.resources.dish_list_search_hint_format
 import compilecook.composeapp.generated.resources.dish_list_title
 import compilecook.composeapp.generated.resources.ic_difficulty_star
@@ -207,8 +206,10 @@ private fun DishList(
   onDishClick: (dish: DishSummary) -> Unit,
   onDishFavoriteClick: (dish: DishSummary) -> Unit,
 ) {
-  LazyColumn(
+  LazyVerticalGrid(
+    columns = GridCells.Adaptive(minSize = AppTheme.dimens.dishCardMinSize),
     contentPadding = PaddingValues(AppTheme.dimens.screenPadding),
+    horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.mediumGap),
     verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.mediumGap)
   ) {
     items(dishes, key = { it.name }) { dish ->
@@ -227,65 +228,59 @@ private fun DishItem(
   onClick: () -> Unit,
   onFavoriteClick: () -> Unit,
 ) {
-  Card(
-    shape = AppTheme.shapes.medium,
-    colors = CardDefaults.cardColors(
-      containerColor = AppTheme.colorScheme.surface,
-    ),
-    elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.elevationExtraSmall),
+  Column(
     modifier = Modifier
       .fillMaxWidth()
-      .height(AppTheme.dimens.dishListItemHeight),
-    onClick = onClick,
+      .clip(AppTheme.shapes.medium)
+      .clickable(onClick = onClick)
+      .padding(bottom = AppTheme.dimens.smallGap)
   ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-      Row(modifier = Modifier.fillMaxSize()) {
-        DishImage(dish = dish)
+    Box {
+      DishImage(dish = dish)
 
-        Column(
-          modifier = Modifier
-            .weight(1f)
-            .padding(AppTheme.dimens.mediumGap)
-            .fillMaxHeight(),
-          verticalArrangement = Arrangement.SpaceBetween
-        ) {
-          Column {
-            Text(
-              modifier = Modifier.padding(end = AppTheme.dimens.iconLarge),
-              text = dish.name,
-              style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-              color = AppTheme.colors.titleText,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-            )
-
-            Spacer(modifier = Modifier.height(AppTheme.dimens.tinyGap))
-
-            Text(
-              text = dish.description.replace("\n", " "),
-              style = AppTheme.typography.bodySmall,
-              color = AppTheme.colors.bodyMedium,
-              maxLines = 2,
-              overflow = TextOverflow.Ellipsis,
-              lineHeight = 16.sp
-            )
-          }
-
-          Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-              text = stringResource(Res.string.dish_list_item_difficulty),
-              style = AppTheme.typography.labelSmall,
-              color = AppTheme.colors.subTitleText
-            )
-            DifficultyStars(count = dish.difficulty.toInt())
-          }
-        }
+      Box(
+        modifier = Modifier
+          .align(Alignment.TopEnd)
+          .padding(AppTheme.dimens.smallGap)
+          .size(AppTheme.dimens.dishCardFavoriteIconBox)
+          .clip(CircleShape)
+          .background(AppTheme.colorScheme.surface.copy(alpha = 0.6f))
+          .clickable(onClick = onFavoriteClick),
+        contentAlignment = Alignment.Center
+      ) {
+        Icon(
+          imageVector = if (dish.isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
+          contentDescription = stringResource(Res.string.common_des_toggle_favorite),
+          tint = if (dish.isFavorite) AppTheme.colors.favorite else AppTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.size(AppTheme.dimens.iconSmall)
+        )
       }
+    }
 
-      FavoriteButton(
-        isFavorite = dish.isFavorite,
-        onClick = onFavoriteClick,
-        modifier = Modifier.align(Alignment.TopEnd).size(AppTheme.dimens.iconLarge)
+    Spacer(modifier = Modifier.height(AppTheme.dimens.smallGap))
+
+    Column(
+      modifier = Modifier.padding(horizontal = AppTheme.dimens.smallGap)
+    ) {
+      Text(
+        text = dish.name,
+        style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+        color = AppTheme.colors.titleText,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+      )
+
+      Text(
+        text = dish.description.replace("\n", " "),
+        style = AppTheme.typography.bodySmall,
+        color = AppTheme.colors.bodyMedium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+      )
+
+      DifficultyStars(
+        count = dish.difficulty.toInt(),
+        modifier = Modifier.padding(top = AppTheme.dimens.tinyGap),
       )
     }
   }
@@ -294,9 +289,9 @@ private fun DishItem(
 @Composable
 private fun DishImage(dish: DishSummary) {
   val modifier = Modifier
-    .width(AppTheme.dimens.dishListItemHeight)
-    .fillMaxHeight()
-    .clip(AppTheme.shapes.medium.startOnly)
+    .fillMaxWidth()
+    .aspectRatio(AppTheme.dimens.dishCardImageAspectRatio)
+    .clip(AppTheme.shapes.medium)
 
   if (dish.image.isNotBlank()) {
     AsyncImage(
@@ -321,10 +316,10 @@ private fun DishImage(dish: DishSummary) {
 }
 
 @Composable
-private fun DifficultyStars(count: Int) {
+private fun DifficultyStars(count: Int, modifier: Modifier = Modifier) {
   Row(
-    modifier = Modifier.padding(start = AppTheme.dimens.smallGap),
-    verticalAlignment = Alignment.CenterVertically
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = modifier,
   ) {
     repeat(count) {
       Icon(

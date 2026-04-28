@@ -40,6 +40,7 @@ data class ExtendedDimens(
   val iconLarge: Dp = 48.dp,
   val categoryIconBox: Dp = 64.dp,
   val heroCardIconSize: Dp = 32.dp,
+  val dishCardFavoriteIconBox: Dp = 36.dp,
 
   // component specific
   val dishListItemHeight: Dp = 110.dp,
@@ -48,6 +49,8 @@ data class ExtendedDimens(
   val heroCardHorizontalPadding: Dp = 24.dp,
   val heroCardIconGap: Dp = 20.dp,
   val categoryCardMinSize: Dp = 140.dp,
+  val dishCardMinSize: Dp = 160.dp,
+  val dishCardImageAspectRatio: Float = 1f,
   val aboutIconSize: Dp = 100.dp,
   val fabSize: Dp = 56.dp,
   val fabIconSize: Dp = 28.dp,

@@ -1,5 +1,6 @@
 package com.yueban.compilecook.ui.widget
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -24,7 +25,8 @@ fun FavoriteButton(
     Icon(
       imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
       contentDescription = stringResource(Res.string.common_des_toggle_favorite),
-      tint = if (isFavorite) AppTheme.colors.favorite else AppTheme.colorScheme.onSurfaceVariant
+      tint = if (isFavorite) AppTheme.colors.favorite else AppTheme.colorScheme.onSurfaceVariant,
+      modifier = Modifier.size(AppTheme.dimens.iconMedium),
     )
   }
 }
