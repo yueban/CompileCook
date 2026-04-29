@@ -5,140 +5,104 @@ import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class TipTest {
-
   @Test
-  fun initialState_isEmpty() = testingDb {
-    val tips = tipQueries.getAll().awaitAsList()
+  fun initialState_tipSummariesEmpty() = testingDb {
+    val tips = tipQueries.getTipSummaries().awaitAsList()
     assertTrue(tips.isEmpty(), "Initially, the tip table should be empty.")
   }
 
   @Test
-  fun upsertAndGetByName_succeeds() = testingDb {
-    // Insert a tip using upsert
+  fun upsertAndSelectTip() = testingDb {
     tipQueries.upsertTip(
       name = "Knife Skills 101",
+      pinyin = "knife skills 101",
       type = "basic",
       content = "Keep your fingers curled when chopping."
     )
 
-    // Retrieve the tip by its Name (Primary Key)
-    val insertedTip = tipQueries.getByName("Knife Skills 101").awaitAsOneOrNull()
+    val tips = tipQueries.getTipSummaries().awaitAsList()
+    assertEquals(1, tips.size)
+    assertEquals("Knife Skills 101", tips.first().name)
+    assertEquals("basic", tips.first().type)
+    assertEquals(false, tips.first().isFavorite)
 
-    assertNotNull(insertedTip, "Inserted tip should be found by Name.")
-    assertEquals("Knife Skills 101", insertedTip.name)
-    assertEquals("basic", insertedTip.type)
-    assertEquals("Keep your fingers curled when chopping.", insertedTip.content)
-
-    // Check for a non-existent Name
-    val nonExistentTip = tipQueries.getByName("Rocket Science").awaitAsOneOrNull()
-    assertNull(nonExistentTip, "Querying a non-existent Name should return null.")
+    val detail = tipQueries.getTipDetail("Knife Skills 101").awaitAsOneOrNull()
+    assertNotNull(detail)
+    assertEquals("Knife Skills 101", detail.name)
+    assertEquals("basic", detail.type)
+    assertEquals("Keep your fingers curled when chopping.", detail.content)
+    assertEquals(false, detail.isFavorite)
   }
 
   @Test
-  fun getAll_returnsAllInsertedTips() = testingDb {
-    tipQueries.upsertTip("Boiling Water", "basic", "Use a lid to boil faster.")
-    tipQueries.upsertTip("Searing Meat", "learn", "Dry the meat first.")
-
-    val allTips = tipQueries.getAll().awaitAsList()
-    assertEquals(2, allTips.size, "Should return all 2 inserted tips.")
-    assertTrue(allTips.any { it.name == "Boiling Water" })
-    assertTrue(allTips.any { it.name == "Searing Meat" })
+  fun getTipDetail_nonExistent_returnsNull() = testingDb {
+    val tip = tipQueries.getTipDetail("Non Existent Tip").awaitAsOneOrNull()
+    assertNull(tip)
   }
 
   @Test
-  fun upsertTip_modifiesCorrectEntry() = testingDb {
-    // 1. Insert initial tip
-    tipQueries.upsertTip(
-      name = "Seasoning",
-      type = "basic",
-      content = "Add salt at the beginning."
-    )
-    val originalTip = tipQueries.getByName("Seasoning").awaitAsOne()
+  fun upsertTip_modifiesExisting() = testingDb {
+    tipQueries.upsertTip("Seasoning", "seasoning", "basic", "Add salt at the beginning.")
+    val original = tipQueries.getTipDetail("Seasoning").awaitAsOne()
 
-    // 2. Upsert the SAME name with NEW details (acts as UPDATE)
-    tipQueries.upsertTip(
-      name = "Seasoning", // Keep name same to trigger replace
-      type = "advanced", // Changed type
-      content = "Layer salt throughout the cooking process." // Changed content
-    )
+    tipQueries.upsertTip("Seasoning", "seasoning", "advanced", "Layer salt throughout cooking.")
+    val updated = tipQueries.getTipDetail("Seasoning").awaitAsOne()
 
-    val updatedTip = tipQueries.getByName("Seasoning").awaitAsOne()
-
-    // Verify fields updated
-    assertEquals("Seasoning", updatedTip.name)
-    assertEquals("advanced", updatedTip.type)
-    assertEquals("Layer salt throughout the cooking process.", updatedTip.content)
-
-    assertNotEquals(originalTip.type, updatedTip.type, "Type should have changed.")
-    assertNotEquals(originalTip.content, updatedTip.content, "Content should have changed.")
+    assertEquals("Seasoning", updated.name)
+    assertEquals("advanced", updated.type)
+    assertEquals("Layer salt throughout cooking.", updated.content)
+    assertTrue(original.type != updated.type)
   }
 
   @Test
-  fun deleteByName_removesCorrectEntry() = testingDb {
-    tipQueries.upsertTip("Mise en place", "basic", "Prepare everything before cooking.")
-    tipQueries.upsertTip("Sous Vide", "advanced", "Vacuum seal the food.")
+  fun deleteTipByName_removesCorrectEntry() = testingDb {
+    tipQueries.upsertTip("Mise en place", "mise en place", "basic", "Prepare everything.")
+    tipQueries.upsertTip("Sous Vide", "sous vide", "advanced", "Vacuum seal the food.")
 
-    // Delete the first tip by Name
-    tipQueries.deleteByName("Mise en place")
+    tipQueries.deleteTipByName("Mise en place")
 
-    val remainingTips = tipQueries.getAll().awaitAsList()
-    assertEquals(1, remainingTips.size, "There should be only one tip remaining.")
-    assertEquals("Sous Vide", remainingTips.first().name)
+    val remaining = tipQueries.getTipSummaries().awaitAsList()
+    assertEquals(1, remaining.size)
+    assertEquals("Sous Vide", remaining.first().name)
 
-    val deletedTip = tipQueries.getByName("Mise en place").awaitAsOneOrNull()
-    assertNull(deletedTip, "The deleted tip should no longer be found.")
+    val deleted = tipQueries.getTipDetail("Mise en place").awaitAsOneOrNull()
+    assertNull(deleted)
   }
 
   @Test
-  fun deleteAll_clearsTheTable() = testingDb {
-    // Insert some data
-    tipQueries.upsertTip("Tip 1", "basic", "Content 1")
-    tipQueries.upsertTip("Tip 2", "learn", "Content 2")
-    tipQueries.upsertTip("Tip 3", "advanced", "Content 3")
+  fun deleteAllTips_clearsTable() = testingDb {
+    tipQueries.upsertTip("Tip 1", "tip 1", "basic", "Content 1")
+    tipQueries.upsertTip("Tip 2", "tip 2", "learn", "Content 2")
+    tipQueries.upsertTip("Tip 3", "tip 3", "advanced", "Content 3")
 
-    assertEquals(3, tipQueries.getAll().awaitAsList().size, "3 tips should exist before delete.")
+    assertEquals(3, tipQueries.getTipSummaries().awaitAsList().size)
 
-    // Clear the table
-    tipQueries.deleteAll()
+    tipQueries.deleteAllTips()
 
-    val tipsAfterDelete = tipQueries.getAll().awaitAsList()
-    assertTrue(tipsAfterDelete.isEmpty(), "The table should be empty after deleteAll.")
+    assertTrue(tipQueries.getTipSummaries().awaitAsList().isEmpty())
   }
 
   @Test
-  fun getByType_returnsMatchingTips() = testingDb {
-    // Insert mixed types
-    tipQueries.upsertTip("Knife Care", "basic", "Don't wash in dishwasher.")
-    tipQueries.upsertTip("Pot Selection", "basic", "Use heavy bottom pots.")
+  fun insertTipFavoriteAndIsFavorite() = testingDb {
+    tipQueries.upsertTip("Knife Skills", "knife skills", "basic", "Keep fingers curled.")
+    tipQueries.insertTipFavorite("Knife Skills")
 
-    tipQueries.upsertTip("Sauce Making", "learn", "Make a roux first.")
+    val isFavorite = tipQueries.isTipFavorite("Knife Skills").awaitAsOne()
+    assertEquals(true, isFavorite)
+  }
 
-    tipQueries.upsertTip("Molecular Gastronomy", "advanced", "Use agar agar.")
+  @Test
+  fun deleteTipFavorite() = testingDb {
+    tipQueries.upsertTip("Knife Skills", "knife skills", "basic", "Keep fingers curled.")
+    tipQueries.insertTipFavorite("Knife Skills")
+    assertEquals(true, tipQueries.isTipFavorite("Knife Skills").awaitAsOne())
 
-    // Test querying "basic"
-    val basicTips = tipQueries.getByType("basic").awaitAsList()
-    assertEquals(2, basicTips.size)
-    assertTrue(basicTips.all { it.type == "basic" })
-    assertTrue(basicTips.any { it.name == "Knife Care" })
-
-    // Test querying "learn"
-    val learnTips = tipQueries.getByType("learn").awaitAsList()
-    assertEquals(1, learnTips.size)
-    assertEquals("Sauce Making", learnTips.first().name)
-
-    // Test querying "advanced"
-    val advancedTips = tipQueries.getByType("advanced").awaitAsList()
-    assertEquals(1, advancedTips.size)
-    assertEquals("Molecular Gastronomy", advancedTips.first().name)
-
-    // Test querying non-existent type
-    val emptyTips = tipQueries.getByType("random_type").awaitAsList()
-    assertTrue(emptyTips.isEmpty(), "Querying a non-existent type should return an empty list.")
+    tipQueries.deleteTipFavorite("Knife Skills")
+    assertEquals(false, tipQueries.isTipFavorite("Knife Skills").awaitAsOne())
   }
 }
