@@ -1,5 +1,7 @@
 package com.yueban.compilecook.data.net.di
 
+import com.yueban.compilecook.data.net.service.AiRemoteDataSource
+import com.yueban.compilecook.data.net.service.AiRemoteDataSourceImpl
 import com.yueban.compilecook.data.net.service.DishRemoteDataSource
 import com.yueban.compilecook.data.net.service.DishRemoteDataSourceImpl
 import com.yueban.compilecook.json.json
@@ -37,6 +39,7 @@ val remoteDataSourceModule = module {
     NetClient(get(), resolveBaseUrl())
   }
   singleOf(::DishRemoteDataSourceImpl) bind DishRemoteDataSource::class
+  singleOf(::AiRemoteDataSourceImpl) bind AiRemoteDataSource::class
 }
 
 expect fun resolveBaseUrl(): String

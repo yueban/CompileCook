@@ -6,6 +6,7 @@
     <string name="common_unknown_error">Unknown error</string>
     <string name="common_network_error">Network error</string>
     <string name="common_des_back">Back</string>
+    <string name="common_des_ai_assistant">Ai assistant</string>
     <string name="common_des_clear">Clear</string>
     <string name="common_des_toggle_favorite">Toggle favorite</string>
     <string name="common_search_hint">Search...</string>
@@ -54,4 +55,9 @@
 
     <string name="about_title">About</string>
     <string name="about_des_app_icon">Compile Cook</string>
+
+    <string name="ai_chat_context_format">Current: %1$s</string>
+    <string name="ai_chat_input_hint">Ask about cooking…</string>
+    <string name="ai_chat_des_camera">Camera</string>
+    <string name="ai_chat_des_send">Send</string>
 </resources>

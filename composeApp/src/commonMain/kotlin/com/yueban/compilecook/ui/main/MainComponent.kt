@@ -9,8 +9,10 @@ import com.arkivanov.decompose.value.Value
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.ui.base.BaseComponent
+import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
 import com.yueban.compilecook.ui.main.DefaultMainComponent.Config
 import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
+import com.yueban.compilecook.ui.main.MainComponent.Output.AiClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.RandomDishClicked
 import com.yueban.compilecook.ui.main.MainDishComponent.Output.DishCategoryClicked
@@ -25,6 +27,7 @@ interface MainComponent {
   fun onDishSearchClicked()
   fun onRandomDishClicked()
   fun onAboutClicked()
+  fun onAiClicked()
 
   enum class MainTab {
     DISHES, TIPS;
@@ -48,6 +51,7 @@ interface MainComponent {
     data object DishSearchClicked : Output
     data class RandomDishClicked(val dishName: String) : Output
     data object AboutClicked : Output
+    data object AiClicked : Output, ToggleAiDrawerOutput
   }
 }
 
@@ -83,6 +87,8 @@ class DefaultMainComponent(
   }
 
   override fun onAboutClicked() = onOutput(AboutClicked)
+
+  override fun onAiClicked() = onOutput(AiClicked)
 
   private fun createChild(config: Config, ctx: ComponentContext): MainComponent.Child {
     return when (config) {

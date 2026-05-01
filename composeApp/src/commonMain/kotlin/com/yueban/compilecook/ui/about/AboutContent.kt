@@ -40,8 +40,8 @@ fun AboutContent(component: AboutComponent) {
     topBar = {
       TitleTopBar(
         title = stringResource(Res.string.about_title),
-        enableBack = true,
-        onBackClick = component::onBackClicked
+        onBackClick = component::onBackClicked,
+        onAiClick = component::onAiClicked,
       )
     }
   ) { padding ->
@@ -84,6 +84,7 @@ private fun AboutHeader() {
 private class PreviewAboutComponent : AboutComponent {
   override val uiState = MutableStateFlow(PreviewData.aboutState)
   override fun onBackClicked() = Unit
+  override fun onAiClicked() = Unit
 }
 
 @UniversalScreenPreview

@@ -3,9 +3,11 @@ package com.yueban.compilecook.ui.about
 import com.arkivanov.decompose.ComponentContext
 import com.mikepenz.aboutlibraries.Libs
 import com.yueban.compilecook.ui.about.AboutComponent.Output
+import com.yueban.compilecook.ui.about.AboutComponent.Output.AiClicked
 import com.yueban.compilecook.ui.about.AboutComponent.Output.BackClicked
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
+import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
@@ -19,9 +21,11 @@ data class AboutState(
 
 interface AboutComponent : UiStateComponent<AboutState> {
   fun onBackClicked()
+  fun onAiClicked()
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
+    data object AiClicked : Output, ToggleAiDrawerOutput
   }
 }
 
@@ -44,4 +48,6 @@ class DefaultAboutComponent(
   }
 
   override fun onBackClicked() = onOutput(BackClicked)
+
+  override fun onAiClicked() = onOutput(AiClicked)
 }

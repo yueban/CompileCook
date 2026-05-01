@@ -45,6 +45,7 @@ fun MarkdownDetailContent(
   onImageClick: (String) -> Unit,
   overlayLabel: String,
   modifier: Modifier = Modifier,
+  onAiClick: (() -> Unit)? = null,
   topBarActions: @Composable RowScope.() -> Unit = {},
 ) {
   val listState = rememberLazyListState()
@@ -66,8 +67,8 @@ fun MarkdownDetailContent(
           topBar = {
             TitleTopBar(
               title = title,
-              enableBack = true,
               onBackClick = onBackClick,
+              onAiClick = onAiClick,
               actions = topBarActions,
             )
           },

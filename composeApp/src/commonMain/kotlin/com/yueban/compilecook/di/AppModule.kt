@@ -5,6 +5,8 @@ import com.yueban.compilecook.service.DefaultMessageService
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.ui.about.AboutComponent
 import com.yueban.compilecook.ui.about.DefaultAboutComponent
+import com.yueban.compilecook.ui.ai.AiChatComponent
+import com.yueban.compilecook.ui.ai.DefaultAiChatComponent
 import com.yueban.compilecook.ui.dish.DefaultDishComponent
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
 import com.yueban.compilecook.ui.dish.DishComponent
@@ -55,4 +57,6 @@ val uiModule = module {
       DefaultAboutComponent(ctx, onOut)
     )
   }
+
+  factory<AiChatComponent> { (ctx: ComponentContext) -> DefaultAiChatComponent(ctx, get()) }
 }

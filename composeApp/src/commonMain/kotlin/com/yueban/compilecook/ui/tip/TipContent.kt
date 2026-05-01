@@ -35,6 +35,7 @@ fun TipContent(component: TipComponent) {
     onBackClick = component::onBackClicked,
     onImageClick = component::onImageClicked,
     overlayLabel = IMAGE_OVERLAY_LABEL,
+    onAiClick = component::onAiClicked,
   )
 }
 
@@ -42,6 +43,7 @@ private class PreviewTipComponent : TipComponent {
   override val uiState = MutableStateFlow(PreviewData.tipState)
   override val imageSlot: Value<ChildSlot<String, ImageComponent>> = MutableValue(ChildSlot())
   override fun onBackClicked() = Unit
+  override fun onAiClicked() = Unit
   override fun onImageClicked(imageUrl: String) = Unit
 }
 

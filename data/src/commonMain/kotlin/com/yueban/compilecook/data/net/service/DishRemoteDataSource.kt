@@ -10,7 +10,7 @@ interface DishRemoteDataSource {
   suspend fun getTips(): List<TipRemoteEntity>
 }
 
-class DishRemoteDataSourceImpl(
+internal class DishRemoteDataSourceImpl(
   private val netClient: NetClient,
 ) : DishRemoteDataSource {
   override suspend fun getDishes(): List<DishRemoteEntity> = netClient.get("/dishes.json").body()

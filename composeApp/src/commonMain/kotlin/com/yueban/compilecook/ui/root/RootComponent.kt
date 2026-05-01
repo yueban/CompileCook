@@ -1,6 +1,11 @@
 package com.yueban.compilecook.ui.root
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.router.slot.ChildSlot
+import com.arkivanov.decompose.router.slot.SlotNavigation
+import com.arkivanov.decompose.router.slot.activate
+import com.arkivanov.decompose.router.slot.childSlot
+import com.arkivanov.decompose.router.slot.dismiss
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -17,8 +22,11 @@ import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.about.AboutComponent
+import com.yueban.compilecook.ui.ai.AiChatComponent
 import com.yueban.compilecook.ui.base.BackOutput
-import com.yueban.compilecook.ui.base.BaseComponent
+import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
+import com.yueban.compilecook.ui.base.UiStateComponent
+import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
@@ -26,6 +34,7 @@ import com.yueban.compilecook.ui.dish.DishListSource
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
 import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
+import com.yueban.compilecook.ui.main.MainComponent.Output.AiClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishCategoryClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.DishSearchClicked
 import com.yueban.compilecook.ui.main.MainComponent.Output.RandomDishClicked
@@ -43,20 +52,36 @@ import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
 import com.yueban.compilecook.ui.tip.TipComponent
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 
 private const val KEY_ROOT_CHILD_STACK = "ROOT_CHILD_STACK"
+private const val KEY_AI_CHAT_SLOT = "AI_CHAT_SLOT"
+private const val DRAWER_ANIMATION_DURATION_MS = 300L
 
-interface RootComponent : BackHandlerOwner, WebNavigationOwner {
+data class RootState(
+  val isDrawerOpen: Boolean = false,
+)
+
+interface RootComponent :
+  BackHandlerOwner,
+  WebNavigationOwner,
+  UiStateComponent<RootState> {
   val stack: Value<ChildStack<Config, Child>>
+  val aiChatSlot: Value<ChildSlot<Unit, AiChatComponent>>
   val messages: Flow<UiMessage>
   fun onDeepLink(url: String)
   fun onUriClicked(uri: String): Boolean
   fun onBackClicked()
+  fun toggleDrawer()
+  fun openDrawer()
+  fun closeDrawer()
 
   sealed class Child {
     class MainChild(val component: MainComponent) : Child()
@@ -71,9 +96,21 @@ interface RootComponent : BackHandlerOwner, WebNavigationOwner {
 class DefaultRootComponent(
   componentContext: ComponentContext,
   deepLinkUrl: String? = null,
-) : RootComponent, BaseComponent(componentContext) {
+) : RootComponent, UiStateComponentImpl<RootState>(
+  componentContext = componentContext,
+  initialState = RootState(),
+) {
   private val deepLinkHandler: DeepLinkHandler = get()
   private val navigation = StackNavigation<Config>()
+  private val aiChatNavigation = SlotNavigation<Unit>()
+  override val aiChatSlot: Value<ChildSlot<Unit, AiChatComponent>> =
+    componentContext.childSlot(
+      source = aiChatNavigation,
+      serializer = Unit.serializer(),
+      key = KEY_AI_CHAT_SLOT,
+      handleBackButton = false,
+      childFactory = { _, childContext -> get<AiChatComponent> { parametersOf(childContext) } },
+    )
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
     childStack(
       key = KEY_ROOT_CHILD_STACK,
@@ -93,6 +130,8 @@ class DefaultRootComponent(
     },
   )
   override val messages: Flow<UiMessage> = get<MessageService>().messageFlow
+
+  private var drawerDismissJob: Job? = null
 
   init {
     lifecycle.doOnCreate {
@@ -139,6 +178,10 @@ class DefaultRootComponent(
       DishSearchClicked -> DishList(DishListSource.Search)
       is RandomDishClicked -> Dish(output.dishName)
       AboutClicked -> About
+      AiClicked -> {
+        toggleDrawer()
+        return
+      }
     }.let { navigation.push(it) }
   }
 
@@ -157,6 +200,33 @@ class DefaultRootComponent(
 
   override fun onBackClicked() = navigation.pop()
 
+  override fun toggleDrawer() {
+    if (uiState.value.isDrawerOpen) {
+      closeDrawer()
+    } else {
+      openDrawer()
+    }
+  }
+
+  override fun openDrawer() {
+    drawerDismissJob?.cancel()
+    drawerDismissJob = null
+    if (!uiState.value.isDrawerOpen) {
+      aiChatNavigation.activate(Unit)
+    }
+    setState { copy(isDrawerOpen = true) }
+  }
+
+  override fun closeDrawer() {
+    setState { copy(isDrawerOpen = false) }
+    drawerDismissJob?.cancel()
+    drawerDismissJob = componentScope.launch {
+      // dismiss after drawer closing animation
+      delay(DRAWER_ANIMATION_DURATION_MS)
+      aiChatNavigation.dismiss()
+    }
+  }
+
   @Serializable
   sealed interface Config {
     @Serializable data class Main(val initialTab: MainTab = MainTab.TIPS) : Config
@@ -165,15 +235,15 @@ class DefaultRootComponent(
     @Serializable data class Dish(val dishName: String) : Config
     @Serializable data object About : Config
   }
-}
 
-private inline fun <T> StackNavigation<*>.onOutput(
-  event: T,
-  crossinline handler: (T) -> Unit = {},
-) {
-  if (event is BackOutput) {
-    pop()
-  } else {
-    handler(event)
+  private inline fun <T> StackNavigation<*>.onOutput(
+    event: T,
+    crossinline handler: (T) -> Unit = {},
+  ) {
+    when (event) {
+      is BackOutput -> pop()
+      is ToggleAiDrawerOutput -> toggleDrawer()
+      else -> handler(event)
+    }
   }
 }

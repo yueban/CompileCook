@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,14 +18,15 @@ import com.yueban.compilecook.ui.util.UniversalWidgetPreview
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.app_name
+import compilecook.composeapp.generated.resources.common_des_ai_assistant
 import compilecook.composeapp.generated.resources.common_des_back
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TitleTopBar(
   title: String,
-  enableBack: Boolean = false,
-  onBackClick: () -> Unit = {},
+  onBackClick: (() -> Unit)? = null,
+  onAiClick: (() -> Unit)? = null,
   actions: @Composable RowScope.() -> Unit = {},
 ) {
   CenterAlignedTopAppBar(
@@ -37,7 +39,7 @@ fun TitleTopBar(
       )
     },
     navigationIcon = {
-      if (enableBack) {
+      if (onBackClick != null) {
         IconButton(onClick = onBackClick) {
           Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -46,7 +48,17 @@ fun TitleTopBar(
         }
       }
     },
-    actions = actions,
+    actions = {
+      actions()
+      if (onAiClick != null) {
+        IconButton(onClick = onAiClick) {
+          Icon(
+            imageVector = Icons.Default.SmartToy,
+            contentDescription = stringResource(Res.string.common_des_ai_assistant),
+          )
+        }
+      }
+    },
     colors = topAppBarColors(
       containerColor = AppTheme.colorScheme.background,
       scrolledContainerColor = AppTheme.colorScheme.background,
@@ -70,7 +82,7 @@ private fun PreviewTitleTopBar_Simple() = PreviewWrapper {
 private fun PreviewTitleTopBar_WithBack() = PreviewWrapper {
   TitleTopBar(
     title = stringResource(Res.string.app_name),
-    enableBack = true
+    onBackClick = {},
   )
 }
 
@@ -79,7 +91,7 @@ private fun PreviewTitleTopBar_WithBack() = PreviewWrapper {
 private fun PreviewTitleTopBar_WithActions() = PreviewWrapper {
   TitleTopBar(
     title = stringResource(Res.string.app_name),
-    enableBack = true,
+    onBackClick = {},
     actions = {
       IconButton(onClick = {}) {
         Icon(Icons.Default.Search, contentDescription = "Search")

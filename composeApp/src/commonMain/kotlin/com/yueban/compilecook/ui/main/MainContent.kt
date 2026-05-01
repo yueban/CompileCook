@@ -70,6 +70,7 @@ fun MainContent(component: MainComponent) {
     topBar = {
       TitleTopBar(
         title = stringResource(Res.string.app_name),
+        onAiClick = component::onAiClicked,
         actions = {
           TopBarActions(
             activeChild = activeChild,
@@ -106,7 +107,7 @@ private fun ArchNavigationBar(
   activeChild: Child,
   onTabSelected: (MainTab) -> Unit,
   onRandomDishClicked: () -> Unit,
-  bottomFabOffset: Dp
+  bottomFabOffset: Dp,
 ) {
   // unify container color and elevation to make a seamless shape.
   val barColor = NavigationBarDefaults.containerColor
@@ -216,6 +217,7 @@ private class PreviewMainComponent(activeTab: MainTab = MainTab.TIPS) : MainComp
   override fun onDishSearchClicked() = Unit
   override fun onRandomDishClicked() = Unit
   override fun onAboutClicked() = Unit
+  override fun onAiClicked() = Unit
 }
 
 @UniversalScreenPreview

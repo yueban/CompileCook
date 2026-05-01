@@ -6,6 +6,7 @@
     <string name="common_unknown_error">未知错误</string>
     <string name="common_network_error">网络错误</string>
     <string name="common_des_back">返回</string>
+    <string name="common_des_ai_assistant">智能助手</string>
     <string name="common_des_clear">清空</string>
     <string name="common_des_toggle_favorite">切换收藏</string>
     <string name="common_search_hint">搜索...</string>
@@ -54,4 +55,9 @@
 
     <string name="about_title">关于</string>
     <string name="about_des_app_icon">码上开饭</string>
+
+    <string name="ai_chat_context_format">当前：%1$s</string>
+    <string name="ai_chat_input_hint">问问做菜的事…</string>
+    <string name="ai_chat_des_camera">拍照</string>
+    <string name="ai_chat_des_send">发送</string>
 </resources>

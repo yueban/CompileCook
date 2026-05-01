@@ -113,6 +113,7 @@ kotlin {
       implementation(project.dependencies.platform(libs.ktor.bom))
       implementation(libs.ktor.client.js)
       implementation(libs.kotlin.browser)
+      implementation(libs.kotlinx.browser)
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)

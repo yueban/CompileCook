@@ -96,8 +96,8 @@ fun DishListContent(component: DishListComponent) {
       } else {
         TitleTopBar(
           title = title,
-          enableBack = true,
           onBackClick = component::onBackClicked,
+          onAiClick = component::onAiClicked,
           actions = {
             IconButton(onClick = { component.onSearchActiveChanged(true) }) {
               Icon(
@@ -336,6 +336,7 @@ private fun DifficultyStars(count: Int, modifier: Modifier = Modifier) {
 private abstract class PreviewDishListComponent : DishListComponent {
   override val uiState = MutableStateFlow(PreviewData.dishListState)
   override fun onBackClicked() = Unit
+  override fun onAiClicked() = Unit
   override fun onFilterCategoryChanged(category: DishCategory?) = Unit
   override fun onFilterDifficultyChanged(level: Int?) = Unit
   override fun onDishClicked(dish: DishSummary) = Unit

@@ -9,11 +9,13 @@ import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.Success
+import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
 import com.yueban.compilecook.ui.image.ImageComponent
 import com.yueban.compilecook.ui.image.ImageSlotHolder
+import com.yueban.compilecook.ui.tip.TipComponent.Output.AiClicked
 import com.yueban.compilecook.ui.tip.TipComponent.Output.BackClicked
 import com.yueban.compilecook.ui.widget.markdown.TocItem
 import com.yueban.compilecook.ui.widget.markdown.extractToc
@@ -37,10 +39,12 @@ data class TipState(
 interface TipComponent : UiStateComponent<TipState> {
   val imageSlot: Value<ChildSlot<String, ImageComponent>>
   fun onBackClicked()
+  fun onAiClicked()
   fun onImageClicked(imageUrl: String)
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
+    data object AiClicked : Output, ToggleAiDrawerOutput
   }
 }
 
@@ -76,6 +80,8 @@ class DefaultTipComponent(
   }
 
   override fun onBackClicked() = onOutput(BackClicked)
+
+  override fun onAiClicked() = onOutput(AiClicked)
 
   override fun onImageClicked(imageUrl: String) = imageSlotHolder.show(imageUrl)
 }

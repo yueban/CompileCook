@@ -10,9 +10,11 @@ import com.yueban.compilecook.repo.entity.DishDetail
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.Success
+import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
+import com.yueban.compilecook.ui.dish.DishComponent.Output.AiClicked
 import com.yueban.compilecook.ui.dish.DishComponent.Output.BackClicked
 import com.yueban.compilecook.ui.image.ImageComponent
 import com.yueban.compilecook.ui.image.ImageSlotHolder
@@ -41,11 +43,13 @@ data class DishState(
 interface DishComponent : UiStateComponent<DishState> {
   val imageSlot: Value<ChildSlot<String, ImageComponent>>
   fun onBackClicked()
+  fun onAiClicked()
   fun onFavoriteToggle()
   fun onImageClicked(imageUrl: String)
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
+    data object AiClicked : Output, ToggleAiDrawerOutput
   }
 }
 
@@ -86,6 +90,8 @@ class DefaultDishComponent(
   }
 
   override fun onBackClicked() = onOutput(BackClicked)
+
+  override fun onAiClicked() = onOutput(AiClicked)
 
   override fun onImageClicked(imageUrl: String) = imageSlotHolder.show(imageUrl)
 

@@ -6,9 +6,11 @@ import com.yueban.compilecook.repo.entity.DishCategory
 import com.yueban.compilecook.repo.entity.DishSummary
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
+import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
+import com.yueban.compilecook.ui.dish.DishListComponent.Output.AiClicked
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.BackClicked
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import com.yueban.compilecook.ui.util.SmartMatcher
@@ -40,6 +42,7 @@ sealed interface DishListSource {
 
 interface DishListComponent : UiStateComponent<DishListState> {
   fun onBackClicked()
+  fun onAiClicked()
   fun onFilterCategoryChanged(category: DishCategory?)
   fun onFilterDifficultyChanged(level: Int?)
   fun onDishClicked(dish: DishSummary)
@@ -49,6 +52,7 @@ interface DishListComponent : UiStateComponent<DishListState> {
 
   sealed interface Output {
     data object BackClicked : Output, BackOutput
+    data object AiClicked : Output, ToggleAiDrawerOutput
     data class DishClicked(val dishName: String) : Output
   }
 }
@@ -98,6 +102,8 @@ class DefaultDishListComponent(
       onSearchActiveChanged(false)
     }
   }
+
+  override fun onAiClicked() = onOutput(AiClicked)
 
   override fun onFilterCategoryChanged(category: DishCategory?) = setState {
     copy(filterCategory = category)

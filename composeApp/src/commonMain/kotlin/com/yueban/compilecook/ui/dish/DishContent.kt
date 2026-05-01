@@ -36,6 +36,7 @@ fun DishContent(component: DishComponent) {
     onBackClick = component::onBackClicked,
     onImageClick = component::onImageClicked,
     overlayLabel = IMAGE_OVERLAY_LABEL,
+    onAiClick = component::onAiClicked,
     topBarActions = {
       state.dishAsync.value?.let {
         FavoriteButton(
@@ -51,6 +52,7 @@ private class PreviewDishComponent : DishComponent {
   override val uiState = MutableStateFlow(PreviewData.dishState)
   override val imageSlot: Value<ChildSlot<String, ImageComponent>> = MutableValue(ChildSlot())
   override fun onBackClicked() = Unit
+  override fun onAiClicked() = Unit
   override fun onFavoriteToggle() = Unit
   override fun onImageClicked(imageUrl: String) = Unit
 }
