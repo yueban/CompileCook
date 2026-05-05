@@ -24,17 +24,10 @@ data class TipDetail(
 
 @Serializable
 enum class TipType {
-  @SerialName("basic")
-  BASIC,
-
-  @SerialName("learn")
-  LEARN,
-
-  @SerialName("advanced")
-  ADVANCED,
-
-  @SerialName("unknown")
-  UNKNOWN;
+  @SerialName("basic") BASIC,
+  @SerialName("learn") LEARN,
+  @SerialName("advanced") ADVANCED,
+  @SerialName("unknown") UNKNOWN;
 
   companion object {
     fun fromValue(value: String): TipType =

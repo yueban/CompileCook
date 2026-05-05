@@ -120,7 +120,6 @@ class DefaultMainComponent(
   @Serializable
   sealed interface Config {
     @Serializable data object Tips : Config
-
     @Serializable data object Dishes : Config
   }
 }

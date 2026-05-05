@@ -160,13 +160,9 @@ class DefaultRootComponent(
   @Serializable
   sealed interface Config {
     @Serializable data class Main(val initialTab: MainTab = MainTab.TIPS) : Config
-
     @Serializable data class Tip(val tipName: String) : Config
-
     @Serializable data class DishList(val source: DishListSource) : Config
-
     @Serializable data class Dish(val dishName: String) : Config
-
     @Serializable data object About : Config
   }
 }

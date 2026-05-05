@@ -32,38 +32,17 @@ data class DishDetail(
 
 @Serializable
 enum class DishCategory {
-  @SerialName("vegetable_dish")
-  VEGETABLE_DISH,
-
-  @SerialName("meat_dish")
-  MEAT_DISH,
-
-  @SerialName("aquatic")
-  AQUATIC,
-
-  @SerialName("breakfast")
-  BREAKFAST,
-
-  @SerialName("staple")
-  STAPLE,
-
-  @SerialName("semi_finished")
-  SEMI_FINISHED,
-
-  @SerialName("soup")
-  SOUP,
-
-  @SerialName("drink")
-  DRINK,
-
-  @SerialName("condiment")
-  CONDIMENT,
-
-  @SerialName("dessert")
-  DESSERT,
-
-  @SerialName("unknown")
-  UNKNOWN;
+  @SerialName("vegetable_dish") VEGETABLE_DISH,
+  @SerialName("meat_dish") MEAT_DISH,
+  @SerialName("aquatic") AQUATIC,
+  @SerialName("breakfast") BREAKFAST,
+  @SerialName("staple") STAPLE,
+  @SerialName("semi_finished") SEMI_FINISHED,
+  @SerialName("soup") SOUP,
+  @SerialName("drink") DRINK,
+  @SerialName("condiment") CONDIMENT,
+  @SerialName("dessert") DESSERT,
+  @SerialName("unknown") UNKNOWN;
 
   companion object {
     fun fromValue(value: String): DishCategory =

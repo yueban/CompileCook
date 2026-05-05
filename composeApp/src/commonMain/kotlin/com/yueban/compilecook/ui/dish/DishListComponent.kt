@@ -32,13 +32,9 @@ data class DishListState(
 @Serializable
 sealed interface DishListSource {
   @Serializable data object All : DishListSource
-
   @Serializable data object Search : DishListSource
-
   @Serializable data object Favorite : DishListSource
-
   @Serializable data class Category(val category: DishCategory) : DishListSource
-
   @Serializable data class Difficulty(val level: Int) : DishListSource
 }
 

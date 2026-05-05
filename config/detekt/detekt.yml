@@ -801,11 +801,11 @@ formatting:
   android: true
   autoCorrect: true
   AnnotationOnSeparateLine:
-    active: true
+    active: false
     autoCorrect: true
     indentSize: 2
   AnnotationSpacing:
-    active: true
+    active: false
     autoCorrect: true
   ArgumentListWrapping:
     active: true
@@ -1021,7 +1021,7 @@ formatting:
     active: true
     autoCorrect: true
   SpacingBetweenDeclarationsWithAnnotations:
-    active: true
+    active: false
     autoCorrect: true
   SpacingBetweenDeclarationsWithComments:
     active: true

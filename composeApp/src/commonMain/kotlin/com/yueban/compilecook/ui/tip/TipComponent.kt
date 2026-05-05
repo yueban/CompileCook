@@ -30,10 +30,8 @@ private const val KEY_TIP_IMAGE_CHILD_SLOT = "TIP_IMAGE_CHILD_SLOT"
 @Serializable
 data class TipState(
   val tipName: String,
-  @Transient
-  val contentAsync: Async<State> = Uninitialized,
-  @Transient
-  val tocAsync: Async<List<TocItem>> = Uninitialized,
+  @Transient val contentAsync: Async<State> = Uninitialized,
+  @Transient val tocAsync: Async<List<TocItem>> = Uninitialized,
 )
 
 interface TipComponent : UiStateComponent<TipState> {
