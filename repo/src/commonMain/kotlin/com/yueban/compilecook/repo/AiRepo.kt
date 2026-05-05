@@ -6,6 +6,7 @@ import com.yueban.compilecook.data.net.entity.AiChatRequestMessage
 import com.yueban.compilecook.data.net.service.AiRemoteDataSource
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiContext
+import com.yueban.compilecook.util.serialName
 import kotlinx.coroutines.flow.Flow
 
 interface AiRepo {
@@ -25,7 +26,7 @@ internal class AiRepoImpl(
     val request = AiChatRequest(
       messages = messages.map {
         AiChatRequestMessage(
-          role = it.role.name.lowercase(),
+          role = it.role.serialName(),
           content = it.content,
         )
       },

@@ -8,6 +8,17 @@ plugins {
   alias(libs.plugins.androidKotlinMultiplatformLibrary)
   alias(libs.plugins.sqldelight)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.buildconfig)
+}
+
+buildConfig {
+  useKotlinOutput { internalVisibility = true }
+  className("AIKonfig")
+  packageName(Configs.packageName)
+
+  buildConfigField("MIMO_API_KEY", Configs.mimoApiKey)
+  buildConfigField("MIMO_BASE_URL", Configs.mimoBaseUrl)
+  buildConfigField("MIMO_MODEL", Configs.mimoModel)
 }
 
 kotlin {
@@ -56,6 +67,7 @@ kotlin {
       implementation(libs.ktor.client.logging)
       implementation(libs.ktor.client.content.negotiation)
       implementation(libs.ktor.serialization.kotlinx.json)
+      implementation(libs.openai.client)
     }
     androidMain.dependencies {
       implementation(libs.sqldelight.android.driver)

@@ -88,6 +88,7 @@ slf4j-nop = "2.0.17"
 ##     ⬆ = "2.1.0-alpha0"
 ##     ⬆ = "2.1.0-alpha1"
 platformtools = "0.7.5"
+openai-client = "4.1.0"
 
 [libraries]
 
@@ -147,3 +148,4 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j-nop" }
 platformtools-darkmodedetector = { module = "io.github.kdroidfilter:platformtools.darkmodedetector", version.ref = "platformtools" }
+openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openai-client" }

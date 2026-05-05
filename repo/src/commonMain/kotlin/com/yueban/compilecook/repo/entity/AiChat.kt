@@ -1,5 +1,8 @@
 package com.yueban.compilecook.repo.entity
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 data class AiChatMessage(
   val id: String,
   val role: AiChatRole,
@@ -7,7 +10,12 @@ data class AiChatMessage(
   val timestamp: Long,
 )
 
-enum class AiChatRole { USER, ASSISTANT, SYSTEM }
+@Serializable
+enum class AiChatRole {
+  @SerialName("user") USER,
+  @SerialName("assistant") ASSISTANT,
+  @SerialName("system") SYSTEM,
+}
 
 data class AiContext(
   val type: AiContextType,

@@ -9,10 +9,7 @@ plugins {
 }
 
 buildConfig {
-  useKotlinOutput {
-    internalVisibility = false
-  }
-
+  useKotlinOutput { internalVisibility = false }
   className("BuildKonfig")
   packageName(Configs.packageName)
 
