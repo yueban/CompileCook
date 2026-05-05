@@ -77,13 +77,6 @@ class TipMappingTest {
   }
 
   @Test
-  fun TipType_fromValue_ignoreCase() {
-    assertEquals(TipType.BASIC, TipType.fromValue("BASIC"))
-    assertEquals(TipType.LEARN, TipType.fromValue("Learn"))
-    assertEquals(TipType.ADVANCED, TipType.fromValue("ADVANCED"))
-  }
-
-  @Test
   fun TipType_fromValue_unknown() {
     assertEquals(TipType.UNKNOWN, TipType.fromValue("nonexistent"))
     assertEquals(TipType.UNKNOWN, TipType.fromValue(""))

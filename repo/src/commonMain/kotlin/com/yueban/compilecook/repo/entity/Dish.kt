@@ -2,6 +2,7 @@ package com.yueban.compilecook.repo.entity
 
 import com.yueban.compilecook.data.cache.db.entity.DishDetailLocalEntity
 import com.yueban.compilecook.data.cache.db.entity.DishSummaryLocalEntity
+import com.yueban.compilecook.util.serialName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -45,8 +46,7 @@ enum class DishCategory {
   @SerialName("unknown") UNKNOWN;
 
   companion object {
-    fun fromValue(value: String): DishCategory =
-      entries.find { it.name.equals(value, ignoreCase = true) } ?: UNKNOWN
+    fun fromValue(value: String): DishCategory = entries.find { it.serialName() == value } ?: UNKNOWN
   }
 }
 

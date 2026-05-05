@@ -124,14 +124,6 @@ class DishMappingTest {
   }
 
   @Test
-  fun DishCategory_fromValue_ignoreCase() {
-    assertEquals(DishCategory.MEAT_DISH, DishCategory.fromValue("MEAT_DISH"))
-    assertEquals(DishCategory.MEAT_DISH, DishCategory.fromValue("Meat_Dish"))
-    assertEquals(DishCategory.STAPLE, DishCategory.fromValue("STAPLE"))
-    assertEquals(DishCategory.AQUATIC, DishCategory.fromValue("AQUATIC"))
-  }
-
-  @Test
   fun DishCategory_fromValue_unknown() {
     assertEquals(DishCategory.UNKNOWN, DishCategory.fromValue("nonexistent"))
     assertEquals(DishCategory.UNKNOWN, DishCategory.fromValue(""))

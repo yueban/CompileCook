@@ -2,6 +2,7 @@ package com.yueban.compilecook.repo.entity
 
 import com.yueban.compilecook.data.cache.db.entity.TipDetailLocalEntity
 import com.yueban.compilecook.data.cache.db.entity.TipSummaryLocalEntity
+import com.yueban.compilecook.util.serialName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -30,8 +31,7 @@ enum class TipType {
   @SerialName("unknown") UNKNOWN;
 
   companion object {
-    fun fromValue(value: String): TipType =
-      TipType.entries.find { it.name.equals(value, ignoreCase = true) } ?: UNKNOWN
+    fun fromValue(value: String): TipType = TipType.entries.find { it.serialName() == value } ?: UNKNOWN
   }
 }
 
