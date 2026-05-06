@@ -27,7 +27,7 @@ data class ExtendedDimens(
   val elevationLarge: Dp = 4.dp,
 
   // corner radius
-  val radiusExtraSmall: Dp = 2.dp,
+  val radiusExtraSmall: Dp = 4.dp,
   val radiusSmall: Dp = 8.dp,
   val radiusMedium: Dp = 12.dp,
   val radiusLarge: Dp = 16.dp,
@@ -65,6 +65,12 @@ data class ExtendedDimens(
   // alignment & offsets
   val favoriteIconOffsetY: Dp = 2.dp,
   val difficultyStarOffsetY: Dp = 2.dp,
+
+  // ai chat
+  val aiChatMessageMaxWidth: Dp = 300.dp,
+  val aiChatInputFieldRadius: Dp = 24.dp,
+  val aiChatLoadingSize: Dp = 16.dp,
+  val aiChatLoadingStroke: Dp = 2.dp,
 )
 
 internal val LocalExtendedDimens = staticCompositionLocalOf { ExtendedDimens() }

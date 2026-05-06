@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatRole
@@ -56,9 +55,34 @@ fun AiChatContent(
   var inputText by remember { mutableStateOf("") }
   val listState = rememberLazyListState()
 
-  LaunchedEffect(state.messages.size) {
-    if (state.messages.isNotEmpty()) {
-      listState.animateScrollToItem(state.messages.lastIndex)
+  // user sends a message — always scroll to bottom
+  val userMessageCount = state.messages.count { it.role == AiChatRole.USER }
+  LaunchedEffect(userMessageCount) {
+    if (userMessageCount > 0) {
+      listState.scrollToItem(state.messages.size)
+    }
+  }
+
+  // auto scroll on last message changing
+  val lastMessage = state.messages.lastOrNull()
+  LaunchedEffect(lastMessage) {
+    if (lastMessage == null || lastMessage.role != AiChatRole.ASSISTANT) return@LaunchedEffect
+
+    val layoutInfo = listState.layoutInfo
+    val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
+    val lastMessageIndex = state.messages.size
+    // response generating — keep bottom visible when content grows
+    if (lastVisible.index >= lastMessageIndex) {
+      val lastItem = layoutInfo.visibleItemsInfo.lastOrNull { it.index == lastMessageIndex } ?: lastVisible
+      val offset = (lastItem.size - layoutInfo.viewportEndOffset).coerceAtLeast(0)
+      listState.scrollToItem(lastMessageIndex, scrollOffset = offset)
+    } else if (lastVisible.index >= lastMessageIndex - 1) {
+      // scroll to bottom only if the previous last item was completely visible
+      val isFullyVisible =
+        lastVisible.offset >= 0 && lastVisible.offset + lastVisible.size <= layoutInfo.viewportEndOffset
+      if (isFullyVisible) {
+        listState.scrollToItem(lastMessageIndex)
+      }
     }
   }
 
@@ -72,7 +96,7 @@ fun AiChatContent(
         modifier = Modifier
           .fillMaxWidth()
           .background(AppTheme.colorScheme.surfaceVariant)
-          .padding(horizontal = 16.dp, vertical = 8.dp)
+          .padding(horizontal = AppTheme.dimens.screenPadding, vertical = AppTheme.dimens.smallGap)
       ) {
         Text(
           text = stringResource(Res.string.ai_chat_context_format, context.name),
@@ -89,29 +113,19 @@ fun AiChatContent(
       modifier = Modifier
         .weight(1f)
         .fillMaxWidth()
-        .padding(horizontal = 16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
+        .padding(horizontal = AppTheme.dimens.screenPadding),
+      verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap),
     ) {
       item(key = "top_spacer") {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppTheme.dimens.smallGap))
       }
 
+      val lastMessageId = state.messages.lastOrNull()?.id
       items(state.messages, key = { it.id }) { message ->
-        MessageBubble(message)
-      }
-
-      if (state.isLoading) {
-        item {
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-          ) {
-            CircularProgressIndicator(
-              modifier = Modifier.size(24.dp),
-              strokeWidth = 2.dp,
-            )
-          }
-        }
+        MessageBubble(
+          message = message,
+          isLoading = state.isLoading && message.role == AiChatRole.ASSISTANT && message.id == lastMessageId,
+        )
       }
     }
 
@@ -139,9 +153,9 @@ private fun ChatInputArea(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(8.dp),
+      .padding(AppTheme.dimens.smallGap),
     verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap),
   ) {
     OutlinedTextField(
       value = inputText,
@@ -149,12 +163,12 @@ private fun ChatInputArea(
       modifier = Modifier.weight(1f),
       placeholder = { Text(stringResource(Res.string.ai_chat_input_hint)) },
       maxLines = 3,
-      shape = RoundedCornerShape(24.dp),
+      shape = RoundedCornerShape(AppTheme.dimens.aiChatInputFieldRadius),
     )
 
     IconButton(
       onClick = onCameraClick,
-      modifier = Modifier.size(48.dp),
+      modifier = Modifier.size(AppTheme.dimens.iconLarge),
     ) {
       Icon(
         imageVector = Icons.Default.CameraAlt,
@@ -170,7 +184,7 @@ private fun ChatInputArea(
           onSend()
         }
       },
-      modifier = Modifier.size(48.dp),
+      modifier = Modifier.size(AppTheme.dimens.iconLarge),
       enabled = canSend,
     ) {
       Icon(
@@ -187,42 +201,44 @@ private fun ChatInputArea(
 }
 
 @Composable
-private fun MessageBubble(message: AiChatMessage) {
+private fun MessageBubble(message: AiChatMessage, isLoading: Boolean = false) {
   val isUser = message.role == AiChatRole.USER
 
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+    verticalAlignment = Alignment.Bottom,
   ) {
-    Box(
-      modifier = Modifier
-        .widthIn(max = 300.dp)
-        .clip(
-          RoundedCornerShape(
-            topStart = 16.dp,
-            topEnd = 16.dp,
-            bottomStart = if (isUser) 16.dp else 4.dp,
-            bottomEnd = if (isUser) 4.dp else 16.dp,
-          )
-        )
-        .background(
-          if (isUser) {
-            AppTheme.colorScheme.primary
-          } else {
-            AppTheme.colorScheme.surfaceVariant
-          }
-        )
-        .padding(12.dp)
-    ) {
-      Text(
-        text = message.content,
-        style = AppTheme.typography.bodyMedium,
-        color = if (isUser) {
-          AppTheme.colorScheme.onPrimary
-        } else {
-          AppTheme.colorScheme.onSurfaceVariant
-        },
+    MessageBubbleContent(message.content, isUser)
+    if (isLoading) {
+      CircularProgressIndicator(
+        modifier = Modifier.size(AppTheme.dimens.aiChatLoadingSize).padding(start = AppTheme.dimens.tinyGap),
+        strokeWidth = AppTheme.dimens.aiChatLoadingStroke,
       )
     }
+  }
+}
+
+@Composable
+private fun MessageBubbleContent(content: String, isUser: Boolean) {
+  Box(
+    modifier = Modifier
+      .widthIn(max = AppTheme.dimens.aiChatMessageMaxWidth)
+      .clip(
+        RoundedCornerShape(
+          topStart = AppTheme.dimens.radiusLarge,
+          topEnd = AppTheme.dimens.radiusLarge,
+          bottomStart = if (isUser) AppTheme.dimens.radiusLarge else AppTheme.dimens.radiusExtraSmall,
+          bottomEnd = if (isUser) AppTheme.dimens.radiusExtraSmall else AppTheme.dimens.radiusLarge,
+        )
+      )
+      .background(if (isUser) AppTheme.colorScheme.primary else AppTheme.colorScheme.surfaceVariant)
+      .padding(AppTheme.dimens.mediumGap)
+  ) {
+    Text(
+      text = content,
+      style = AppTheme.typography.bodyMedium,
+      color = if (isUser) AppTheme.colorScheme.onPrimary else AppTheme.colorScheme.onSurfaceVariant,
+    )
   }
 }
