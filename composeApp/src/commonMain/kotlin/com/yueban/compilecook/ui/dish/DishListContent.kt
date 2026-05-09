@@ -308,7 +308,7 @@ private fun DishImage(dish: DishSummary) {
       Icon(
         painter = painterResource(dish.category.icon),
         contentDescription = dish.category.displayName,
-        modifier = Modifier.size(AppTheme.dimens.iconLarge),
+        modifier = Modifier.size(AppTheme.dimens.iconExtraLarge),
         tint = Color.Unspecified
       )
     }

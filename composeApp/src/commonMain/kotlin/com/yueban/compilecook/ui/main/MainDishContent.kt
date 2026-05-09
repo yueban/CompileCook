@@ -198,7 +198,7 @@ private fun DishCategoryCard(
         AnyIcon(
           source = icon,
           contentDescription = name,
-          modifier = Modifier.size(AppTheme.dimens.iconLarge),
+          modifier = Modifier.size(AppTheme.dimens.iconExtraLarge),
         )
       }
 

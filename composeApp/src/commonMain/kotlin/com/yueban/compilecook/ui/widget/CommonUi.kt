@@ -34,7 +34,7 @@ import org.jetbrains.compose.resources.stringResource
 fun LoadingComposable(modifier: Modifier = Modifier) {
   Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
     CircularProgressIndicator(
-      modifier = Modifier.size(AppTheme.dimens.iconLarge),
+      modifier = Modifier.size(AppTheme.dimens.iconExtraLarge),
       strokeWidth = AppTheme.dimens.indicatorWidth
     )
   }

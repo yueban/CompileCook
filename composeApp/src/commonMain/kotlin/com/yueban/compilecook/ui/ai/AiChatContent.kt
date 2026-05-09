@@ -1,11 +1,13 @@
 package com.yueban.compilecook.ui.ai
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,14 +20,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +49,8 @@ import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_context_changed_format
 import compilecook.composeapp.generated.resources.ai_chat_context_format
 import compilecook.composeapp.generated.resources.ai_chat_des_camera
+import compilecook.composeapp.generated.resources.ai_chat_des_history
+import compilecook.composeapp.generated.resources.ai_chat_des_new_conversation
 import compilecook.composeapp.generated.resources.ai_chat_des_send
 import compilecook.composeapp.generated.resources.ai_chat_dismiss
 import compilecook.composeapp.generated.resources.ai_chat_input_hint
@@ -107,31 +112,12 @@ fun AiChatContent(
       .fillMaxSize()
       .background(AppTheme.colorScheme.background)
   ) {
-    state.currentContext?.let { context ->
-      Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .background(AppTheme.colorScheme.surfaceVariant)
-          .padding(horizontal = AppTheme.dimens.screenPadding, vertical = AppTheme.dimens.smallGap)
-      ) {
-        Text(
-          text = stringResource(Res.string.ai_chat_context_format, context.name),
-          style = AppTheme.typography.labelMedium,
-          color = AppTheme.colorScheme.onSurfaceVariant,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
-      }
-    }
-
-    val pendingContext = state.pendingContext
-    if (pendingContext != null && state.messages.isNotEmpty()) {
-      ContextChangeBanner(
-        newContextName = pendingContext.name,
-        onNewChat = component::switchContext,
-        onDismiss = component::dismissContextChange,
-      )
-    }
+    TopBar(
+      state = state,
+      onNewConversation = { component.clearMessages() },
+      onSwitchContext = component::switchContext,
+      onDismissContextChange = component::dismissContextChange,
+    )
 
     if (state.messages.isEmpty()) {
       HintContent(
@@ -203,7 +189,7 @@ private fun ChatInputArea(
 
     IconButton(
       onClick = onCameraClick,
-      modifier = Modifier.size(AppTheme.dimens.iconLarge),
+      modifier = Modifier.size(AppTheme.dimens.iconExtraLarge),
     ) {
       Icon(
         imageVector = Icons.Default.CameraAlt,
@@ -219,7 +205,7 @@ private fun ChatInputArea(
           onSend()
         }
       },
-      modifier = Modifier.size(AppTheme.dimens.iconLarge),
+      modifier = Modifier.size(AppTheme.dimens.iconExtraLarge),
       enabled = canSend,
     ) {
       Icon(
@@ -315,39 +301,96 @@ private fun HintContent(
 }
 
 @Composable
-private fun ContextChangeBanner(
-  newContextName: String,
-  onNewChat: () -> Unit,
-  onDismiss: () -> Unit,
+private fun TopBar(
+  state: AiChatState,
+  onNewConversation: () -> Unit,
+  onSwitchContext: () -> Unit,
+  onDismissContextChange: () -> Unit,
 ) {
+  val showContextChange = state.pendingContext != null && state.messages.isNotEmpty()
+  val topBarColor =
+    if (showContextChange) AppTheme.colorScheme.secondaryContainer else AppTheme.colorScheme.surfaceVariant
+  val onTopBarColor =
+    if (showContextChange) AppTheme.colorScheme.onSecondaryContainer else AppTheme.colorScheme.onSurfaceVariant
+
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .background(AppTheme.colorScheme.secondaryContainer)
-      .padding(horizontal = AppTheme.dimens.screenPadding, vertical = AppTheme.dimens.smallGap),
+      .defaultMinSize(minHeight = AppTheme.dimens.aiChatTopBarMinHeight)
+      .background(topBarColor)
+      .padding(horizontal = AppTheme.dimens.smallGap),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(
-      text = stringResource(Res.string.ai_chat_context_changed_format, newContextName),
-      style = AppTheme.typography.labelMedium,
-      color = AppTheme.colorScheme.onSecondaryContainer,
-      modifier = Modifier.weight(1f),
-      maxLines = 1,
-      overflow = TextOverflow.Ellipsis,
-    )
-    TextButton(onClick = onNewChat) {
+    if (showContextChange) {
       Text(
-        text = stringResource(Res.string.ai_chat_new_chat),
+        text = stringResource(Res.string.ai_chat_context_changed_format, state.pendingContext.name),
         style = AppTheme.typography.labelMedium,
-        color = AppTheme.colorScheme.primary,
+        color = onTopBarColor,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.weight(1f).padding(start = AppTheme.dimens.smallGap),
       )
-    }
-    TextButton(onClick = onDismiss) {
-      Text(
-        text = stringResource(Res.string.ai_chat_dismiss),
-        style = AppTheme.typography.labelMedium,
-        color = AppTheme.colorScheme.error,
-      )
+
+      Row(
+        horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.tinyGap),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text(
+          text = stringResource(Res.string.ai_chat_new_chat),
+          style = AppTheme.typography.labelMedium,
+          color = AppTheme.colorScheme.primary,
+          modifier = Modifier.clickable(onClick = onSwitchContext)
+            .padding(horizontal = AppTheme.dimens.smallGap, vertical = AppTheme.dimens.tinyGap),
+        )
+        Text(
+          text = stringResource(Res.string.ai_chat_dismiss),
+          style = AppTheme.typography.labelMedium,
+          color = AppTheme.colorScheme.error,
+          modifier = Modifier.clickable(onClick = onDismissContextChange)
+            .padding(horizontal = AppTheme.dimens.smallGap, vertical = AppTheme.dimens.tinyGap),
+        )
+      }
+    } else {
+      if (state.currentContext != null) {
+        Text(
+          text = stringResource(Res.string.ai_chat_context_format, state.currentContext.name),
+          style = AppTheme.typography.labelMedium,
+          color = onTopBarColor,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.weight(1f).padding(start = AppTheme.dimens.smallGap),
+        )
+      } else {
+        Spacer(modifier = Modifier.weight(1f))
+      }
+
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(end = AppTheme.dimens.tinyGap),
+      ) {
+        IconButton(
+          onClick = { /* TODO: conversation history */ },
+//          enabled = false,
+          modifier = Modifier.size(AppTheme.dimens.iconLarge),
+        ) {
+          Icon(
+            imageVector = Icons.Outlined.History,
+            contentDescription = stringResource(Res.string.ai_chat_des_history),
+            tint = onTopBarColor.copy(alpha = 0.5f),
+          )
+        }
+
+        IconButton(
+          onClick = onNewConversation,
+          modifier = Modifier.size(AppTheme.dimens.iconLarge),
+        ) {
+          Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = stringResource(Res.string.ai_chat_des_new_conversation),
+            tint = onTopBarColor,
+          )
+        }
+      }
     }
   }
 }

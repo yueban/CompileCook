@@ -37,7 +37,8 @@ data class ExtendedDimens(
   val iconExtraSmall: Dp = 14.dp,
   val iconSmall: Dp = 18.dp,
   val iconMedium: Dp = 24.dp,
-  val iconLarge: Dp = 48.dp,
+  val iconLarge: Dp = 36.dp,
+  val iconExtraLarge: Dp = 48.dp,
   val categoryIconBox: Dp = 64.dp,
   val heroCardIconSize: Dp = 32.dp,
   val dishCardFavoriteIconBox: Dp = 36.dp,
@@ -71,6 +72,7 @@ data class ExtendedDimens(
   val aiChatInputFieldRadius: Dp = 24.dp,
   val aiChatLoadingSize: Dp = 16.dp,
   val aiChatLoadingStroke: Dp = 2.dp,
+  val aiChatTopBarMinHeight: Dp = 48.dp,
 )
 
 internal val LocalExtendedDimens = staticCompositionLocalOf { ExtendedDimens() }
