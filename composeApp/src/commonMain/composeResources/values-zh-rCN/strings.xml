@@ -60,4 +60,18 @@
     <string name="ai_chat_input_hint">问问做菜的事…</string>
     <string name="ai_chat_des_camera">拍照</string>
     <string name="ai_chat_des_send">发送</string>
+
+    <string name="ai_hint_dish_how_to_cook">怎么做这道菜？</string>
+    <string name="ai_hint_dish_substitutions">有什么替代食材？</string>
+    <string name="ai_hint_dish_nutrition">营养信息？</string>
+    <string name="ai_hint_tip_explain">解释这个技巧</string>
+    <string name="ai_hint_tip_alternatives">有其他方法吗？</string>
+    <string name="ai_hint_tip_mistakes">常见错误有哪些？</string>
+    <string name="ai_hint_general_recipe">推荐一道菜</string>
+    <string name="ai_hint_general_tips">做菜技巧</string>
+    <string name="ai_hint_general_what_to_make">我能做什么菜？</string>
+
+    <string name="ai_chat_context_changed_format">上下文已切换：%1$s</string>
+    <string name="ai_chat_new_chat">新对话</string>
+    <string name="ai_chat_dismiss">忽略</string>
 </resources>

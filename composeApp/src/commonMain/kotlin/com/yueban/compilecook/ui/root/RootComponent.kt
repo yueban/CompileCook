@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.router.slot.dismiss
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.childStackWebNavigation
 import com.arkivanov.decompose.router.stack.navigate
@@ -16,9 +17,12 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.webhistory.WebNavigation
 import com.arkivanov.decompose.router.webhistory.WebNavigationOwner
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.subscribe
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.yueban.compilecook.logger.Logger
+import com.yueban.compilecook.repo.entity.AiContext
+import com.yueban.compilecook.repo.entity.AiContextType
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.about.AboutComponent
@@ -134,6 +138,12 @@ class DefaultRootComponent(
   private var drawerDismissJob: Job? = null
 
   init {
+    stack.subscribe {
+      if (uiState.value.isDrawerOpen) {
+        val context = deriveAiContext(stack.active.instance)
+        aiChatSlot.value.child?.instance?.updateContext(context)
+      }
+    }
     lifecycle.doOnCreate {
       componentScope.launch {
         deepLinkHandler.deepLinkFlow.collect { url ->
@@ -148,7 +158,9 @@ class DefaultRootComponent(
   }
 
   override fun onUriClicked(uri: String): Boolean =
-    parseUriToConfig(uri)?.let { navigation.push(it) } != null
+    parseUriToConfig(uri)?.let {
+      navigation.push(it)
+    } != null
 
   private fun parseUriToConfig(uri: String): Config? {
     val segments = uri.split("/")
@@ -198,7 +210,9 @@ class DefaultRootComponent(
 
   private fun onAboutOutput(output: AboutComponent.Output) = navigation.onOutput(output)
 
-  override fun onBackClicked() = navigation.pop()
+  override fun onBackClicked() {
+    navigation.pop()
+  }
 
   override fun toggleDrawer() {
     if (uiState.value.isDrawerOpen) {
@@ -215,6 +229,8 @@ class DefaultRootComponent(
       aiChatNavigation.activate(Unit)
     }
     setState { copy(isDrawerOpen = true) }
+    val context = deriveAiContext(stack.active.instance)
+    aiChatSlot.value.child?.instance?.updateContext(context)
   }
 
   override fun closeDrawer() {
@@ -234,6 +250,12 @@ class DefaultRootComponent(
     @Serializable data class DishList(val source: DishListSource) : Config
     @Serializable data class Dish(val dishName: String) : Config
     @Serializable data object About : Config
+  }
+
+  private fun deriveAiContext(child: RootComponent.Child): AiContext? = when (child) {
+    is DishChild -> AiContext(AiContextType.DISH, child.component.uiState.value.dishName, "")
+    is TipChild -> AiContext(AiContextType.TIP, child.component.uiState.value.tipName, "")
+    else -> null
   }
 
   private inline fun <T> StackNavigation<*>.onOutput(

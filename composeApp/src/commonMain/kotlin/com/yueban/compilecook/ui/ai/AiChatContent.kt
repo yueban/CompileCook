@@ -19,11 +19,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,12 +39,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatRole
+import com.yueban.compilecook.repo.entity.AiContext
+import com.yueban.compilecook.repo.entity.AiContextType
 import com.yueban.compilecook.ui.theme.AppTheme
 import compilecook.composeapp.generated.resources.Res
+import compilecook.composeapp.generated.resources.ai_chat_context_changed_format
 import compilecook.composeapp.generated.resources.ai_chat_context_format
 import compilecook.composeapp.generated.resources.ai_chat_des_camera
 import compilecook.composeapp.generated.resources.ai_chat_des_send
+import compilecook.composeapp.generated.resources.ai_chat_dismiss
 import compilecook.composeapp.generated.resources.ai_chat_input_hint
+import compilecook.composeapp.generated.resources.ai_chat_new_chat
+import compilecook.composeapp.generated.resources.ai_hint_dish_how_to_cook
+import compilecook.composeapp.generated.resources.ai_hint_dish_nutrition
+import compilecook.composeapp.generated.resources.ai_hint_dish_substitutions
+import compilecook.composeapp.generated.resources.ai_hint_general_recipe
+import compilecook.composeapp.generated.resources.ai_hint_general_tips
+import compilecook.composeapp.generated.resources.ai_hint_general_what_to_make
+import compilecook.composeapp.generated.resources.ai_hint_tip_alternatives
+import compilecook.composeapp.generated.resources.ai_hint_tip_explain
+import compilecook.composeapp.generated.resources.ai_hint_tip_mistakes
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -108,24 +124,43 @@ fun AiChatContent(
       }
     }
 
-    LazyColumn(
-      state = listState,
-      modifier = Modifier
-        .weight(1f)
-        .fillMaxWidth()
-        .padding(horizontal = AppTheme.dimens.screenPadding),
-      verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap),
-    ) {
-      item(key = "top_spacer") {
-        Spacer(modifier = Modifier.height(AppTheme.dimens.smallGap))
-      }
+    val pendingContext = state.pendingContext
+    if (pendingContext != null && state.messages.isNotEmpty()) {
+      ContextChangeBanner(
+        newContextName = pendingContext.name,
+        onNewChat = component::switchContext,
+        onDismiss = component::dismissContextChange,
+      )
+    }
 
-      val lastMessageId = state.messages.lastOrNull()?.id
-      items(state.messages, key = { it.id }) { message ->
-        MessageBubble(
-          message = message,
-          isLoading = state.isLoading && message.role == AiChatRole.ASSISTANT && message.id == lastMessageId,
-        )
+    if (state.messages.isEmpty()) {
+      HintContent(
+        context = state.currentContext,
+        onHintClick = { component.sendMessage(it) },
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxWidth(),
+      )
+    } else {
+      LazyColumn(
+        state = listState,
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxWidth()
+          .padding(horizontal = AppTheme.dimens.screenPadding),
+        verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap),
+      ) {
+        item(key = "top_spacer") {
+          Spacer(modifier = Modifier.height(AppTheme.dimens.smallGap))
+        }
+
+        val lastMessageId = state.messages.lastOrNull()?.id
+        items(state.messages, key = { it.id }) { message ->
+          MessageBubble(
+            message = message,
+            isLoading = state.isLoading && message.role == AiChatRole.ASSISTANT && message.id == lastMessageId,
+          )
+        }
       }
     }
 
@@ -240,5 +275,79 @@ private fun MessageBubbleContent(content: String, isUser: Boolean) {
       style = AppTheme.typography.bodyMedium,
       color = if (isUser) AppTheme.colorScheme.onPrimary else AppTheme.colorScheme.onSurfaceVariant,
     )
+  }
+}
+
+@Composable
+private fun HintContent(
+  context: AiContext?,
+  onHintClick: (String) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val hints = when (context?.type) {
+    AiContextType.DISH -> listOf(
+      stringResource(Res.string.ai_hint_dish_how_to_cook),
+      stringResource(Res.string.ai_hint_dish_substitutions),
+      stringResource(Res.string.ai_hint_dish_nutrition),
+    )
+    AiContextType.TIP -> listOf(
+      stringResource(Res.string.ai_hint_tip_explain),
+      stringResource(Res.string.ai_hint_tip_alternatives),
+      stringResource(Res.string.ai_hint_tip_mistakes),
+    )
+    else -> listOf(
+      stringResource(Res.string.ai_hint_general_recipe),
+      stringResource(Res.string.ai_hint_general_tips),
+      stringResource(Res.string.ai_hint_general_what_to_make),
+    )
+  }
+
+  Box(modifier = modifier, contentAlignment = Alignment.BottomStart) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimens.screenPadding)) {
+      hints.forEach { hint ->
+        AssistChip(
+          onClick = { onHintClick(hint) },
+          label = { Text(hint) },
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun ContextChangeBanner(
+  newContextName: String,
+  onNewChat: () -> Unit,
+  onDismiss: () -> Unit,
+) {
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .background(AppTheme.colorScheme.secondaryContainer)
+      .padding(horizontal = AppTheme.dimens.screenPadding, vertical = AppTheme.dimens.smallGap),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = stringResource(Res.string.ai_chat_context_changed_format, newContextName),
+      style = AppTheme.typography.labelMedium,
+      color = AppTheme.colorScheme.onSecondaryContainer,
+      modifier = Modifier.weight(1f),
+      maxLines = 1,
+      overflow = TextOverflow.Ellipsis,
+    )
+    TextButton(onClick = onNewChat) {
+      Text(
+        text = stringResource(Res.string.ai_chat_new_chat),
+        style = AppTheme.typography.labelMedium,
+        color = AppTheme.colorScheme.primary,
+      )
+    }
+    TextButton(onClick = onDismiss) {
+      Text(
+        text = stringResource(Res.string.ai_chat_dismiss),
+        style = AppTheme.typography.labelMedium,
+        color = AppTheme.colorScheme.error,
+      )
+    }
   }
 }

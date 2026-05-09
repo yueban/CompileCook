@@ -15,11 +15,15 @@ data class AiChatState(
   val messages: List<AiChatMessage> = emptyList(),
   val isLoading: Boolean = false,
   val currentContext: AiContext? = null,
+  val pendingContext: AiContext? = null,
 )
 
 interface AiChatComponent : UiStateComponent<AiChatState> {
   fun sendMessage(text: String)
   fun clearMessages()
+  fun updateContext(context: AiContext?)
+  fun switchContext()
+  fun dismissContextChange()
 }
 
 class DefaultAiChatComponent(
@@ -82,5 +86,30 @@ class DefaultAiChatComponent(
 
   override fun clearMessages() {
     setState { copy(messages = emptyList()) }
+  }
+
+  override fun updateContext(context: AiContext?) {
+    setState {
+      when {
+        context == null || context == currentContext -> copy(pendingContext = null)
+        currentContext == null || messages.isEmpty() -> copy(currentContext = context, pendingContext = null)
+        context != currentContext -> copy(pendingContext = context)
+        else -> this
+      }
+    }
+  }
+
+  override fun switchContext() {
+    setState {
+      copy(
+        currentContext = pendingContext,
+        pendingContext = null,
+        messages = emptyList(),
+      )
+    }
+  }
+
+  override fun dismissContextChange() {
+    setState { copy(pendingContext = null) }
   }
 }

@@ -32,7 +32,7 @@ internal class AiRemoteDataSourceImpl : AiRemoteDataSource {
       val systemMessage = request.context?.let {
         ChatMessage(
           role = ChatRole.System,
-          content = "You are a cooking assistant. Current: ${it.type} - ${it.name}",
+          content = "You are a cooking assistant. The user is viewing a ${it.type.lowercase()}: ${it.name}.",
         )
       }
       val allMessages = buildList {
