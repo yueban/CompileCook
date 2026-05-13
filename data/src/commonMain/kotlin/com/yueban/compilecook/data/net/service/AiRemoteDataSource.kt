@@ -8,6 +8,7 @@ import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
 import com.yueban.compilecook.AIKonfig
 import com.yueban.compilecook.data.net.entity.AiChatRequest
+import com.yueban.compilecook.logger.openAiLoggingConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -20,6 +21,7 @@ internal class AiRemoteDataSourceImpl : AiRemoteDataSource {
     OpenAI(
       host = OpenAIHost(baseUrl = AIKonfig.MIMO_BASE_URL),
       token = AIKonfig.MIMO_API_KEY,
+      logging = openAiLoggingConfig,
     )
   }
 

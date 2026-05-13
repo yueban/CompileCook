@@ -1,18 +1,22 @@
 package com.yueban.compilecook.logger
 
+import com.aallam.openai.api.logging.LogLevel
+import com.aallam.openai.client.LoggingConfig
+import com.yueban.compilecook.BuildKonfig
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.koin.core.logger.Level
 import org.koin.core.logger.MESSAGE
 
 typealias KoinLogger = org.koin.core.logger.Logger
+typealias OpenAiLogger = com.aallam.openai.api.logging.Logger
 
 object Logger {
-  fun init(debug: Boolean) {
-    if (debug) {
+  fun init() {
+    if (BuildKonfig.IS_DEBUG) {
       Napier.base(DebugAntilog())
     }
-    v("napier init, debug: $debug")
+    v("napier init, debug: ${BuildKonfig.IS_DEBUG}")
   }
 
   fun v(message: String, throwable: Throwable? = null, tag: String? = null) = Napier.v(message, throwable, tag)
@@ -24,7 +28,7 @@ object Logger {
   fun wtf(message: String, throwable: Throwable? = null, tag: String? = null) = Napier.wtf(message, throwable, tag)
 }
 
-class CustomKoinLogger(debug: Boolean) : KoinLogger(if (debug) Level.INFO else Level.ERROR) {
+class CustomKoinLogger : KoinLogger(if (BuildKonfig.IS_DEBUG) Level.INFO else Level.NONE) {
   override fun display(level: Level, msg: MESSAGE) {
     when (level) {
       Level.DEBUG -> Logger.d(msg)
@@ -35,3 +39,9 @@ class CustomKoinLogger(debug: Boolean) : KoinLogger(if (debug) Level.INFO else L
     }
   }
 }
+
+val openAiLoggingConfig = LoggingConfig(
+  logLevel = if (BuildKonfig.IS_DEBUG) LogLevel.Headers else LogLevel.None,
+  logger = OpenAiLogger.Simple,
+  sanitize = !BuildKonfig.IS_DEBUG,
+)
