@@ -31,12 +31,15 @@ internal class AiRemoteDataSourceImpl : AiRemoteDataSource {
       val messages = request.messages.map {
         ChatMessage(role = it.role.toChatRole(), content = it.content)
       }
-      // TODO: enhance system prompt with actual dish/tip content (ingredients, steps, etc.)
       val systemMessage = request.context?.let {
-        ChatMessage(
-          role = ChatRole.System,
-          content = "You are a cooking assistant. The user is viewing a ${it.type.lowercase()}: ${it.name}.",
-        )
+        val content = buildString {
+          append("You are a cooking assistant. The user is viewing a ${it.type.lowercase()}: ${it.name}.")
+          if (it.content.isNotBlank()) {
+            append("\n\nHere is the content:\n")
+            append(it.content)
+          }
+        }
+        ChatMessage(role = ChatRole.System, content = content)
       }
       val allMessages = buildList {
         systemMessage?.let { add(it) }
