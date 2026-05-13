@@ -10,6 +10,7 @@ data class AiChatRequest(
   val context: AiChatRequestContext?,
 )
 
+// TODO: add content field to pass dish/tip text to the API
 data class AiChatRequestContext(
   val type: String,
   val name: String,

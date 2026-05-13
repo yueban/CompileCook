@@ -252,6 +252,7 @@ class DefaultRootComponent(
     @Serializable data object About : Config
   }
 
+  // TODO: pass actual dish/tip content into AiContext so the system prompt has real data
   private fun deriveAiContext(child: RootComponent.Child): AiContext? = when (child) {
     is DishChild -> AiContext(AiContextType.DISH, child.component.uiState.value.dishName, "")
     is TipChild -> AiContext(AiContextType.TIP, child.component.uiState.value.tipName, "")

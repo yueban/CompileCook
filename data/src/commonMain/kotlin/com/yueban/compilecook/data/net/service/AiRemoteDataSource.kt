@@ -29,6 +29,7 @@ internal class AiRemoteDataSourceImpl : AiRemoteDataSource {
       val messages = request.messages.map {
         ChatMessage(role = it.role.toChatRole(), content = it.content)
       }
+      // TODO: enhance system prompt with actual dish/tip content (ingredients, steps, etc.)
       val systemMessage = request.context?.let {
         ChatMessage(
           role = ChatRole.System,

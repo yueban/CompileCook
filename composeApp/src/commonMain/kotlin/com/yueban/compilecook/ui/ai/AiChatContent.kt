@@ -178,6 +178,7 @@ private fun ChatInputArea(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap),
   ) {
+    // TODO: support keyboard submit (Enter to send) on desktop/web platforms
     OutlinedTextField(
       value = inputText,
       onValueChange = onInputChange,
@@ -256,6 +257,7 @@ private fun MessageBubbleContent(content: String, isUser: Boolean) {
       .background(if (isUser) AppTheme.colorScheme.primary else AppTheme.colorScheme.surfaceVariant)
       .padding(AppTheme.dimens.mediumGap)
   ) {
+    // TODO: render markdown in assistant messages (lists, code blocks, links, etc.)
     Text(
       text = content,
       style = AppTheme.typography.bodyMedium,

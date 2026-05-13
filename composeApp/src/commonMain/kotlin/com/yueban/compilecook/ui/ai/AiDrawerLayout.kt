@@ -86,6 +86,7 @@ private fun AiDrawerOverlay(
       enter = fadeIn(),
       exit = fadeOut(),
     ) {
+      // TODO: use theme scrim color instead of hardcoded Color.Black
       Box(
         modifier = Modifier
           .fillMaxSize()
@@ -107,6 +108,7 @@ private fun AiDrawerOverlay(
         .width(panelWidth)
         .align(Alignment.CenterEnd),
     ) {
+      // TODO: use theme surface color instead of hardcoded Color.White
       Box(
         modifier = Modifier
           .fillMaxSize()
@@ -193,6 +195,7 @@ private fun AiDrawerSideBySide(
           }
       )
 
+      // TODO: use theme surface color instead of hardcoded Color.White
       Box(
         modifier = Modifier
           .fillMaxHeight()
@@ -214,6 +217,7 @@ private fun AiDrawerSideBySide(
         mainContent()
       }
 
+      // TODO: use theme surface color instead of hardcoded Color.White
       Box(
         modifier = Modifier
           .fillMaxHeight()

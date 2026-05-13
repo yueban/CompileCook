@@ -17,6 +17,7 @@ enum class AiChatRole {
   @SerialName("system") SYSTEM,
 }
 
+// TODO: populate content field with actual dish recipe / tip text for richer AI context
 data class AiContext(
   val type: AiContextType,
   val name: String,

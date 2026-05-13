@@ -30,6 +30,7 @@ internal class AiRepoImpl(
           content = it.content,
         )
       },
+      // TODO: pass context.content once dish/tip text is available
       context = context?.let {
         AiChatRequestContext(
           type = it.type.name,

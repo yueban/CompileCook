@@ -11,6 +11,7 @@ import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.util.currentTimeMillis
 import kotlinx.coroutines.launch
 
+// TODO: persist chat messages across app restarts
 data class AiChatState(
   val messages: List<AiChatMessage> = emptyList(),
   val isLoading: Boolean = false,
@@ -18,6 +19,7 @@ data class AiChatState(
   val pendingContext: AiContext? = null,
 )
 
+// TODO: add conversation list management (save/load/switch between multiple conversations)
 interface AiChatComponent : UiStateComponent<AiChatState> {
   fun sendMessage(text: String)
   fun clearMessages()
@@ -56,6 +58,7 @@ class DefaultAiChatComponent(
         val assistantMessageId = "assistant_$currentTimeMillis"
         val responseBuilder = StringBuilder()
 
+        // TODO: support retrying failed messages
         aiRepo.chat(uiState.value.messages, uiState.value.currentContext).collect { token ->
           responseBuilder.append(token)
           val assistantMessage = AiChatMessage(
