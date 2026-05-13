@@ -22,11 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.yueban.compilecook.ui.theme.AppTheme
 
 private const val OVERLAY_AI_WIDTH_RATIO = 0.7f
 private const val SIDE_BY_SIDE_AI_WIDTH_DP_TABLET = 380
@@ -86,11 +86,10 @@ private fun AiDrawerOverlay(
       enter = fadeIn(),
       exit = fadeOut(),
     ) {
-      // TODO: use theme scrim color instead of hardcoded Color.Black
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(Color.Black.copy(alpha = 0.4f))
+          .background(AppTheme.colorScheme.scrim.copy(alpha = 0.4f))
           .pointerInput(Unit) {
             detectTapGestures { onCloseDrawer() }
           }
@@ -108,11 +107,10 @@ private fun AiDrawerOverlay(
         .width(panelWidth)
         .align(Alignment.CenterEnd),
     ) {
-      // TODO: use theme surface color instead of hardcoded Color.White
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(Color.White)
+          .background(AppTheme.colorScheme.surface)
           .pointerInput(Unit) {
             detectDragGestures { change, dragAmount ->
               if (dragAmount.x < SWIPE_CLOSE_THRESHOLD) {
@@ -158,7 +156,7 @@ private fun AiDrawerSideBySide(
         modifier = Modifier
           .fillMaxHeight()
           .width(4.dp)
-          .background(Color.Gray.copy(alpha = 0.3f))
+          .background(AppTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
           .dragResizeCursor()
           .pointerInput(Unit) {
             detectDragGestures(
@@ -195,12 +193,11 @@ private fun AiDrawerSideBySide(
           }
       )
 
-      // TODO: use theme surface color instead of hardcoded Color.White
       Box(
         modifier = Modifier
           .fillMaxHeight()
           .width(animatedWidth)
-          .background(Color.White)
+          .background(AppTheme.colorScheme.surface)
       ) {
         aiContent()
       }
@@ -217,12 +214,11 @@ private fun AiDrawerSideBySide(
         mainContent()
       }
 
-      // TODO: use theme surface color instead of hardcoded Color.White
       Box(
         modifier = Modifier
           .fillMaxHeight()
           .width(animatedWidth)
-          .background(Color.White)
+          .background(AppTheme.colorScheme.surface)
       ) {
         aiContent()
       }
