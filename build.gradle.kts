@@ -3,6 +3,9 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 
+// Set project root for Configs to read local.properties reliably
+System.setProperty("compilecook.project.root", rootDir.absolutePath)
+
 plugins {
   alias(libs.plugins.androidApplication) apply false
   alias(libs.plugins.composeHotReload) apply false

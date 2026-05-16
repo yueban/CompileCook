@@ -10,8 +10,17 @@ data class AiChatRequest(
   val context: AiChatRequestContext?,
 )
 
+enum class AiContextType {
+  GENERAL,
+  DISH,
+  TIP,
+  DISH_LIST,
+  DISH_CATEGORY,
+  DISH_DIFFICULTY,
+}
+
 data class AiChatRequestContext(
-  val type: String,
+  val type: AiContextType,
   val name: String,
   val content: String,
 )

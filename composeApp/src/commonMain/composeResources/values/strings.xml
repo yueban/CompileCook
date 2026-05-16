@@ -65,6 +65,7 @@
     <string name="ai_chat_context_changed_format">Context switched: %1$s</string>
     <string name="ai_chat_new_chat">New chat</string>
     <string name="ai_chat_dismiss">Dismiss</string>
+    <string name="ai_chat_context_general">Ai Assistant</string>
 
     <string name="ai_hint_dish_how_to_cook">How to cook this?</string>
     <string name="ai_hint_dish_substitutions">What substitutions?</string>
@@ -75,5 +76,17 @@
     <string name="ai_hint_general_recipe">Suggest a recipe</string>
     <string name="ai_hint_general_tips">Cooking tips</string>
     <string name="ai_hint_general_what_to_make">What can I make?</string>
+    <string name="ai_hint_main_quick_meal">Quick meal ideas</string>
+    <string name="ai_hint_main_seasonal">Seasonal ingredients</string>
+    <string name="ai_hint_main_cooking_method">Compare cooking methods</string>
+    <string name="ai_hint_dishlist_what_to_pick">What should I pick?</string>
+    <string name="ai_hint_dishlist_substitutions">Ingredient substitutions</string>
+    <string name="ai_hint_dishlist_pairing">What pairs well?</string>
+    <string name="ai_hint_dishcategory_cooking_tips">Category cooking tips</string>
+    <string name="ai_hint_dishcategory_ingredients">Key ingredients</string>
+    <string name="ai_hint_dishcategory_variations">Regional variations</string>
+    <string name="ai_hint_dishdifficulty_appropriate">Dishes for my level</string>
+    <string name="ai_hint_dishdifficulty_improve">How to improve?</string>
+    <string name="ai_hint_dishdifficulty_techniques">Techniques to learn</string>
 
 </resources>

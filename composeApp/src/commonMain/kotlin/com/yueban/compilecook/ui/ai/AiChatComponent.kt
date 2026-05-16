@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 data class AiChatState(
   val messages: List<AiChatMessage> = emptyList(),
   val isLoading: Boolean = false,
-  val currentContext: AiContext? = null,
+  val currentContext: AiContext = AiContext.General,
   val pendingContext: AiContext? = null,
 )
 
@@ -23,7 +23,7 @@ data class AiChatState(
 interface AiChatComponent : UiStateComponent<AiChatState> {
   fun sendMessage(text: String)
   fun clearMessages()
-  fun updateContext(context: AiContext?)
+  fun updateContext(context: AiContext)
   fun switchContext()
   fun dismissContextChange()
 }
@@ -91,21 +91,21 @@ class DefaultAiChatComponent(
     setState { copy(messages = emptyList()) }
   }
 
-  override fun updateContext(context: AiContext?) {
+  override fun updateContext(context: AiContext) {
     setState {
       when {
-        context == null || context == currentContext -> copy(pendingContext = null)
-        currentContext == null || messages.isEmpty() -> copy(currentContext = context, pendingContext = null)
-        context != currentContext -> copy(pendingContext = context)
-        else -> this
+        context == currentContext -> copy(pendingContext = null)
+        messages.isEmpty() -> copy(currentContext = context, pendingContext = null)
+        else -> copy(pendingContext = context)
       }
     }
   }
 
   override fun switchContext() {
     setState {
+      val newContext = pendingContext ?: return@setState this
       copy(
-        currentContext = pendingContext,
+        currentContext = newContext,
         pendingContext = null,
         messages = emptyList(),
       )

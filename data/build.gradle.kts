@@ -6,6 +6,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
   alias(libs.plugins.kotlinMultiplatform)
   alias(libs.plugins.androidKotlinMultiplatformLibrary)
+  alias(libs.plugins.composeMultiplatform)
+  alias(libs.plugins.composeCompiler)
   alias(libs.plugins.sqldelight)
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.buildconfig)
@@ -68,6 +70,8 @@ kotlin {
       implementation(libs.ktor.client.content.negotiation)
       implementation(libs.ktor.serialization.kotlinx.json)
       implementation(libs.openai.client)
+      implementation(libs.compose.runtime)
+      implementation(libs.compose.components.resources)
     }
     androidMain.dependencies {
       implementation(libs.sqldelight.android.driver)

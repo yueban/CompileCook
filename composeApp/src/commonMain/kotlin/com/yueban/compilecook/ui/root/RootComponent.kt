@@ -21,7 +21,6 @@ import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.AiContext
-import com.yueban.compilecook.repo.entity.AiContextType
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.about.AboutComponent
@@ -251,10 +250,18 @@ class DefaultRootComponent(
     @Serializable data object About : Config
   }
 
-  private fun deriveAiContext(child: RootComponent.Child): AiContext? = when (child) {
-    is DishChild -> AiContext(AiContextType.DISH, child.component.uiState.value.dishName)
-    is TipChild -> AiContext(AiContextType.TIP, child.component.uiState.value.tipName)
-    else -> null
+  private fun deriveAiContext(child: RootComponent.Child): AiContext = when (child) {
+    is DishChild -> AiContext.Dish(child.component.uiState.value.dishName)
+    is TipChild -> AiContext.Tip(child.component.uiState.value.tipName)
+    is MainChild -> AiContext.General
+    is DishListChild -> {
+      when (val source = child.component.uiState.value.source) {
+        is DishListSource.Category -> AiContext.DishCategory(source.category)
+        is DishListSource.Difficulty -> AiContext.DishDifficulty(source.level)
+        else -> AiContext.DishList
+      }
+    }
+    is AboutChild -> AiContext.General
   }
 
   private inline fun <T> StackNavigation<*>.onOutput(

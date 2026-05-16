@@ -43,8 +43,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatRole
 import com.yueban.compilecook.repo.entity.AiContext
-import com.yueban.compilecook.repo.entity.AiContextType
 import com.yueban.compilecook.ui.theme.AppTheme
+import com.yueban.compilecook.ui.util.displayName
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_context_changed_format
 import compilecook.composeapp.generated.resources.ai_chat_context_format
@@ -58,9 +58,18 @@ import compilecook.composeapp.generated.resources.ai_chat_new_chat
 import compilecook.composeapp.generated.resources.ai_hint_dish_how_to_cook
 import compilecook.composeapp.generated.resources.ai_hint_dish_nutrition
 import compilecook.composeapp.generated.resources.ai_hint_dish_substitutions
-import compilecook.composeapp.generated.resources.ai_hint_general_recipe
-import compilecook.composeapp.generated.resources.ai_hint_general_tips
-import compilecook.composeapp.generated.resources.ai_hint_general_what_to_make
+import compilecook.composeapp.generated.resources.ai_hint_dishcategory_cooking_tips
+import compilecook.composeapp.generated.resources.ai_hint_dishcategory_ingredients
+import compilecook.composeapp.generated.resources.ai_hint_dishcategory_variations
+import compilecook.composeapp.generated.resources.ai_hint_dishdifficulty_appropriate
+import compilecook.composeapp.generated.resources.ai_hint_dishdifficulty_improve
+import compilecook.composeapp.generated.resources.ai_hint_dishdifficulty_techniques
+import compilecook.composeapp.generated.resources.ai_hint_dishlist_pairing
+import compilecook.composeapp.generated.resources.ai_hint_dishlist_substitutions
+import compilecook.composeapp.generated.resources.ai_hint_dishlist_what_to_pick
+import compilecook.composeapp.generated.resources.ai_hint_main_cooking_method
+import compilecook.composeapp.generated.resources.ai_hint_main_quick_meal
+import compilecook.composeapp.generated.resources.ai_hint_main_seasonal
 import compilecook.composeapp.generated.resources.ai_hint_tip_alternatives
 import compilecook.composeapp.generated.resources.ai_hint_tip_explain
 import compilecook.composeapp.generated.resources.ai_hint_tip_mistakes
@@ -268,25 +277,40 @@ private fun MessageBubbleContent(content: String, isUser: Boolean) {
 
 @Composable
 private fun HintContent(
-  context: AiContext?,
+  context: AiContext,
   onHintClick: (String) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val hints = when (context?.type) {
-    AiContextType.DISH -> listOf(
+  val hints = when (context) {
+    is AiContext.Dish -> listOf(
       stringResource(Res.string.ai_hint_dish_how_to_cook),
       stringResource(Res.string.ai_hint_dish_substitutions),
       stringResource(Res.string.ai_hint_dish_nutrition),
     )
-    AiContextType.TIP -> listOf(
+    is AiContext.Tip -> listOf(
       stringResource(Res.string.ai_hint_tip_explain),
       stringResource(Res.string.ai_hint_tip_alternatives),
       stringResource(Res.string.ai_hint_tip_mistakes),
     )
-    else -> listOf(
-      stringResource(Res.string.ai_hint_general_recipe),
-      stringResource(Res.string.ai_hint_general_tips),
-      stringResource(Res.string.ai_hint_general_what_to_make),
+    is AiContext.General -> listOf(
+      stringResource(Res.string.ai_hint_main_quick_meal),
+      stringResource(Res.string.ai_hint_main_seasonal),
+      stringResource(Res.string.ai_hint_main_cooking_method),
+    )
+    is AiContext.DishList -> listOf(
+      stringResource(Res.string.ai_hint_dishlist_what_to_pick),
+      stringResource(Res.string.ai_hint_dishlist_substitutions),
+      stringResource(Res.string.ai_hint_dishlist_pairing),
+    )
+    is AiContext.DishCategory -> listOf(
+      stringResource(Res.string.ai_hint_dishcategory_cooking_tips),
+      stringResource(Res.string.ai_hint_dishcategory_ingredients),
+      stringResource(Res.string.ai_hint_dishcategory_variations),
+    )
+    is AiContext.DishDifficulty -> listOf(
+      stringResource(Res.string.ai_hint_dishdifficulty_appropriate),
+      stringResource(Res.string.ai_hint_dishdifficulty_improve),
+      stringResource(Res.string.ai_hint_dishdifficulty_techniques),
     )
   }
 
@@ -325,7 +349,7 @@ private fun TopBar(
   ) {
     if (showContextChange) {
       Text(
-        text = stringResource(Res.string.ai_chat_context_changed_format, state.pendingContext.name),
+        text = stringResource(Res.string.ai_chat_context_changed_format, state.pendingContext.displayName),
         style = AppTheme.typography.labelMedium,
         color = onTopBarColor,
         maxLines = 1,
@@ -353,9 +377,9 @@ private fun TopBar(
         )
       }
     } else {
-      if (state.currentContext != null) {
+      if (state.currentContext.displayName.isNotBlank()) {
         Text(
-          text = stringResource(Res.string.ai_chat_context_format, state.currentContext.name),
+          text = stringResource(Res.string.ai_chat_context_format, state.currentContext.displayName),
           style = AppTheme.typography.labelMedium,
           color = onTopBarColor,
           maxLines = 1,

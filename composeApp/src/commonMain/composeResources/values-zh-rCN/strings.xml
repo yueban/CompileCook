@@ -65,6 +65,7 @@
     <string name="ai_chat_context_changed_format">上下文已切换：%1$s</string>
     <string name="ai_chat_new_chat">新对话</string>
     <string name="ai_chat_dismiss">忽略</string>
+    <string name="ai_chat_context_general">智能助手</string>
 
     <string name="ai_hint_dish_how_to_cook">怎么做这道菜？</string>
     <string name="ai_hint_dish_substitutions">有什么替代食材？</string>
@@ -75,5 +76,17 @@
     <string name="ai_hint_general_recipe">推荐一道菜</string>
     <string name="ai_hint_general_tips">做菜技巧</string>
     <string name="ai_hint_general_what_to_make">我能做什么菜？</string>
+    <string name="ai_hint_main_quick_meal">快手菜推荐</string>
+    <string name="ai_hint_main_seasonal">时令食材</string>
+    <string name="ai_hint_main_cooking_method">烹饪方式对比</string>
+    <string name="ai_hint_dishlist_what_to_pick">选哪个好？</string>
+    <string name="ai_hint_dishlist_substitutions">食材替代</string>
+    <string name="ai_hint_dishlist_pairing">搭配什么好？</string>
+    <string name="ai_hint_dishcategory_cooking_tips">这类菜的技巧</string>
+    <string name="ai_hint_dishcategory_ingredients">关键食材</string>
+    <string name="ai_hint_dishcategory_variations">地方做法</string>
+    <string name="ai_hint_dishdifficulty_appropriate">适合我的菜</string>
+    <string name="ai_hint_dishdifficulty_improve">怎么提升？</string>
+    <string name="ai_hint_dishdifficulty_techniques">要学的技巧</string>
 
 </resources>

@@ -8,9 +8,20 @@ import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
 import com.yueban.compilecook.AIKonfig
 import com.yueban.compilecook.data.net.entity.AiChatRequest
+import com.yueban.compilecook.data.net.entity.AiContextType
 import com.yueban.compilecook.logger.openAiLoggingConfig
+import compilecook.data.generated.resources.Res
+import compilecook.data.generated.resources.ai_system_content_label
+import compilecook.data.generated.resources.ai_system_dish_context
+import compilecook.data.generated.resources.ai_system_dishcategory_context
+import compilecook.data.generated.resources.ai_system_dishdifficulty_context
+import compilecook.data.generated.resources.ai_system_dishlist_context
+import compilecook.data.generated.resources.ai_system_general_context
+import compilecook.data.generated.resources.ai_system_prompt
+import compilecook.data.generated.resources.ai_system_tip_context
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.jetbrains.compose.resources.getString
 
 interface AiRemoteDataSource {
   suspend fun chat(request: AiChatRequest): Flow<String>
@@ -33,10 +44,30 @@ internal class AiRemoteDataSourceImpl : AiRemoteDataSource {
       }
       val systemMessage = request.context?.let {
         val content = buildString {
-          append("You are a cooking assistant. The user is viewing a ${it.type.lowercase()}: ${it.name}.")
-          if (it.content.isNotBlank()) {
-            append("\n\nHere is the content:\n")
-            append(it.content)
+          append(getString(Res.string.ai_system_prompt))
+          when (it.type) {
+            AiContextType.GENERAL -> append(getString(Res.string.ai_system_general_context))
+            AiContextType.DISH_LIST -> append(getString(Res.string.ai_system_dishlist_context))
+            AiContextType.DISH_CATEGORY -> append(getString(Res.string.ai_system_dishcategory_context, it.name))
+            AiContextType.DISH_DIFFICULTY -> append(getString(Res.string.ai_system_dishdifficulty_context, it.name))
+            AiContextType.DISH -> {
+              append(getString(Res.string.ai_system_dish_context, it.name))
+              if (it.content.isNotBlank()) {
+                append("\n\n")
+                append(getString(Res.string.ai_system_content_label))
+                append("\n")
+                append(it.content)
+              }
+            }
+            AiContextType.TIP -> {
+              append(getString(Res.string.ai_system_tip_context, it.name))
+              if (it.content.isNotBlank()) {
+                append("\n\n")
+                append(getString(Res.string.ai_system_content_label))
+                append("\n")
+                append(it.content)
+              }
+            }
           }
         }
         ChatMessage(role = ChatRole.System, content = content)

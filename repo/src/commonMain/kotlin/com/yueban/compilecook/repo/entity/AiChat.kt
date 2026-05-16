@@ -17,9 +17,11 @@ enum class AiChatRole {
   @SerialName("system") SYSTEM,
 }
 
-data class AiContext(
-  val type: AiContextType,
-  val name: String,
-)
-
-enum class AiContextType { DISH, TIP, NONE }
+sealed interface AiContext {
+  data class Dish(val name: String) : AiContext
+  data class Tip(val name: String) : AiContext
+  data object General : AiContext
+  data object DishList : AiContext
+  data class DishCategory(val category: com.yueban.compilecook.repo.entity.DishCategory) : AiContext
+  data class DishDifficulty(val level: Int) : AiContext
+}
