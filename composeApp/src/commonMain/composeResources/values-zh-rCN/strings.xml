@@ -89,4 +89,13 @@
     <string name="ai_hint_dishdifficulty_improve">怎么提升？</string>
     <string name="ai_hint_dishdifficulty_techniques">要学的技巧</string>
 
+    <string name="ai_system_prompt">你是一个烹饪助手。</string>
+    <string name="ai_system_general_context">用户正在浏览应用，可能会问一些烹饪相关的问题。</string>
+    <string name="ai_system_dishlist_context">用户正在浏览菜品列表。</string>
+    <string name="ai_system_dishcategory_context">用户正在浏览%1$s分类的菜品。</string>
+    <string name="ai_system_dishdifficulty_context">用户正在浏览难度等级为%1$s的菜品。</string>
+    <string name="ai_system_dish_context">用户正在查看菜品：%1$s。</string>
+    <string name="ai_system_tip_context">用户正在查看技巧：%1$s。</string>
+    <string name="ai_system_content_label">以下是内容：</string>
+
 </resources>
