@@ -40,22 +40,8 @@ interface DishLocalDataSource {
 class DishLocalDataSourceImpl(
   private val dishQueries: DishQueries,
   private val tipQueries: TipQueries,
-  private val defaultDispatcher: CoroutineDispatcher,
-) : DishLocalDataSource {
-  private val transactionLock = DbTransactionLock()
-
-  /**
-   * For single inserts/deletes. Pushes work to background, NO Mutex required.
-   */
-  private suspend inline fun <T> write(crossinline block: suspend () -> T): T =
-    withContext(defaultDispatcher) { block() }
-
-  /**
-   * For bulk operations. Pushes to background AND applies platform-specific transaction lock.
-   */
-  private suspend inline fun <T> transactionWrite(crossinline block: suspend () -> T): T =
-    withContext(defaultDispatcher) { transactionLock.withLock { block() } }
-
+  defaultDispatcher: CoroutineDispatcher,
+) : BaseLocalDataSource(defaultDispatcher), DishLocalDataSource {
   override fun getDishSummaries(
     category: String?,
     difficulty: Int?,

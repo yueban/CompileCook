@@ -1,0 +1,71 @@
+CREATE TABLE IF NOT EXISTS AiChatConversationLocalEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    contextType TEXT NOT NULL,
+    contextName TEXT NOT NULL DEFAULT '',
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS AiChatMessageLocalEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    conversationId TEXT NOT NULL,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    timestamp INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS AiChatMessage_conversationId ON AiChatMessageLocalEntity(conversationId);
+CREATE INDEX IF NOT EXISTS AiChatMessage_conversationId_timestamp ON AiChatMessageLocalEntity(conversationId, timestamp);
+
+-- Read: Conversations
+getConversations:
+SELECT * FROM AiChatConversationLocalEntity
+ORDER BY updatedAt DESC;
+
+getConversationById:
+SELECT * FROM AiChatConversationLocalEntity
+WHERE id = ?;
+
+-- Read: Messages
+getMessagesByConversationId:
+SELECT * FROM AiChatMessageLocalEntity
+WHERE conversationId = ?
+ORDER BY timestamp ASC;
+
+getMessageCount:
+SELECT COUNT(*) FROM AiChatMessageLocalEntity
+WHERE conversationId = ?;
+
+-- Write: Conversations
+upsertConversation:
+INSERT OR REPLACE INTO AiChatConversationLocalEntity(id, title, contextType, contextName, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateConversationTitle:
+UPDATE AiChatConversationLocalEntity
+SET title = ?, updatedAt = ?
+WHERE id = ?;
+
+updateConversationTimestamp:
+UPDATE AiChatConversationLocalEntity
+SET updatedAt = ?
+WHERE id = ?;
+
+-- Write: Messages
+upsertMessage:
+INSERT OR REPLACE INTO AiChatMessageLocalEntity(id, conversationId, role, content, timestamp)
+VALUES (?, ?, ?, ?, ?);
+
+-- Delete
+deleteConversationById:
+DELETE FROM AiChatConversationLocalEntity WHERE id = ?;
+
+deleteMessagesByConversationId:
+DELETE FROM AiChatMessageLocalEntity WHERE conversationId = ?;
+
+deleteAllConversations:
+DELETE FROM AiChatConversationLocalEntity;
+
+deleteAllMessages:
+DELETE FROM AiChatMessageLocalEntity;
