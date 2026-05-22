@@ -36,7 +36,7 @@ private const val DRAGGABLE_MAX_WIDTH_DP = 600
 private const val SWIPE_CLOSE_THRESHOLD = -10f
 
 @Composable
-fun AiDrawerLayout(
+fun AiChatDrawerLayout(
   isDrawerOpen: Boolean,
   onCloseDrawer: () -> Unit,
   mainContent: @Composable () -> Unit,

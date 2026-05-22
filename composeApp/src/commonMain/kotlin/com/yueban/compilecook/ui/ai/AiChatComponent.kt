@@ -2,10 +2,10 @@ package com.yueban.compilecook.ui.ai
 
 import com.arkivanov.decompose.ComponentContext
 import com.yueban.compilecook.logger.Logger
-import com.yueban.compilecook.repo.AiRepo
+import com.yueban.compilecook.repo.AiChatRepo
+import com.yueban.compilecook.repo.entity.AiChatContext
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatRole
-import com.yueban.compilecook.repo.entity.AiContext
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.util.currentTimeMillis
@@ -26,22 +26,22 @@ import org.jetbrains.compose.resources.getString
 data class AiChatState(
   val messages: List<AiChatMessage> = emptyList(),
   val isLoading: Boolean = false,
-  val currentContext: AiContext = AiContext.General,
-  val pendingContext: AiContext? = null,
+  val currentContext: AiChatContext = AiChatContext.General,
+  val pendingContext: AiChatContext? = null,
 )
 
 // TODO: add conversation list management (save/load/switch between multiple conversations)
 interface AiChatComponent : UiStateComponent<AiChatState> {
   fun sendMessage(text: String)
   fun clearMessages()
-  fun updateContext(context: AiContext)
+  fun updateContext(context: AiChatContext)
   fun switchContext()
   fun dismissContextChange()
 }
 
 class DefaultAiChatComponent(
   componentContext: ComponentContext,
-  private val aiRepo: AiRepo,
+  private val aiRepo: AiChatRepo,
 ) : AiChatComponent, UiStateComponentImpl<AiChatState>(
   componentContext = componentContext,
   initialState = AiChatState(),
@@ -103,7 +103,7 @@ class DefaultAiChatComponent(
     setState { copy(messages = emptyList()) }
   }
 
-  override fun updateContext(context: AiContext) {
+  override fun updateContext(context: AiChatContext) {
     setState {
       when {
         context == currentContext -> copy(pendingContext = null)
@@ -128,24 +128,24 @@ class DefaultAiChatComponent(
     setState { copy(pendingContext = null) }
   }
 
-  private suspend fun buildSystemMessage(context: AiContext): String = buildString {
+  private suspend fun buildSystemMessage(context: AiChatContext): String = buildString {
     append(getString(Res.string.ai_system_prompt))
     when (context) {
-      AiContext.General -> append(getString(Res.string.ai_system_general_context))
-      AiContext.DishList -> append(getString(Res.string.ai_system_dishlist_context))
-      is AiContext.DishCategory -> append(
+      AiChatContext.General -> append(getString(Res.string.ai_system_general_context))
+      AiChatContext.DishList -> append(getString(Res.string.ai_system_dishlist_context))
+      is AiChatContext.DishCategory -> append(
         getString(
           Res.string.ai_system_dishcategory_context,
           context.category.serialName()
         )
       )
-      is AiContext.DishDifficulty -> append(
+      is AiChatContext.DishDifficulty -> append(
         getString(
           Res.string.ai_system_dishdifficulty_context,
           context.level.toString()
         )
       )
-      is AiContext.Dish -> {
+      is AiChatContext.Dish -> {
         append(getString(Res.string.ai_system_dish_context, context.name))
         val content = aiRepo.getContextContent(context)
         if (content.isNotBlank()) {
@@ -155,7 +155,7 @@ class DefaultAiChatComponent(
           append(content)
         }
       }
-      is AiContext.Tip -> {
+      is AiChatContext.Tip -> {
         append(getString(Res.string.ai_system_tip_context, context.name))
         val content = aiRepo.getContextContent(context)
         if (content.isNotBlank()) {

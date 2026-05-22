@@ -40,9 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yueban.compilecook.repo.entity.AiChatContext
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatRole
-import com.yueban.compilecook.repo.entity.AiContext
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.displayName
 import compilecook.composeapp.generated.resources.Res
@@ -277,37 +277,37 @@ private fun MessageBubbleContent(content: String, isUser: Boolean) {
 
 @Composable
 private fun HintContent(
-  context: AiContext,
+  context: AiChatContext,
   onHintClick: (String) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val hints = when (context) {
-    is AiContext.Dish -> listOf(
+    is AiChatContext.Dish -> listOf(
       stringResource(Res.string.ai_hint_dish_how_to_cook),
       stringResource(Res.string.ai_hint_dish_substitutions),
       stringResource(Res.string.ai_hint_dish_nutrition),
     )
-    is AiContext.Tip -> listOf(
+    is AiChatContext.Tip -> listOf(
       stringResource(Res.string.ai_hint_tip_explain),
       stringResource(Res.string.ai_hint_tip_alternatives),
       stringResource(Res.string.ai_hint_tip_mistakes),
     )
-    is AiContext.General -> listOf(
+    is AiChatContext.General -> listOf(
       stringResource(Res.string.ai_hint_main_quick_meal),
       stringResource(Res.string.ai_hint_main_seasonal),
       stringResource(Res.string.ai_hint_main_cooking_method),
     )
-    is AiContext.DishList -> listOf(
+    is AiChatContext.DishList -> listOf(
       stringResource(Res.string.ai_hint_dishlist_what_to_pick),
       stringResource(Res.string.ai_hint_dishlist_substitutions),
       stringResource(Res.string.ai_hint_dishlist_pairing),
     )
-    is AiContext.DishCategory -> listOf(
+    is AiChatContext.DishCategory -> listOf(
       stringResource(Res.string.ai_hint_dishcategory_cooking_tips),
       stringResource(Res.string.ai_hint_dishcategory_ingredients),
       stringResource(Res.string.ai_hint_dishcategory_variations),
     )
-    is AiContext.DishDifficulty -> listOf(
+    is AiChatContext.DishDifficulty -> listOf(
       stringResource(Res.string.ai_hint_dishdifficulty_appropriate),
       stringResource(Res.string.ai_hint_dishdifficulty_improve),
       stringResource(Res.string.ai_hint_dishdifficulty_techniques),

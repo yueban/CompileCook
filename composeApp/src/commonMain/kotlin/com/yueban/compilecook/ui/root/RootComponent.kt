@@ -20,7 +20,7 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.yueban.compilecook.logger.Logger
-import com.yueban.compilecook.repo.entity.AiContext
+import com.yueban.compilecook.repo.entity.AiChatContext
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.about.AboutComponent
@@ -250,18 +250,18 @@ class DefaultRootComponent(
     @Serializable data object About : Config
   }
 
-  private fun deriveAiContext(child: RootComponent.Child): AiContext = when (child) {
-    is DishChild -> AiContext.Dish(child.component.uiState.value.dishName)
-    is TipChild -> AiContext.Tip(child.component.uiState.value.tipName)
-    is MainChild -> AiContext.General
+  private fun deriveAiContext(child: RootComponent.Child): AiChatContext = when (child) {
+    is DishChild -> AiChatContext.Dish(child.component.uiState.value.dishName)
+    is TipChild -> AiChatContext.Tip(child.component.uiState.value.tipName)
+    is MainChild -> AiChatContext.General
     is DishListChild -> {
       when (val source = child.component.uiState.value.source) {
-        is DishListSource.Category -> AiContext.DishCategory(source.category)
-        is DishListSource.Difficulty -> AiContext.DishDifficulty(source.level)
-        else -> AiContext.DishList
+        is DishListSource.Category -> AiChatContext.DishCategory(source.category)
+        is DishListSource.Difficulty -> AiChatContext.DishDifficulty(source.level)
+        else -> AiChatContext.DishList
       }
     }
-    is AboutChild -> AiContext.General
+    is AboutChild -> AiChatContext.General
   }
 
   private inline fun <T> StackNavigation<*>.onOutput(

@@ -12,11 +12,11 @@ import com.yueban.compilecook.logger.openAiLoggingConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-interface AiRemoteDataSource {
+interface AiChatRemoteDataSource {
   suspend fun chat(request: AiChatRequest): Flow<String>
 }
 
-internal class AiRemoteDataSourceImpl : AiRemoteDataSource {
+internal class AiChatRemoteDataSourceImpl : AiChatRemoteDataSource {
   private val openAi: OpenAI by lazy {
     OpenAI(
       host = OpenAIHost(baseUrl = AIKonfig.MIMO_BASE_URL),

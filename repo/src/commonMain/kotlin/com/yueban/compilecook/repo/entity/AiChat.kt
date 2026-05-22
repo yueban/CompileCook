@@ -17,11 +17,11 @@ enum class AiChatRole {
   @SerialName("system") SYSTEM,
 }
 
-sealed interface AiContext {
-  data class Dish(val name: String) : AiContext
-  data class Tip(val name: String) : AiContext
-  data object General : AiContext
-  data object DishList : AiContext
-  data class DishCategory(val category: com.yueban.compilecook.repo.entity.DishCategory) : AiContext
-  data class DishDifficulty(val level: Int) : AiContext
+sealed interface AiChatContext {
+  data class Dish(val name: String) : AiChatContext
+  data class Tip(val name: String) : AiChatContext
+  data object General : AiChatContext
+  data object DishList : AiChatContext
+  data class DishCategory(val category: com.yueban.compilecook.repo.entity.DishCategory) : AiChatContext
+  data class DishDifficulty(val level: Int) : AiChatContext
 }
