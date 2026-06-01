@@ -4,12 +4,12 @@ import com.arkivanov.decompose.ComponentContext
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.AiChatRepo
 import com.yueban.compilecook.repo.entity.AiChatContext
+import com.yueban.compilecook.repo.entity.AiChatConversation
 import com.yueban.compilecook.repo.entity.AiChatMessage
-import com.yueban.compilecook.repo.entity.AiChatRole
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
+import com.yueban.compilecook.ui.util.getDisplayName
 import com.yueban.compilecook.util.currentTimeMillis
-import com.yueban.compilecook.util.serialName
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_system_content_label
 import compilecook.composeapp.generated.resources.ai_system_dish_context
@@ -19,10 +19,14 @@ import compilecook.composeapp.generated.resources.ai_system_dishlist_context
 import compilecook.composeapp.generated.resources.ai_system_general_context
 import compilecook.composeapp.generated.resources.ai_system_prompt
 import compilecook.composeapp.generated.resources.ai_system_tip_context
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 
-// TODO: persist chat messages across app restarts
 data class AiChatState(
   val messages: List<AiChatMessage> = emptyList(),
   val isLoading: Boolean = false,
@@ -30,7 +34,6 @@ data class AiChatState(
   val pendingContext: AiChatContext? = null,
 )
 
-// TODO: add conversation list management (save/load/switch between multiple conversations)
 interface AiChatComponent : UiStateComponent<AiChatState> {
   fun sendMessage(text: String)
   fun clearMessages()
@@ -46,53 +49,37 @@ class DefaultAiChatComponent(
   componentContext = componentContext,
   initialState = AiChatState(),
 ) {
+  private val conversationIdFlow = MutableStateFlow(0L)
+
+  init {
+    conversationIdFlow
+      .flatMapLatest { convId ->
+        if (convId == 0L) {
+          flowOf(emptyList())
+        } else {
+          aiRepo.getMessagesByConversationId(convId)
+        }
+      }
+      .onEach { setState { copy(messages = it) } }
+      .launchIn(componentScope)
+  }
+
   @Suppress("TooGenericExceptionCaught")
   override fun sendMessage(text: String) {
-    if (text.isBlank()) return
+    if (text.isBlank() || uiState.value.isLoading) return
 
-    val userMessage = AiChatMessage(
-      id = "user_$currentTimeMillis",
-      role = AiChatRole.USER,
-      content = text,
-      timestamp = currentTimeMillis,
-    )
-
-    setState {
-      copy(
-        messages = messages + userMessage,
-        isLoading = true,
-      )
-    }
+    setState { copy(isLoading = true) }
 
     componentScope.launch {
       try {
+        val conversationId = getOrCreateConversationId()
+        val messages = uiState.value.messages // snapshot BEFORE insert to avoid stale read
+        aiRepo.insertUserMessage(conversationId, text)
         val systemMessage = buildSystemMessage(uiState.value.currentContext)
-        val assistantMessageId = "assistant_$currentTimeMillis"
-        val responseBuilder = StringBuilder()
-
         // TODO: support retrying failed messages
-        aiRepo.chat(uiState.value.messages, systemMessage).collect { token ->
-          responseBuilder.append(token)
-          val assistantMessage = AiChatMessage(
-            id = assistantMessageId,
-            role = AiChatRole.ASSISTANT,
-            content = responseBuilder.toString(),
-            timestamp = currentTimeMillis,
-          )
-          setState {
-            val existingMessages = messages.filter { it.id != assistantMessageId }
-            copy(messages = existingMessages + assistantMessage)
-          }
-        }
+        aiRepo.chat(conversationId, text, messages, systemMessage)
       } catch (e: Exception) {
         Logger.e("AI chat error", e)
-        val errorMessage = AiChatMessage(
-          id = "error_$currentTimeMillis",
-          role = AiChatRole.ASSISTANT,
-          content = "Error: ${e.message ?: "Unknown error"}",
-          timestamp = currentTimeMillis,
-        )
-        setState { copy(messages = messages + errorMessage) }
       } finally {
         setState { copy(isLoading = false) }
       }
@@ -100,7 +87,12 @@ class DefaultAiChatComponent(
   }
 
   override fun clearMessages() {
-    setState { copy(messages = emptyList()) }
+    val convId = conversationIdFlow.value
+    if (convId != 0L) {
+      componentScope.launch {
+        aiRepo.deleteMessagesByConversationId(convId)
+      }
+    }
   }
 
   override fun updateContext(context: AiChatContext) {
@@ -114,18 +106,34 @@ class DefaultAiChatComponent(
   }
 
   override fun switchContext() {
+    conversationIdFlow.value = 0L
     setState {
       val newContext = pendingContext ?: return@setState this
       copy(
         currentContext = newContext,
         pendingContext = null,
-        messages = emptyList(),
       )
     }
   }
 
   override fun dismissContextChange() {
     setState { copy(pendingContext = null) }
+  }
+
+  private suspend fun getOrCreateConversationId(): Long {
+    val existing = conversationIdFlow.value
+    if (existing != 0L) return existing
+    val context = uiState.value.currentContext
+    val conversation = AiChatConversation(
+      id = 0L,
+      title = context.getDisplayName(),
+      context = context,
+      createdAt = currentTimeMillis,
+      updatedAt = currentTimeMillis,
+    )
+    val newId = aiRepo.saveConversation(conversation)
+    conversationIdFlow.value = newId
+    return newId
   }
 
   private suspend fun buildSystemMessage(context: AiChatContext): String = buildString {
@@ -136,7 +144,7 @@ class DefaultAiChatComponent(
       is AiChatContext.DishCategory -> append(
         getString(
           Res.string.ai_system_dishcategory_context,
-          context.category.serialName()
+          context.getDisplayName()
         )
       )
       is AiChatContext.DishDifficulty -> append(

@@ -17,25 +17,25 @@ class AiChatTest {
   }
 
   @Test
-  fun upsertAndSelectConversation() = testingDb {
-    aiChatQueries.upsertConversation(
-      id = "conv-1",
+  fun insertAndSelectConversation() = testingDb {
+    aiChatQueries.insertConversation(
       title = "Cooking tips",
       contextType = "general",
       contextName = "",
       createdAt = 1000L,
       updatedAt = 1000L,
     )
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
 
     val conversations = aiChatQueries.getConversations().awaitAsList()
     assertEquals(1, conversations.size)
-    assertEquals("conv-1", conversations.first().id)
+    assertEquals(convId, conversations.first().id)
     assertEquals("Cooking tips", conversations.first().title)
     assertEquals("general", conversations.first().contextType)
 
-    val detail = aiChatQueries.getConversationById("conv-1").awaitAsOneOrNull()
+    val detail = aiChatQueries.getConversationById(convId).awaitAsOneOrNull()
     assertNotNull(detail)
-    assertEquals("conv-1", detail.id)
+    assertEquals(convId, detail.id)
     assertEquals("Cooking tips", detail.title)
     assertEquals("general", detail.contextType)
     assertEquals("", detail.contextName)
@@ -45,28 +45,17 @@ class AiChatTest {
 
   @Test
   fun getConversationById_nonExistent_returnsNull() = testingDb {
-    val conversation = aiChatQueries.getConversationById("non-existent").awaitAsOneOrNull()
+    val conversation = aiChatQueries.getConversationById(999L).awaitAsOneOrNull()
     assertNull(conversation)
   }
 
   @Test
-  fun upsertConversation_modifiesExisting() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Original", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertConversation("conv-1", "Updated", "dish", "Pizza", 1000L, 2000L)
-
-    val updated = aiChatQueries.getConversationById("conv-1").awaitAsOne()
-    assertEquals("Updated", updated.title)
-    assertEquals("dish", updated.contextType)
-    assertEquals("Pizza", updated.contextName)
-    assertEquals(2000L, updated.updatedAt)
-  }
-
-  @Test
   fun updateConversationTitle() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Original", "general", "", 1000L, 1000L)
-    aiChatQueries.updateConversationTitle(title = "New Title", updatedAt = 2000L, id = "conv-1")
+    aiChatQueries.insertConversation("Original", "general", "", 1000L, 1000L)
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.updateConversationTitle(title = "New Title", updatedAt = 2000L, id = convId)
 
-    val updated = aiChatQueries.getConversationById("conv-1").awaitAsOne()
+    val updated = aiChatQueries.getConversationById(convId).awaitAsOne()
     assertEquals("New Title", updated.title)
     assertEquals(2000L, updated.updatedAt)
     assertEquals("general", updated.contextType) // unchanged
@@ -74,33 +63,36 @@ class AiChatTest {
 
   @Test
   fun updateConversationTimestamp() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Title", "general", "", 1000L, 1000L)
-    aiChatQueries.updateConversationTimestamp(updatedAt = 5000L, id = "conv-1")
+    aiChatQueries.insertConversation("Title", "general", "", 1000L, 1000L)
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.updateConversationTimestamp(updatedAt = 5000L, id = convId)
 
-    val updated = aiChatQueries.getConversationById("conv-1").awaitAsOne()
+    val updated = aiChatQueries.getConversationById(convId).awaitAsOne()
     assertEquals(5000L, updated.updatedAt)
     assertEquals("Title", updated.title) // unchanged
   }
 
   @Test
   fun deleteConversationById_removesCorrectEntry() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "First", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertConversation("conv-2", "Second", "general", "", 2000L, 2000L)
+    aiChatQueries.insertConversation("First", "general", "", 1000L, 1000L)
+    val conv1 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertConversation("Second", "general", "", 2000L, 2000L)
+    val conv2 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
 
-    aiChatQueries.deleteConversationById("conv-1")
+    aiChatQueries.deleteConversationById(conv1)
 
     val remaining = aiChatQueries.getConversations().awaitAsList()
     assertEquals(1, remaining.size)
-    assertEquals("conv-2", remaining.first().id)
+    assertEquals(conv2, remaining.first().id)
 
-    val deleted = aiChatQueries.getConversationById("conv-1").awaitAsOneOrNull()
+    val deleted = aiChatQueries.getConversationById(conv1).awaitAsOneOrNull()
     assertNull(deleted)
   }
 
   @Test
   fun deleteAllConversations_clearsTable() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "First", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertConversation("conv-2", "Second", "general", "", 2000L, 2000L)
+    aiChatQueries.insertConversation("First", "general", "", 1000L, 1000L)
+    aiChatQueries.insertConversation("Second", "general", "", 2000L, 2000L)
 
     aiChatQueries.deleteAllConversations()
 
@@ -108,20 +100,23 @@ class AiChatTest {
   }
 
   @Test
-  fun upsertAndSelectMessage() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Chat", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertMessage(
-      id = "msg-1",
-      conversationId = "conv-1",
+  fun insertAndSelectMessage() = testingDb {
+    aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+
+    aiChatQueries.insertMessage(
+      conversationId = convId,
       role = "user",
       content = "Hello!",
       timestamp = 1001L,
+      status = 0L,
     )
+    val msgId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
 
-    val messages = aiChatQueries.getMessagesByConversationId("conv-1").awaitAsList()
+    val messages = aiChatQueries.getMessagesByConversationId(convId).awaitAsList()
     assertEquals(1, messages.size)
-    assertEquals("msg-1", messages.first().id)
-    assertEquals("conv-1", messages.first().conversationId)
+    assertEquals(msgId, messages.first().id)
+    assertEquals(convId, messages.first().conversationId)
     assertEquals("user", messages.first().role)
     assertEquals("Hello!", messages.first().content)
     assertEquals(1001L, messages.first().timestamp)
@@ -129,55 +124,78 @@ class AiChatTest {
 
   @Test
   fun getMessagesByConversationId_ordered() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Chat", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertMessage("msg-2", "conv-1", "assistant", "Hi!", 1003L)
-    aiChatQueries.upsertMessage("msg-1", "conv-1", "user", "Hello!", 1001L)
-    aiChatQueries.upsertMessage("msg-3", "conv-1", "user", "Thanks", 1005L)
+    aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
 
-    val messages = aiChatQueries.getMessagesByConversationId("conv-1").awaitAsList()
+    aiChatQueries.insertMessage(convId, "assistant", "Hi!", 1003L, 0L)
+    val msg2 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertMessage(convId, "user", "Hello!", 1001L, 0L)
+    val msg1 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertMessage(convId, "user", "Thanks", 1005L, 0L)
+    val msg3 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+
+    val messages = aiChatQueries.getMessagesByConversationId(convId).awaitAsList()
     assertEquals(3, messages.size)
-    assertEquals("msg-1", messages[0].id)
-    assertEquals("msg-2", messages[1].id)
-    assertEquals("msg-3", messages[2].id)
+    assertEquals(msg1, messages[0].id)
+    assertEquals(msg2, messages[1].id)
+    assertEquals(msg3, messages[2].id)
   }
 
   @Test
   fun getMessagesByConversationId_empty() = testingDb {
-    val messages = aiChatQueries.getMessagesByConversationId("non-existent").awaitAsList()
+    val messages = aiChatQueries.getMessagesByConversationId(999L).awaitAsList()
     assertTrue(messages.isEmpty())
   }
 
   @Test
   fun getMessageCount() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Chat", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertMessage("msg-1", "conv-1", "user", "Hello!", 1001L)
-    aiChatQueries.upsertMessage("msg-2", "conv-1", "assistant", "Hi!", 1002L)
+    aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertMessage(convId, "user", "Hello!", 1001L, 0L)
+    aiChatQueries.insertMessage(convId, "assistant", "Hi!", 1002L, 0L)
 
-    val count = aiChatQueries.getMessageCount("conv-1").awaitAsOne()
+    val count = aiChatQueries.getMessageCount(convId).awaitAsOne()
     assertEquals(2L, count)
   }
 
   @Test
+  fun updateMessageContent() = testingDb {
+    aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertMessage(convId, "assistant", "", 1001L, 0L)
+    val msgId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+
+    aiChatQueries.updateMessageContent(content = "Updated content", id = msgId)
+
+    val messages = aiChatQueries.getMessagesByConversationId(convId).awaitAsList()
+    assertEquals(1, messages.size)
+    assertEquals("Updated content", messages.first().content)
+  }
+
+  @Test
   fun deleteMessagesByConversationId() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Chat 1", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertConversation("conv-2", "Chat 2", "general", "", 2000L, 2000L)
-    aiChatQueries.upsertMessage("msg-1", "conv-1", "user", "Hello!", 1001L)
-    aiChatQueries.upsertMessage("msg-2", "conv-2", "user", "Hi!", 2001L)
+    aiChatQueries.insertConversation("Chat 1", "general", "", 1000L, 1000L)
+    val conv1 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertConversation("Chat 2", "general", "", 2000L, 2000L)
+    val conv2 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertMessage(conv1, "user", "Hello!", 1001L, 0L)
+    aiChatQueries.insertMessage(conv2, "user", "Hi!", 2001L, 0L)
 
-    aiChatQueries.deleteMessagesByConversationId("conv-1")
+    aiChatQueries.deleteMessagesByConversationId(conv1)
 
-    assertTrue(aiChatQueries.getMessagesByConversationId("conv-1").awaitAsList().isEmpty())
-    assertEquals(1, aiChatQueries.getMessagesByConversationId("conv-2").awaitAsList().size)
+    assertTrue(aiChatQueries.getMessagesByConversationId(conv1).awaitAsList().isEmpty())
+    assertEquals(1, aiChatQueries.getMessagesByConversationId(conv2).awaitAsList().size)
   }
 
   @Test
   fun deleteAllMessages() = testingDb {
-    aiChatQueries.upsertConversation("conv-1", "Chat", "general", "", 1000L, 1000L)
-    aiChatQueries.upsertMessage("msg-1", "conv-1", "user", "Hello!", 1001L)
-    aiChatQueries.upsertMessage("msg-2", "conv-1", "assistant", "Hi!", 1002L)
+    aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
+    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+    aiChatQueries.insertMessage(convId, "user", "Hello!", 1001L, 0L)
+    aiChatQueries.insertMessage(convId, "assistant", "Hi!", 1002L, 0L)
 
     aiChatQueries.deleteAllMessages()
 
-    assertTrue(aiChatQueries.getMessagesByConversationId("conv-1").awaitAsList().isEmpty())
+    assertTrue(aiChatQueries.getMessagesByConversationId(convId).awaitAsList().isEmpty())
   }
 }

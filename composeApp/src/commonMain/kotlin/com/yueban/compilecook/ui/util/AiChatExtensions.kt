@@ -6,6 +6,7 @@ import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_context_general
 import compilecook.composeapp.generated.resources.dish_list_difficulty_title_format
 import compilecook.composeapp.generated.resources.dish_list_title
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 val AiChatContext.displayName: String
@@ -18,3 +19,12 @@ val AiChatContext.displayName: String
     AiChatContext.DishList -> stringResource(Res.string.dish_list_title)
     AiChatContext.General -> stringResource(Res.string.ai_chat_context_general)
   }
+
+suspend fun AiChatContext.getDisplayName(): String = when (this) {
+  is AiChatContext.Tip -> name
+  is AiChatContext.Dish -> name
+  is AiChatContext.DishCategory -> category.getDisplayName() ?: getString(Res.string.dish_list_title)
+  is AiChatContext.DishDifficulty -> getString(Res.string.dish_list_difficulty_title_format, level.toString())
+  AiChatContext.DishList -> getString(Res.string.dish_list_title)
+  AiChatContext.General -> getString(Res.string.ai_chat_context_general)
+}

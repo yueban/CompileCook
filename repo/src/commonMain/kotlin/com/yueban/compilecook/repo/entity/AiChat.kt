@@ -7,7 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 data class AiChatConversation(
-  val id: String,
+  val id: Long,
   val title: String,
   val context: AiChatContext,
   val createdAt: Long,
@@ -15,11 +15,27 @@ data class AiChatConversation(
 )
 
 data class AiChatMessage(
-  val id: String,
+  val id: Long,
   val role: AiChatRole,
   val content: String,
   val timestamp: Long,
+  val status: AiChatMessageStatus = AiChatMessageStatus.COMPLETED,
 )
+
+// TODO: optimize error display messages for better user experience
+@Suppress("MagicNumber")
+enum class AiChatMessageStatus(val value: Int) {
+  COMPLETED(0),
+  STREAMING(1),
+  NETWORK_ERROR(2),
+  TIMEOUT_ERROR(3),
+  SERVER_ERROR(4),
+  UNKNOWN_ERROR(99);
+
+  companion object {
+    fun fromValue(value: Int): AiChatMessageStatus = entries.find { it.value == value } ?: UNKNOWN_ERROR
+  }
+}
 
 @Serializable
 enum class AiChatRole {
@@ -72,13 +88,14 @@ fun AiChatMessageLocalEntity.toAiChatMessage(): AiChatMessage =
     role = AiChatRole.fromValue(role),
     content = content,
     timestamp = timestamp,
+    status = AiChatMessageStatus.fromValue(status.toInt()),
   )
 
 // -- Mapping: Domain -> Local --
 
 fun AiChatConversation.toLocalEntity(): AiChatConversationLocalEntity =
   AiChatConversationLocalEntity(
-    id = id,
+    id = 0L,
     title = title,
     contextType = context.toContextType().serialName(),
     contextName = context.toContextName(),
@@ -86,13 +103,14 @@ fun AiChatConversation.toLocalEntity(): AiChatConversationLocalEntity =
     updatedAt = updatedAt,
   )
 
-fun AiChatMessage.toLocalEntity(conversationId: String): AiChatMessageLocalEntity =
+fun AiChatMessage.toLocalEntity(conversationId: Long): AiChatMessageLocalEntity =
   AiChatMessageLocalEntity(
-    id = id,
+    id = 0L,
     conversationId = conversationId,
     role = role.serialName(),
     content = content,
     timestamp = timestamp,
+    status = status.value.toLong(),
   )
 
 // -- Internal helpers --

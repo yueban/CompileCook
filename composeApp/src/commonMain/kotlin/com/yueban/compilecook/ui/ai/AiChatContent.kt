@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.AiChatContext
 import com.yueban.compilecook.repo.entity.AiChatMessage
+import com.yueban.compilecook.repo.entity.AiChatMessageStatus
 import com.yueban.compilecook.repo.entity.AiChatRole
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.displayName
@@ -89,7 +90,7 @@ fun AiChatContent(
   val userMessageCount = state.messages.count { it.role == AiChatRole.USER }
   LaunchedEffect(userMessageCount) {
     if (userMessageCount > 0) {
-      listState.scrollToItem(state.messages.size)
+      listState.scrollToItem((state.messages.size - 1).coerceAtLeast(0))
     }
   }
 
@@ -149,12 +150,8 @@ fun AiChatContent(
           Spacer(modifier = Modifier.height(AppTheme.dimens.smallGap))
         }
 
-        val lastMessageId = state.messages.lastOrNull()?.id
         items(state.messages, key = { it.id }) { message ->
-          MessageBubble(
-            message = message,
-            isLoading = state.isLoading && message.role == AiChatRole.ASSISTANT && message.id == lastMessageId,
-          )
+          MessageBubble(message = message)
         }
       }
     }
@@ -232,16 +229,22 @@ private fun ChatInputArea(
 }
 
 @Composable
-private fun MessageBubble(message: AiChatMessage, isLoading: Boolean = false) {
+private fun MessageBubble(message: AiChatMessage) {
   val isUser = message.role == AiChatRole.USER
+  val isStreaming = message.status == AiChatMessageStatus.STREAMING
+  val isError = message.status != AiChatMessageStatus.COMPLETED && !isStreaming
 
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
     verticalAlignment = Alignment.Bottom,
   ) {
-    MessageBubbleContent(message.content, isUser)
-    if (isLoading) {
+    MessageBubbleContent(
+      content = message.content,
+      isUser = isUser,
+      isError = isError,
+    )
+    if (isStreaming) {
       CircularProgressIndicator(
         modifier = Modifier.size(AppTheme.dimens.aiChatLoadingSize).padding(start = AppTheme.dimens.tinyGap),
         strokeWidth = AppTheme.dimens.aiChatLoadingStroke,
@@ -251,7 +254,18 @@ private fun MessageBubble(message: AiChatMessage, isLoading: Boolean = false) {
 }
 
 @Composable
-private fun MessageBubbleContent(content: String, isUser: Boolean) {
+private fun MessageBubbleContent(content: String, isUser: Boolean, isError: Boolean = false) {
+  val backgroundColor = when {
+    isUser -> AppTheme.colorScheme.primary
+    isError -> AppTheme.colorScheme.errorContainer
+    else -> AppTheme.colorScheme.surfaceVariant
+  }
+  val textColor = when {
+    isUser -> AppTheme.colorScheme.onPrimary
+    isError -> AppTheme.colorScheme.onErrorContainer
+    else -> AppTheme.colorScheme.onSurfaceVariant
+  }
+
   Box(
     modifier = Modifier
       .widthIn(max = AppTheme.dimens.aiChatMessageMaxWidth)
@@ -263,14 +277,14 @@ private fun MessageBubbleContent(content: String, isUser: Boolean) {
           bottomEnd = if (isUser) AppTheme.dimens.radiusExtraSmall else AppTheme.dimens.radiusLarge,
         )
       )
-      .background(if (isUser) AppTheme.colorScheme.primary else AppTheme.colorScheme.surfaceVariant)
+      .background(backgroundColor)
       .padding(AppTheme.dimens.mediumGap)
   ) {
     // TODO: render markdown in assistant messages (lists, code blocks, links, etc.)
     Text(
       text = content,
       style = AppTheme.typography.bodyMedium,
-      color = if (isUser) AppTheme.colorScheme.onPrimary else AppTheme.colorScheme.onSurfaceVariant,
+      color = textColor,
     )
   }
 }

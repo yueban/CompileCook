@@ -47,6 +47,7 @@ import compilecook.composeapp.generated.resources.main_dish_category_soup
 import compilecook.composeapp.generated.resources.main_dish_category_staple
 import compilecook.composeapp.generated.resources.main_dish_category_vegetable_dish
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 val DishCategory.icon: DrawableResource
@@ -94,3 +95,17 @@ val DishCategory.displayName: String?
     DESSERT -> Res.string.main_dish_category_dessert
     UNKNOWN -> null
   }?.let { stringResource(it) }
+
+suspend fun DishCategory.getDisplayName(): String? = when (this) {
+  VEGETABLE_DISH -> getString(Res.string.main_dish_category_vegetable_dish)
+  MEAT_DISH -> getString(Res.string.main_dish_category_meat_dish)
+  AQUATIC -> getString(Res.string.main_dish_category_aquatic)
+  BREAKFAST -> getString(Res.string.main_dish_category_breakfast)
+  STAPLE -> getString(Res.string.main_dish_category_staple)
+  SEMI_FINISHED -> getString(Res.string.main_dish_category_semi_finished)
+  SOUP -> getString(Res.string.main_dish_category_soup)
+  DRINK -> getString(Res.string.main_dish_category_drink)
+  CONDIMENT -> getString(Res.string.main_dish_category_condiment)
+  DESSERT -> getString(Res.string.main_dish_category_dessert)
+  UNKNOWN -> null
+}

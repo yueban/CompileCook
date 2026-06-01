@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS AiChatConversationLocalEntity (
-    id TEXT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     contextType TEXT NOT NULL,
     contextName TEXT NOT NULL DEFAULT '',
@@ -8,11 +8,12 @@ CREATE TABLE IF NOT EXISTS AiChatConversationLocalEntity (
 );
 
 CREATE TABLE IF NOT EXISTS AiChatMessageLocalEntity (
-    id TEXT PRIMARY KEY NOT NULL,
-    conversationId TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conversationId INTEGER NOT NULL,
     role TEXT NOT NULL,
     content TEXT NOT NULL,
-    timestamp INTEGER NOT NULL
+    timestamp INTEGER NOT NULL,
+    status INTEGER NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS AiChatMessage_conversationId ON AiChatMessageLocalEntity(conversationId);
@@ -31,17 +32,38 @@ WHERE id = ?;
 getMessagesByConversationId:
 SELECT * FROM AiChatMessageLocalEntity
 WHERE conversationId = ?
-ORDER BY timestamp ASC;
+ORDER BY timestamp ASC, id ASC;
 
 getMessageCount:
 SELECT COUNT(*) FROM AiChatMessageLocalEntity
 WHERE conversationId = ?;
 
--- Write: Conversations
-upsertConversation:
-INSERT OR REPLACE INTO AiChatConversationLocalEntity(id, title, contextType, contextName, createdAt, updatedAt)
-VALUES (?, ?, ?, ?, ?, ?);
+-- Insert: Conversations
+insertConversation:
+INSERT INTO AiChatConversationLocalEntity(title, contextType, contextName, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?);
 
+-- Insert: Messages
+insertMessage:
+INSERT INTO AiChatMessageLocalEntity(conversationId, role, content, timestamp, status)
+VALUES (?, ?, ?, ?, ?);
+
+-- Get last insert row ID (must be called immediately after insert on the same connection)
+selectLastInsertRowId:
+SELECT last_insert_rowid();
+
+-- Update: Messages
+updateMessageContent:
+UPDATE AiChatMessageLocalEntity
+SET content = ?
+WHERE id = ?;
+
+updateMessageStatus:
+UPDATE AiChatMessageLocalEntity
+SET status = ?
+WHERE id = ?;
+
+-- Update: Conversations
 updateConversationTitle:
 UPDATE AiChatConversationLocalEntity
 SET title = ?, updatedAt = ?
@@ -51,11 +73,6 @@ updateConversationTimestamp:
 UPDATE AiChatConversationLocalEntity
 SET updatedAt = ?
 WHERE id = ?;
-
--- Write: Messages
-upsertMessage:
-INSERT OR REPLACE INTO AiChatMessageLocalEntity(id, conversationId, role, content, timestamp)
-VALUES (?, ?, ?, ?, ?);
 
 -- Delete
 deleteConversationById:

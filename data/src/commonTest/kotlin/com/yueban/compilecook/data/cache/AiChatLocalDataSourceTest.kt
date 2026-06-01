@@ -38,15 +38,15 @@ class AiChatLocalDataSourceTest {
   @Test
   fun getConversations_orderedByUpdatedAt() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "First", "general", "", 1000L, 1000L))
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-2", "Second", "general", "", 2000L, 3000L))
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-3", "Third", "general", "", 3000L, 2000L))
+    dataSource.insertConversation(AiChatConversationLocalEntity(0L, "First", "general", "", 1000L, 1000L))
+    dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Second", "general", "", 2000L, 3000L))
+    dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Third", "general", "", 3000L, 2000L))
 
     val conversations = dataSource.getConversations().first()
     assertEquals(3, conversations.size)
-    assertEquals("conv-2", conversations[0].id) // updatedAt=3000
-    assertEquals("conv-3", conversations[1].id) // updatedAt=2000
-    assertEquals("conv-1", conversations[2].id) // updatedAt=1000
+    assertEquals("Second", conversations[0].title) // updatedAt=3000
+    assertEquals("Third", conversations[1].title) // updatedAt=2000
+    assertEquals("First", conversations[2].title) // updatedAt=1000
 
     cleanup()
   }
@@ -54,11 +54,11 @@ class AiChatLocalDataSourceTest {
   @Test
   fun getConversationById_found() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat", "dish", "Pizza", 1000L, 2000L))
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "dish", "Pizza", 1000L, 2000L))
 
-    val conversation = dataSource.getConversationById("conv-1")
+    val conversation = dataSource.getConversationById(convId)
     assertNotNull(conversation)
-    assertEquals("conv-1", conversation.id)
+    assertEquals(convId, conversation.id)
     assertEquals("Chat", conversation.title)
     assertEquals("dish", conversation.contextType)
     assertEquals("Pizza", conversation.contextName)
@@ -70,19 +70,20 @@ class AiChatLocalDataSourceTest {
   fun getConversationById_notFound() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
 
-    val conversation = dataSource.getConversationById("non-existent")
+    val conversation = dataSource.getConversationById(999L)
     assertNull(conversation)
 
     cleanup()
   }
 
   @Test
-  fun upsertConversation() = runTest(UnconfinedTestDispatcher()) {
+  fun insertConversation() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Test", "general", "", 1000L, 1000L))
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Test", "general", "", 1000L, 1000L))
 
     val conversations = dataSource.getConversations().first()
     assertEquals(1, conversations.size)
+    assertEquals(convId, conversations.first().id)
     assertEquals("Test", conversations.first().title)
 
     cleanup()
@@ -91,11 +92,13 @@ class AiChatLocalDataSourceTest {
   @Test
   fun updateConversationTitle() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Original", "general", "", 1000L, 1000L))
+    val convId = dataSource.insertConversation(
+      AiChatConversationLocalEntity(0L, "Original", "general", "", 1000L, 1000L)
+    )
 
-    dataSource.updateConversationTitle("conv-1", "Updated", 2000L)
+    dataSource.updateConversationTitle(convId, "Updated", 2000L)
 
-    val conversation = dataSource.getConversationById("conv-1")
+    val conversation = dataSource.getConversationById(convId)
     assertNotNull(conversation)
     assertEquals("Updated", conversation.title)
     assertEquals(2000L, conversation.updatedAt)
@@ -106,11 +109,11 @@ class AiChatLocalDataSourceTest {
   @Test
   fun updateConversationTimestamp() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Title", "general", "", 1000L, 1000L))
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Title", "general", "", 1000L, 1000L))
 
-    dataSource.updateConversationTimestamp("conv-1", 5000L)
+    dataSource.updateConversationTimestamp(convId, 5000L)
 
-    val conversation = dataSource.getConversationById("conv-1")
+    val conversation = dataSource.getConversationById(convId)
     assertNotNull(conversation)
     assertEquals(5000L, conversation.updatedAt)
     assertEquals("Title", conversation.title) // unchanged
@@ -121,17 +124,17 @@ class AiChatLocalDataSourceTest {
   @Test
   fun deleteConversationById_cascadesToMessages() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat", "general", "", 1000L, 1000L))
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-2", "Other", "general", "", 2000L, 2000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "Hello", 1001L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-2", "conv-2", "user", "Hi", 2001L))
+    val conv1 = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "general", "", 1000L, 1000L))
+    val conv2 = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Other", "general", "", 2000L, 2000L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv1, "user", "Hello", 1001L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv2, "user", "Hi", 2001L, 0L))
 
-    dataSource.deleteConversationById("conv-1")
+    dataSource.deleteConversationById(conv1)
 
-    assertNull(dataSource.getConversationById("conv-1"))
-    assertNotNull(dataSource.getConversationById("conv-2"))
-    assertTrue(dataSource.getMessagesByConversationId("conv-1").first().isEmpty())
-    assertEquals(1, dataSource.getMessagesByConversationId("conv-2").first().size)
+    assertNull(dataSource.getConversationById(conv1))
+    assertNotNull(dataSource.getConversationById(conv2))
+    assertTrue(dataSource.getMessagesByConversationId(conv1).first().isEmpty())
+    assertEquals(1, dataSource.getMessagesByConversationId(conv2).first().size)
 
     cleanup()
   }
@@ -139,14 +142,14 @@ class AiChatLocalDataSourceTest {
   @Test
   fun deleteAllConversations() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "First", "general", "", 1000L, 1000L))
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-2", "Second", "general", "", 2000L, 2000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "Hello", 1001L))
+    val conv1 = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "First", "general", "", 1000L, 1000L))
+    dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Second", "general", "", 2000L, 2000L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv1, "user", "Hello", 1001L, 0L))
 
     dataSource.deleteAllConversations()
 
     assertTrue(dataSource.getConversations().first().isEmpty())
-    assertTrue(dataSource.getMessagesByConversationId("conv-1").first().isEmpty())
+    assertTrue(dataSource.getMessagesByConversationId(conv1).first().isEmpty())
 
     cleanup()
   }
@@ -155,7 +158,7 @@ class AiChatLocalDataSourceTest {
   fun getMessagesByConversationId_empty() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
 
-    assertTrue(dataSource.getMessagesByConversationId("non-existent").first().isEmpty())
+    assertTrue(dataSource.getMessagesByConversationId(999L).first().isEmpty())
 
     cleanup()
   }
@@ -163,16 +166,16 @@ class AiChatLocalDataSourceTest {
   @Test
   fun getMessagesByConversationId_orderedByTimestamp() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat", "general", "", 1000L, 1000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-3", "conv-1", "user", "Third", 3000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "First", 1000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-2", "conv-1", "assistant", "Second", 2000L))
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "general", "", 1000L, 1000L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "user", "Third", 3000L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "user", "First", 1000L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "assistant", "Second", 2000L, 0L))
 
-    val messages = dataSource.getMessagesByConversationId("conv-1").first()
+    val messages = dataSource.getMessagesByConversationId(convId).first()
     assertEquals(3, messages.size)
-    assertEquals("msg-1", messages[0].id)
-    assertEquals("msg-2", messages[1].id)
-    assertEquals("msg-3", messages[2].id)
+    assertEquals("First", messages[0].content)
+    assertEquals("Second", messages[1].content)
+    assertEquals("Third", messages[2].content)
 
     cleanup()
   }
@@ -180,25 +183,25 @@ class AiChatLocalDataSourceTest {
   @Test
   fun getMessageCount() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat", "general", "", 1000L, 1000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "Hello", 1001L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-2", "conv-1", "assistant", "Hi", 1002L))
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "general", "", 1000L, 1000L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "user", "Hello", 1001L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "assistant", "Hi", 1002L, 0L))
 
-    val count = dataSource.getMessageCount("conv-1")
+    val count = dataSource.getMessageCount(convId)
     assertEquals(2L, count)
 
     cleanup()
   }
 
   @Test
-  fun upsertMessage() = runTest(UnconfinedTestDispatcher()) {
+  fun insertMessage() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat", "general", "", 1000L, 1000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "Hello!", 1001L))
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "general", "", 1000L, 1000L))
+    val msgId = dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "user", "Hello!", 1001L, 0L))
 
-    val messages = dataSource.getMessagesByConversationId("conv-1").first()
+    val messages = dataSource.getMessagesByConversationId(convId).first()
     assertEquals(1, messages.size)
-    assertEquals("msg-1", messages.first().id)
+    assertEquals(msgId, messages.first().id)
     assertEquals("user", messages.first().role)
     assertEquals("Hello!", messages.first().content)
 
@@ -206,19 +209,35 @@ class AiChatLocalDataSourceTest {
   }
 
   @Test
-  fun upsertMessages() = runTest(UnconfinedTestDispatcher()) {
+  fun insertMessages() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat", "general", "", 1000L, 1000L))
-    dataSource.upsertMessages(
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "general", "", 1000L, 1000L))
+    val ids = dataSource.insertMessages(
       listOf(
-        AiChatMessageLocalEntity("msg-1", "conv-1", "user", "Hello", 1001L),
-        AiChatMessageLocalEntity("msg-2", "conv-1", "assistant", "Hi!", 1002L),
-        AiChatMessageLocalEntity("msg-3", "conv-1", "user", "Thanks", 1003L),
+        AiChatMessageLocalEntity(0L, convId, "user", "Hello", 1001L, 0L),
+        AiChatMessageLocalEntity(0L, convId, "assistant", "Hi!", 1002L, 0L),
+        AiChatMessageLocalEntity(0L, convId, "user", "Thanks", 1003L, 0L),
       )
     )
 
-    val messages = dataSource.getMessagesByConversationId("conv-1").first()
+    assertEquals(3, ids.size)
+    val messages = dataSource.getMessagesByConversationId(convId).first()
     assertEquals(3, messages.size)
+
+    cleanup()
+  }
+
+  @Test
+  fun updateMessageContent() = runTest(UnconfinedTestDispatcher()) {
+    val (dataSource, cleanup) = createDataSource()
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "general", "", 1000L, 1000L))
+    val msgId = dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "assistant", "", 1001L, 0L))
+
+    dataSource.updateMessageContent(msgId, "Updated content")
+
+    val messages = dataSource.getMessagesByConversationId(convId).first()
+    assertEquals(1, messages.size)
+    assertEquals("Updated content", messages.first().content)
 
     cleanup()
   }
@@ -226,15 +245,15 @@ class AiChatLocalDataSourceTest {
   @Test
   fun deleteMessagesByConversationId() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat 1", "general", "", 1000L, 1000L))
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-2", "Chat 2", "general", "", 2000L, 2000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "Hello", 1001L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-2", "conv-2", "user", "Hi", 2001L))
+    val conv1 = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat 1", "general", "", 1000L, 1000L))
+    val conv2 = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat 2", "general", "", 2000L, 2000L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv1, "user", "Hello", 1001L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv2, "user", "Hi", 2001L, 0L))
 
-    dataSource.deleteMessagesByConversationId("conv-1")
+    dataSource.deleteMessagesByConversationId(conv1)
 
-    assertTrue(dataSource.getMessagesByConversationId("conv-1").first().isEmpty())
-    assertEquals(1, dataSource.getMessagesByConversationId("conv-2").first().size)
+    assertTrue(dataSource.getMessagesByConversationId(conv1).first().isEmpty())
+    assertEquals(1, dataSource.getMessagesByConversationId(conv2).first().size)
 
     cleanup()
   }
@@ -242,13 +261,13 @@ class AiChatLocalDataSourceTest {
   @Test
   fun deleteAllMessages() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat", "general", "", 1000L, 1000L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "Hello", 1001L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-2", "conv-1", "assistant", "Hi", 1002L))
+    val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "general", "", 1000L, 1000L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "user", "Hello", 1001L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, convId, "assistant", "Hi", 1002L, 0L))
 
     dataSource.deleteAllMessages()
 
-    assertTrue(dataSource.getMessagesByConversationId("conv-1").first().isEmpty())
+    assertTrue(dataSource.getMessagesByConversationId(convId).first().isEmpty())
 
     cleanup()
   }
@@ -256,20 +275,22 @@ class AiChatLocalDataSourceTest {
   @Test
   fun multipleConversations_independent() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertConversation(AiChatConversationLocalEntity("conv-1", "Chat 1", "dish", "Pizza", 1000L, 1000L))
-    dataSource.upsertConversation(
-      AiChatConversationLocalEntity("conv-2", "Chat 2", "tip", "Knife Skills", 2000L, 2000L)
+    val conv1 = dataSource.insertConversation(
+      AiChatConversationLocalEntity(0L, "Chat 1", "dish", "Pizza", 1000L, 1000L)
     )
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-1", "conv-1", "user", "About pizza", 1001L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-2", "conv-1", "assistant", "Pizza info", 1002L))
-    dataSource.upsertMessage(AiChatMessageLocalEntity("msg-3", "conv-2", "user", "About knives", 2001L))
+    val conv2 = dataSource.insertConversation(
+      AiChatConversationLocalEntity(0L, "Chat 2", "tip", "Knife Skills", 2000L, 2000L)
+    )
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv1, "user", "About pizza", 1001L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv1, "assistant", "Pizza info", 1002L, 0L))
+    dataSource.insertMessage(AiChatMessageLocalEntity(0L, conv2, "user", "About knives", 2001L, 0L))
 
-    val conv1Messages = dataSource.getMessagesByConversationId("conv-1").first()
-    val conv2Messages = dataSource.getMessagesByConversationId("conv-2").first()
+    val conv1Messages = dataSource.getMessagesByConversationId(conv1).first()
+    val conv2Messages = dataSource.getMessagesByConversationId(conv2).first()
     assertEquals(2, conv1Messages.size)
     assertEquals(1, conv2Messages.size)
-    assertTrue(conv1Messages.all { it.conversationId == "conv-1" })
-    assertTrue(conv2Messages.all { it.conversationId == "conv-2" })
+    assertTrue(conv1Messages.all { it.conversationId == conv1 })
+    assertTrue(conv2Messages.all { it.conversationId == conv2 })
 
     cleanup()
   }

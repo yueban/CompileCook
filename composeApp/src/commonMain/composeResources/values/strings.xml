@@ -97,5 +97,6 @@
     <string name="ai_system_dish_context"> The user is viewing a dish: %1$s.</string>
     <string name="ai_system_tip_context"> The user is viewing a tip: %1$s.</string>
     <string name="ai_system_content_label">Here is the content:</string>
+    <string name="ai_chat_error_format">Error: %1$s</string>
 
 </resources>

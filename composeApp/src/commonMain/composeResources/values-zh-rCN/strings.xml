@@ -97,5 +97,6 @@
     <string name="ai_system_dish_context">用户正在查看菜品：%1$s。</string>
     <string name="ai_system_tip_context">用户正在查看技巧：%1$s。</string>
     <string name="ai_system_content_label">以下是内容：</string>
+    <string name="ai_chat_error_format">错误：%1$s</string>
 
 </resources>

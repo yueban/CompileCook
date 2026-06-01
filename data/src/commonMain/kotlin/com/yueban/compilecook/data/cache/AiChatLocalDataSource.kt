@@ -14,17 +14,19 @@ import kotlinx.coroutines.withContext
 
 interface AiChatLocalDataSource {
   fun getConversations(): Flow<List<AiChatConversationLocalEntity>>
-  suspend fun getConversationById(id: String): AiChatConversationLocalEntity?
-  suspend fun upsertConversation(conversation: AiChatConversationLocalEntity)
-  suspend fun updateConversationTitle(id: String, title: String, updatedAt: Long)
-  suspend fun updateConversationTimestamp(id: String, updatedAt: Long)
-  suspend fun deleteConversationById(id: String)
+  suspend fun getConversationById(id: Long): AiChatConversationLocalEntity?
+  suspend fun insertConversation(conversation: AiChatConversationLocalEntity): Long
+  suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long)
+  suspend fun updateConversationTimestamp(id: Long, updatedAt: Long)
+  suspend fun deleteConversationById(id: Long)
   suspend fun deleteAllConversations()
-  fun getMessagesByConversationId(conversationId: String): Flow<List<AiChatMessageLocalEntity>>
-  suspend fun getMessageCount(conversationId: String): Long
-  suspend fun upsertMessage(message: AiChatMessageLocalEntity)
-  suspend fun upsertMessages(messages: List<AiChatMessageLocalEntity>)
-  suspend fun deleteMessagesByConversationId(conversationId: String)
+  fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>>
+  suspend fun getMessageCount(conversationId: Long): Long
+  suspend fun insertMessage(message: AiChatMessageLocalEntity): Long
+  suspend fun insertMessages(messages: List<AiChatMessageLocalEntity>): List<Long>
+  suspend fun updateMessageContent(id: Long, content: String)
+  suspend fun updateMessageStatus(id: Long, status: Long)
+  suspend fun deleteMessagesByConversationId(conversationId: Long)
   suspend fun deleteAllMessages()
 }
 
@@ -35,25 +37,29 @@ class AiChatLocalDataSourceImpl(
   override fun getConversations(): Flow<List<AiChatConversationLocalEntity>> =
     aiChatQueries.getConversations().asFlow().mapToList(defaultDispatcher)
 
-  override suspend fun getConversationById(id: String): AiChatConversationLocalEntity? =
+  override suspend fun getConversationById(id: Long): AiChatConversationLocalEntity? =
     withContext(defaultDispatcher) { aiChatQueries.getConversationById(id).awaitAsOneOrNull() }
 
-  override suspend fun upsertConversation(conversation: AiChatConversationLocalEntity) = write {
-    aiChatQueries.upsertConversation(conversation)
-    Logger.d("upsert conversation: ${conversation.id}")
+  override suspend fun insertConversation(conversation: AiChatConversationLocalEntity): Long = write {
+    aiChatQueries.transactionWithResult {
+      aiChatQueries.insertConversation(conversation)
+      val id = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+      Logger.d("insert conversation: $id")
+      id
+    }
   }
 
-  override suspend fun updateConversationTitle(id: String, title: String, updatedAt: Long) = write {
+  override suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long) = write {
     aiChatQueries.updateConversationTitle(title = title, updatedAt = updatedAt, id = id)
     Logger.d("update conversation title: $id")
   }
 
-  override suspend fun updateConversationTimestamp(id: String, updatedAt: Long) = write {
+  override suspend fun updateConversationTimestamp(id: Long, updatedAt: Long) = write {
     aiChatQueries.updateConversationTimestamp(updatedAt = updatedAt, id = id)
     Logger.d("update conversation timestamp: $id")
   }
 
-  override suspend fun deleteConversationById(id: String) = write {
+  override suspend fun deleteConversationById(id: Long) = write {
     aiChatQueries.deleteMessagesByConversationId(id)
     aiChatQueries.deleteConversationById(id)
     Logger.d("delete conversation: $id")
@@ -65,25 +71,44 @@ class AiChatLocalDataSourceImpl(
     Logger.d("delete all conversations and messages")
   }
 
-  override fun getMessagesByConversationId(conversationId: String): Flow<List<AiChatMessageLocalEntity>> =
+  override fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>> =
     aiChatQueries.getMessagesByConversationId(conversationId).asFlow().mapToList(defaultDispatcher)
 
-  override suspend fun getMessageCount(conversationId: String): Long =
+  override suspend fun getMessageCount(conversationId: Long): Long =
     withContext(defaultDispatcher) { aiChatQueries.getMessageCount(conversationId).awaitAsOne() }
 
-  override suspend fun upsertMessage(message: AiChatMessageLocalEntity) = write {
-    aiChatQueries.upsertMessage(message)
-    Logger.d("upsert message: ${message.id}")
-  }
-
-  override suspend fun upsertMessages(messages: List<AiChatMessageLocalEntity>) = transactionWrite {
-    aiChatQueries.transaction {
-      messages.forEach { aiChatQueries.upsertMessage(it) }
+  override suspend fun insertMessage(message: AiChatMessageLocalEntity): Long = write {
+    aiChatQueries.transactionWithResult {
+      aiChatQueries.insertMessage(message)
+      val id = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+      Logger.d("insert message: $id")
+      id
     }
-    Logger.d("upsert messages: ${messages.size}")
   }
 
-  override suspend fun deleteMessagesByConversationId(conversationId: String) = write {
+  override suspend fun insertMessages(messages: List<AiChatMessageLocalEntity>): List<Long> = transactionWrite {
+    aiChatQueries.transactionWithResult {
+      val ids = mutableListOf<Long>()
+      messages.forEach { message ->
+        aiChatQueries.insertMessage(message)
+        ids.add(aiChatQueries.selectLastInsertRowId().awaitAsOne())
+      }
+      Logger.d("insert messages: ${ids.size}")
+      ids
+    }
+  }
+
+  override suspend fun updateMessageContent(id: Long, content: String) = write {
+    aiChatQueries.updateMessageContent(content = content, id = id)
+    Logger.d("update message content: $id")
+  }
+
+  override suspend fun updateMessageStatus(id: Long, status: Long) = write {
+    aiChatQueries.updateMessageStatus(status = status, id = id)
+    Logger.d("update message status: $id")
+  }
+
+  override suspend fun deleteMessagesByConversationId(conversationId: Long) = write {
     aiChatQueries.deleteMessagesByConversationId(conversationId)
     Logger.d("delete messages by conversation: $conversationId")
   }
@@ -94,9 +119,8 @@ class AiChatLocalDataSourceImpl(
   }
 }
 
-private suspend fun AiChatQueries.upsertConversation(conversation: AiChatConversationLocalEntity) =
-  upsertConversation(
-    id = conversation.id,
+private suspend fun AiChatQueries.insertConversation(conversation: AiChatConversationLocalEntity) =
+  insertConversation(
     title = conversation.title,
     contextType = conversation.contextType,
     contextName = conversation.contextName,
@@ -104,11 +128,11 @@ private suspend fun AiChatQueries.upsertConversation(conversation: AiChatConvers
     updatedAt = conversation.updatedAt,
   )
 
-private suspend fun AiChatQueries.upsertMessage(message: AiChatMessageLocalEntity) =
-  upsertMessage(
-    id = message.id,
+private suspend fun AiChatQueries.insertMessage(message: AiChatMessageLocalEntity) =
+  insertMessage(
     conversationId = message.conversationId,
     role = message.role,
     content = message.content,
     timestamp = message.timestamp,
+    status = message.status,
   )
