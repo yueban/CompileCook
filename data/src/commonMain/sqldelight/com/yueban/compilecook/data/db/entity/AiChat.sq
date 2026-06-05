@@ -63,6 +63,11 @@ UPDATE AiChatMessageLocalEntity
 SET status = ?
 WHERE id = ?;
 
+updateMessageStatusByConversationAndStatus:
+UPDATE AiChatMessageLocalEntity
+SET status = :newStatus
+WHERE conversationId = ? AND status = ?;
+
 -- Update: Conversations
 updateConversationTitle:
 UPDATE AiChatConversationLocalEntity

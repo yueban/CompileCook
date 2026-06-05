@@ -19,18 +19,26 @@ import compilecook.composeapp.generated.resources.ai_system_dishlist_context
 import compilecook.composeapp.generated.resources.ai_system_general_context
 import compilecook.composeapp.generated.resources.ai_system_prompt
 import compilecook.composeapp.generated.resources.ai_system_tip_context
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.jetbrains.compose.resources.getString
 
+@Serializable
 data class AiChatState(
+  val conversationId: Long = 0L,
+  @Transient
   val messages: List<AiChatMessage> = emptyList(),
+  @Transient
   val isLoading: Boolean = false,
   val currentContext: AiChatContext = AiChatContext.General,
+  @Transient
   val pendingContext: AiChatContext? = null,
 )
 
@@ -48,11 +56,16 @@ class DefaultAiChatComponent(
 ) : AiChatComponent, UiStateComponentImpl<AiChatState>(
   componentContext = componentContext,
   initialState = AiChatState(),
+  serializer = AiChatState.serializer(),
 ) {
-  private val conversationIdFlow = MutableStateFlow(0L)
-
   init {
-    conversationIdFlow
+    uiState
+      .map { it.conversationId }
+      .distinctUntilChanged()
+      .onEach { convId ->
+        // Reset messages stuck in STREAMING status before observing (e.g. app killed mid-stream)
+        if (convId != 0L) aiRepo.resetStreamingMessages(convId)
+      }
       .flatMapLatest { convId ->
         if (convId == 0L) {
           flowOf(emptyList())
@@ -87,7 +100,7 @@ class DefaultAiChatComponent(
   }
 
   override fun clearMessages() {
-    val convId = conversationIdFlow.value
+    val convId = uiState.value.conversationId
     if (convId != 0L) {
       componentScope.launch {
         aiRepo.deleteMessagesByConversationId(convId)
@@ -106,10 +119,10 @@ class DefaultAiChatComponent(
   }
 
   override fun switchContext() {
-    conversationIdFlow.value = 0L
     setState {
       val newContext = pendingContext ?: return@setState this
       copy(
+        conversationId = 0L,
         currentContext = newContext,
         pendingContext = null,
       )
@@ -121,7 +134,7 @@ class DefaultAiChatComponent(
   }
 
   private suspend fun getOrCreateConversationId(): Long {
-    val existing = conversationIdFlow.value
+    val existing = uiState.value.conversationId
     if (existing != 0L) return existing
     val context = uiState.value.currentContext
     val conversation = AiChatConversation(
@@ -132,7 +145,7 @@ class DefaultAiChatComponent(
       updatedAt = currentTimeMillis,
     )
     val newId = aiRepo.saveConversation(conversation)
-    conversationIdFlow.value = newId
+    setState { copy(conversationId = newId) }
     return newId
   }
 

@@ -35,6 +35,7 @@ interface AiChatRepo {
   suspend fun deleteMessagesByConversationId(conversationId: Long)
   suspend fun deleteAllConversations()
   suspend fun deleteAllMessages()
+  suspend fun resetStreamingMessages(conversationId: Long)
 }
 
 internal class AiChatRepoImpl(
@@ -129,4 +130,12 @@ internal class AiChatRepoImpl(
 
   override suspend fun deleteAllMessages() =
     aiLocalDataSource.deleteAllMessages()
+
+  override suspend fun resetStreamingMessages(conversationId: Long) {
+    aiLocalDataSource.updateMessageStatusByConversationAndStatus(
+      conversationId = conversationId,
+      fromStatus = AiChatMessageStatus.STREAMING.value.toLong(),
+      toStatus = AiChatMessageStatus.UNKNOWN_ERROR.value.toLong(),
+    )
+  }
 }

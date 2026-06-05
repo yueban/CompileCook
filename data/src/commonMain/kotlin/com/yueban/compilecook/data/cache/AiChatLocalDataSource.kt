@@ -26,6 +26,7 @@ interface AiChatLocalDataSource {
   suspend fun insertMessages(messages: List<AiChatMessageLocalEntity>): List<Long>
   suspend fun updateMessageContent(id: Long, content: String)
   suspend fun updateMessageStatus(id: Long, status: Long)
+  suspend fun updateMessageStatusByConversationAndStatus(conversationId: Long, fromStatus: Long, toStatus: Long)
   suspend fun deleteMessagesByConversationId(conversationId: Long)
   suspend fun deleteAllMessages()
 }
@@ -106,6 +107,19 @@ class AiChatLocalDataSourceImpl(
   override suspend fun updateMessageStatus(id: Long, status: Long) = write {
     aiChatQueries.updateMessageStatus(status = status, id = id)
     Logger.d("update message status: $id")
+  }
+
+  override suspend fun updateMessageStatusByConversationAndStatus(
+    conversationId: Long,
+    fromStatus: Long,
+    toStatus: Long,
+  ) = write {
+    aiChatQueries.updateMessageStatusByConversationAndStatus(
+      newStatus = toStatus,
+      conversationId = conversationId,
+      status = fromStatus,
+    )
+    Logger.d("update message status by conversation: $conversationId, from=$fromStatus, to=$toStatus")
   }
 
   override suspend fun deleteMessagesByConversationId(conversationId: Long) = write {

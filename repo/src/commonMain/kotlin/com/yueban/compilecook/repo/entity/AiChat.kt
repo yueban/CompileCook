@@ -48,13 +48,14 @@ enum class AiChatRole {
   }
 }
 
+@Serializable
 sealed interface AiChatContext {
-  data class Dish(val name: String) : AiChatContext
-  data class Tip(val name: String) : AiChatContext
-  data object General : AiChatContext
-  data object DishList : AiChatContext
-  data class DishCategory(val category: com.yueban.compilecook.repo.entity.DishCategory) : AiChatContext
-  data class DishDifficulty(val level: Int) : AiChatContext
+  @Serializable data class Dish(val name: String) : AiChatContext
+  @Serializable data class Tip(val name: String) : AiChatContext
+  @Serializable data object General : AiChatContext
+  @Serializable data object DishList : AiChatContext
+  @Serializable data class DishCategory(val category: com.yueban.compilecook.repo.entity.DishCategory) : AiChatContext
+  @Serializable data class DishDifficulty(val level: Int) : AiChatContext
 }
 
 @Serializable
