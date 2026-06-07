@@ -70,6 +70,11 @@
     <string name="ai_chat_confirm">Confirm</string>
     <string name="ai_chat_cancel">Cancel</string>
     <string name="ai_chat_context_general">Ai Assistant</string>
+    <string name="ai_chat_error_network">Network error, please check your connection</string>
+    <string name="ai_chat_error_timeout">Request timed out, please try again</string>
+    <string name="ai_chat_error_server">Server error, please try again later</string>
+    <string name="ai_chat_error_unknown">Something went wrong</string>
+    <string name="ai_chat_retry">Retry</string>
 
     <string name="ai_hint_dish_how_to_cook">How to cook this?</string>
     <string name="ai_hint_dish_substitutions">What substitutions?</string>
@@ -101,6 +106,5 @@
     <string name="ai_system_dish_context"> The user is viewing a dish: %1$s.</string>
     <string name="ai_system_tip_context"> The user is viewing a tip: %1$s.</string>
     <string name="ai_system_content_label">Here is the content:</string>
-    <string name="ai_chat_error_format">Error: %1$s</string>
 
 </resources>

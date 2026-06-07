@@ -70,6 +70,11 @@
     <string name="ai_chat_confirm">确认</string>
     <string name="ai_chat_cancel">取消</string>
     <string name="ai_chat_context_general">智能助手</string>
+    <string name="ai_chat_error_network">网络错误，请检查网络连接</string>
+    <string name="ai_chat_error_timeout">请求超时，请重试</string>
+    <string name="ai_chat_error_server">服务器错误，请稍后重试</string>
+    <string name="ai_chat_error_unknown">出了点问题</string>
+    <string name="ai_chat_retry">重试</string>
 
     <string name="ai_hint_dish_how_to_cook">怎么做这道菜？</string>
     <string name="ai_hint_dish_substitutions">有什么替代食材？</string>
@@ -101,6 +106,5 @@
     <string name="ai_system_dish_context">用户正在查看菜品：%1$s。</string>
     <string name="ai_system_tip_context">用户正在查看技巧：%1$s。</string>
     <string name="ai_system_content_label">以下是内容：</string>
-    <string name="ai_chat_error_format">错误：%1$s</string>
 
 </resources>

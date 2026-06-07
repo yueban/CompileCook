@@ -38,6 +38,10 @@ getMessageCount:
 SELECT COUNT(*) FROM AiChatMessageLocalEntity
 WHERE conversationId = ?;
 
+getMessageById:
+SELECT * FROM AiChatMessageLocalEntity
+WHERE id = ?;
+
 -- Insert: Conversations
 insertConversation:
 INSERT INTO AiChatConversationLocalEntity(title, contextType, contextName, createdAt, updatedAt)
@@ -80,6 +84,12 @@ SET updatedAt = ?
 WHERE id = ?;
 
 -- Delete
+deleteMessageById:
+DELETE FROM AiChatMessageLocalEntity WHERE id = ?;
+
+deleteMessagesByIds:
+DELETE FROM AiChatMessageLocalEntity WHERE id IN ?;
+
 deleteConversationById:
 DELETE FROM AiChatConversationLocalEntity WHERE id = ?;
 

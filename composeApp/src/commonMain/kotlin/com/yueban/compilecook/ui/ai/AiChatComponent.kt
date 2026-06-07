@@ -45,6 +45,7 @@ data class AiChatState(
 
 interface AiChatComponent : UiStateComponent<AiChatState> {
   fun sendMessage(text: String)
+  fun retryMessage(assistantMessageId: Long)
   fun clearMessages()
   fun updateContext(context: AiChatContext)
   fun switchContext()
@@ -92,10 +93,27 @@ class DefaultAiChatComponent(
         val messages = uiState.value.messages // snapshot BEFORE insert to avoid stale read
         aiRepo.insertUserMessage(conversationId, text)
         val systemMessage = buildSystemMessage(uiState.value.currentContext)
-        // TODO: support retrying failed messages
         aiRepo.chat(conversationId, text, messages, systemMessage)
       } catch (e: Exception) {
         Logger.e("AI chat error", e)
+      } finally {
+        setState { copy(isLoading = false) }
+      }
+    }
+  }
+
+  @Suppress("TooGenericExceptionCaught")
+  override fun retryMessage(assistantMessageId: Long) {
+    if (uiState.value.isLoading) return
+
+    setState { copy(isLoading = true) }
+
+    chatJob = componentScope.launch {
+      try {
+        val systemMessage = buildSystemMessage(uiState.value.currentContext)
+        aiRepo.retryMessage(assistantMessageId, systemMessage)
+      } catch (e: Exception) {
+        Logger.e("AI retry error", e)
       } finally {
         setState { copy(isLoading = false) }
       }

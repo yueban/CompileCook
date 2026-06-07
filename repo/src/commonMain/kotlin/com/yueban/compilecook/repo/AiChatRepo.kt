@@ -4,7 +4,13 @@ import com.yueban.compilecook.data.cache.AiChatLocalDataSource
 import com.yueban.compilecook.data.cache.DishLocalDataSource
 import com.yueban.compilecook.data.net.entity.AiChatRequest
 import com.yueban.compilecook.data.net.entity.AiChatRequestMessage
+import com.yueban.compilecook.data.net.error.AiChatApiError
+import com.yueban.compilecook.data.net.error.AiChatError
+import com.yueban.compilecook.data.net.error.AiChatNetworkError
+import com.yueban.compilecook.data.net.error.AiChatServerError
+import com.yueban.compilecook.data.net.error.AiChatTimeoutError
 import com.yueban.compilecook.data.net.service.AiChatRemoteDataSource
+import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.repo.entity.AiChatContext
 import com.yueban.compilecook.repo.entity.AiChatConversation
 import com.yueban.compilecook.repo.entity.AiChatMessage
@@ -21,6 +27,7 @@ import kotlinx.coroutines.flow.map
 
 interface AiChatRepo {
   suspend fun chat(conversationId: Long, userContent: String, messages: List<AiChatMessage>, systemMessage: String)
+  suspend fun retryMessage(assistantMessageId: Long, systemMessage: String)
   suspend fun insertUserMessage(conversationId: Long, content: String): Long
   suspend fun getContextContent(context: AiChatContext): String
   fun getConversations(): Flow<List<AiChatConversation>>
@@ -43,7 +50,6 @@ internal class AiChatRepoImpl(
   private val aiLocalDataSource: AiChatLocalDataSource,
   private val dishLocalDataSource: DishLocalDataSource,
 ) : AiChatRepo {
-  @Suppress("TooGenericExceptionCaught")
   override suspend fun chat(
     conversationId: Long,
     userContent: String,
@@ -61,10 +67,42 @@ internal class AiChatRepoImpl(
 
     val requestMessages = messages.map { AiChatRequestMessage(role = it.role.serialName(), content = it.content) } +
       AiChatRequestMessage(role = AiChatRole.USER.serialName(), content = userContent)
-    val request = AiChatRequest(
-      messages = requestMessages,
-      systemMessage = systemMessage,
-    )
+    doChat(assistantMessageId, requestMessages, systemMessage)
+  }
+
+  override suspend fun retryMessage(assistantMessageId: Long, systemMessage: String) {
+    val localEntity = aiLocalDataSource.getMessageById(assistantMessageId) ?: return
+    val target = localEntity.toAiChatMessage()
+    val isValidTarget = target.role == AiChatRole.ASSISTANT &&
+      target.status != AiChatMessageStatus.COMPLETED &&
+      target.status != AiChatMessageStatus.STREAMING
+    val allMessages = if (isValidTarget) {
+      aiLocalDataSource.getMessagesByConversationId(localEntity.conversationId)
+        .firstOrNull().orEmpty()
+    } else {
+      emptyList()
+    }
+    val targetIndex = allMessages.indexOfFirst { it.id == assistantMessageId }
+    if (!isValidTarget || targetIndex < 0) return
+
+    val idsToDelete = allMessages.drop(targetIndex + 1).map { it.id }
+    if (idsToDelete.isNotEmpty()) aiLocalDataSource.deleteMessagesByIds(idsToDelete)
+
+    val requestMessages = allMessages.take(targetIndex)
+      .map { it.toAiChatMessage() }
+      .map { AiChatRequestMessage(role = it.role.serialName(), content = it.content) }
+
+    aiLocalDataSource.updateMessageContent(assistantMessageId, "")
+    aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.STREAMING.value.toLong())
+    doChat(assistantMessageId, requestMessages, systemMessage)
+  }
+
+  private suspend fun doChat(
+    assistantMessageId: Long,
+    requestMessages: List<AiChatRequestMessage>,
+    systemMessage: String,
+  ) {
+    val request = AiChatRequest(messages = requestMessages, systemMessage = systemMessage)
     try {
       val responseBuilder = StringBuilder()
       aiRemoteDataSource.chat(request).collect { token ->
@@ -72,10 +110,21 @@ internal class AiChatRepoImpl(
         aiLocalDataSource.updateMessageContent(assistantMessageId, responseBuilder.toString())
       }
       aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.COMPLETED.value.toLong())
-    } catch (e: Exception) {
-      // TODO: map specific exceptions to appropriate AiChatMessageStatus types
+    } catch (e: AiChatTimeoutError) {
+      Logger.e("AI chat timeout", e)
+      aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.TIMEOUT_ERROR.value.toLong())
+    } catch (e: AiChatNetworkError) {
+      Logger.e("AI chat network error", e)
+      aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.NETWORK_ERROR.value.toLong())
+    } catch (e: AiChatServerError) {
+      Logger.e("AI chat server error", e)
+      aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.SERVER_ERROR.value.toLong())
+    } catch (e: AiChatApiError) {
+      Logger.e("AI chat API error", e)
       aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.UNKNOWN_ERROR.value.toLong())
-      throw e
+    } catch (e: AiChatError) {
+      Logger.e("AI chat unknown error", e)
+      aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.UNKNOWN_ERROR.value.toLong())
     }
   }
 
@@ -135,7 +184,7 @@ internal class AiChatRepoImpl(
     aiLocalDataSource.updateMessageStatusByConversationAndStatus(
       conversationId = conversationId,
       fromStatus = AiChatMessageStatus.STREAMING.value.toLong(),
-      toStatus = AiChatMessageStatus.UNKNOWN_ERROR.value.toLong(),
+      toStatus = AiChatMessageStatus.CANCELLED.value.toLong(),
     )
   }
 }

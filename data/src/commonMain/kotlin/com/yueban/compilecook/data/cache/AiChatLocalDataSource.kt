@@ -21,12 +21,15 @@ interface AiChatLocalDataSource {
   suspend fun deleteConversationById(id: Long)
   suspend fun deleteAllConversations()
   fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>>
+  suspend fun getMessageById(id: Long): AiChatMessageLocalEntity?
   suspend fun getMessageCount(conversationId: Long): Long
   suspend fun insertMessage(message: AiChatMessageLocalEntity): Long
   suspend fun insertMessages(messages: List<AiChatMessageLocalEntity>): List<Long>
   suspend fun updateMessageContent(id: Long, content: String)
   suspend fun updateMessageStatus(id: Long, status: Long)
   suspend fun updateMessageStatusByConversationAndStatus(conversationId: Long, fromStatus: Long, toStatus: Long)
+  suspend fun deleteMessageById(id: Long)
+  suspend fun deleteMessagesByIds(ids: List<Long>)
   suspend fun deleteMessagesByConversationId(conversationId: Long)
   suspend fun deleteAllMessages()
 }
@@ -78,6 +81,9 @@ class AiChatLocalDataSourceImpl(
   override suspend fun getMessageCount(conversationId: Long): Long =
     withContext(defaultDispatcher) { aiChatQueries.getMessageCount(conversationId).awaitAsOne() }
 
+  override suspend fun getMessageById(id: Long): AiChatMessageLocalEntity? =
+    withContext(defaultDispatcher) { aiChatQueries.getMessageById(id).awaitAsOneOrNull() }
+
   override suspend fun insertMessage(message: AiChatMessageLocalEntity): Long = write {
     aiChatQueries.transactionWithResult {
       aiChatQueries.insertMessage(message)
@@ -120,6 +126,16 @@ class AiChatLocalDataSourceImpl(
       status = fromStatus,
     )
     Logger.d("update message status by conversation: $conversationId, from=$fromStatus, to=$toStatus")
+  }
+
+  override suspend fun deleteMessageById(id: Long) = write {
+    aiChatQueries.deleteMessageById(id)
+    Logger.d("delete message: $id")
+  }
+
+  override suspend fun deleteMessagesByIds(ids: List<Long>) = write {
+    aiChatQueries.deleteMessagesByIds(ids)
+    Logger.d("delete messages by ids: ${ids.size}")
   }
 
   override suspend fun deleteMessagesByConversationId(conversationId: Long) = write {

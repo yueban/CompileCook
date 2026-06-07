@@ -61,10 +61,15 @@ import compilecook.composeapp.generated.resources.ai_chat_des_history
 import compilecook.composeapp.generated.resources.ai_chat_des_new_conversation
 import compilecook.composeapp.generated.resources.ai_chat_des_send
 import compilecook.composeapp.generated.resources.ai_chat_dismiss
+import compilecook.composeapp.generated.resources.ai_chat_error_network
+import compilecook.composeapp.generated.resources.ai_chat_error_server
+import compilecook.composeapp.generated.resources.ai_chat_error_timeout
+import compilecook.composeapp.generated.resources.ai_chat_error_unknown
 import compilecook.composeapp.generated.resources.ai_chat_input_hint
 import compilecook.composeapp.generated.resources.ai_chat_new_chat
 import compilecook.composeapp.generated.resources.ai_chat_new_conversation_confirm_message
 import compilecook.composeapp.generated.resources.ai_chat_new_conversation_confirm_title
+import compilecook.composeapp.generated.resources.ai_chat_retry
 import compilecook.composeapp.generated.resources.ai_hint_dish_how_to_cook
 import compilecook.composeapp.generated.resources.ai_hint_dish_nutrition
 import compilecook.composeapp.generated.resources.ai_hint_dish_substitutions
@@ -160,7 +165,11 @@ fun AiChatContent(
         }
 
         items(state.messages, key = { it.id }) { message ->
-          MessageBubble(message = message)
+          MessageBubble(
+            message = message,
+            isLoading = state.isLoading,
+            onRetry = { component.retryMessage(message.id) },
+          )
         }
       }
     }
@@ -238,32 +247,58 @@ private fun ChatInputArea(
 }
 
 @Composable
-private fun MessageBubble(message: AiChatMessage) {
-  val isUser = message.role == AiChatRole.USER
-  val isStreaming = message.status == AiChatMessageStatus.STREAMING
-  val isError = message.status != AiChatMessageStatus.COMPLETED && !isStreaming
+private fun MessageBubble(message: AiChatMessage, isLoading: Boolean, onRetry: () -> Unit) {
+  val isRetryable = message.status == AiChatMessageStatus.NETWORK_ERROR ||
+    message.status == AiChatMessageStatus.TIMEOUT_ERROR ||
+    message.status == AiChatMessageStatus.SERVER_ERROR ||
+    message.status == AiChatMessageStatus.CANCELLED
 
-  Row(
+  Column(
     modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
-    verticalAlignment = Alignment.Bottom,
+    horizontalAlignment = if (message.isUser) Alignment.End else Alignment.Start,
   ) {
-    MessageBubbleContent(
-      content = message.content,
-      isUser = isUser,
-      isError = isError,
-    )
-    if (isStreaming) {
-      CircularProgressIndicator(
-        modifier = Modifier.size(AppTheme.dimens.aiChatLoadingSize).padding(start = AppTheme.dimens.tinyGap),
-        strokeWidth = AppTheme.dimens.aiChatLoadingStroke,
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start,
+      verticalAlignment = Alignment.Bottom,
+    ) {
+      MessageBubbleContent(
+        content = message.content,
+        isUser = message.isUser,
+        status = message.status,
       )
+      if (message.isStreaming) {
+        CircularProgressIndicator(
+          modifier = Modifier.size(AppTheme.dimens.aiChatLoadingSize).padding(start = AppTheme.dimens.tinyGap),
+          strokeWidth = AppTheme.dimens.aiChatLoadingStroke,
+        )
+      }
+    }
+    if (isRetryable) {
+      TextButton(
+        onClick = onRetry,
+        enabled = !isLoading,
+        modifier = Modifier.padding(top = AppTheme.dimens.tinyGap),
+      ) {
+        Text(
+          text = stringResource(Res.string.ai_chat_retry),
+          style = AppTheme.typography.labelMedium,
+          color = AppTheme.colorScheme.primary,
+        )
+      }
     }
   }
 }
 
 @Composable
-private fun MessageBubbleContent(content: String, isUser: Boolean, isError: Boolean = false) {
+private fun MessageBubbleContent(
+  content: String,
+  isUser: Boolean,
+  status: AiChatMessageStatus = AiChatMessageStatus.COMPLETED
+) {
+  val isError = status != AiChatMessageStatus.COMPLETED &&
+    status != AiChatMessageStatus.STREAMING &&
+    status != AiChatMessageStatus.CANCELLED
   val backgroundColor = when {
     isUser -> AppTheme.colorScheme.primary
     isError -> AppTheme.colorScheme.errorContainer
@@ -273,6 +308,12 @@ private fun MessageBubbleContent(content: String, isUser: Boolean, isError: Bool
     isUser -> AppTheme.colorScheme.onPrimary
     isError -> AppTheme.colorScheme.onErrorContainer
     else -> AppTheme.colorScheme.onSurfaceVariant
+  }
+  val errorMessage = status.errorMessage()
+  val displayText = when {
+    isError && content.isNotBlank() -> "$content\n\n$errorMessage"
+    isError -> errorMessage.orEmpty()
+    else -> content
   }
 
   Box(
@@ -291,11 +332,20 @@ private fun MessageBubbleContent(content: String, isUser: Boolean, isError: Bool
   ) {
     // TODO: render markdown in assistant messages (lists, code blocks, links, etc.)
     Text(
-      text = content,
+      text = displayText,
       style = AppTheme.typography.bodyMedium,
       color = textColor,
     )
   }
+}
+
+@Composable
+private fun AiChatMessageStatus.errorMessage(): String? = when (this) {
+  AiChatMessageStatus.NETWORK_ERROR -> stringResource(Res.string.ai_chat_error_network)
+  AiChatMessageStatus.TIMEOUT_ERROR -> stringResource(Res.string.ai_chat_error_timeout)
+  AiChatMessageStatus.SERVER_ERROR -> stringResource(Res.string.ai_chat_error_server)
+  AiChatMessageStatus.UNKNOWN_ERROR -> stringResource(Res.string.ai_chat_error_unknown)
+  else -> null
 }
 
 @Composable

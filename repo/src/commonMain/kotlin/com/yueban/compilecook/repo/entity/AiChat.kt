@@ -20,9 +20,11 @@ data class AiChatMessage(
   val content: String,
   val timestamp: Long,
   val status: AiChatMessageStatus = AiChatMessageStatus.COMPLETED,
-)
+) {
+  val isUser: Boolean get() = role == AiChatRole.USER
+  val isStreaming: Boolean get() = status == AiChatMessageStatus.STREAMING
+}
 
-// TODO: optimize error display messages for better user experience
 @Suppress("MagicNumber")
 enum class AiChatMessageStatus(val value: Int) {
   COMPLETED(0),
@@ -30,6 +32,7 @@ enum class AiChatMessageStatus(val value: Int) {
   NETWORK_ERROR(2),
   TIMEOUT_ERROR(3),
   SERVER_ERROR(4),
+  CANCELLED(5),
   UNKNOWN_ERROR(99);
 
   companion object {
