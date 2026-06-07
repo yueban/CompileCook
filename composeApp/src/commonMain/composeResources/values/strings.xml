@@ -65,6 +65,10 @@
     <string name="ai_chat_context_changed_format">Context switched: %1$s</string>
     <string name="ai_chat_new_chat">New chat</string>
     <string name="ai_chat_dismiss">Dismiss</string>
+    <string name="ai_chat_new_conversation_confirm_title">New conversation</string>
+    <string name="ai_chat_new_conversation_confirm_message">Start a new conversation? Current messages will be cleared.</string>
+    <string name="ai_chat_confirm">Confirm</string>
+    <string name="ai_chat_cancel">Cancel</string>
     <string name="ai_chat_context_general">Ai Assistant</string>
 
     <string name="ai_hint_dish_how_to_cook">How to cook this?</string>

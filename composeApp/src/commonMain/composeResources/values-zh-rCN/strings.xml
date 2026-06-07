@@ -65,6 +65,10 @@
     <string name="ai_chat_context_changed_format">上下文已切换：%1$s</string>
     <string name="ai_chat_new_chat">新对话</string>
     <string name="ai_chat_dismiss">忽略</string>
+    <string name="ai_chat_new_conversation_confirm_title">新对话</string>
+    <string name="ai_chat_new_conversation_confirm_message">开始新对话？当前消息将被清空。</string>
+    <string name="ai_chat_confirm">确认</string>
+    <string name="ai_chat_cancel">取消</string>
     <string name="ai_chat_context_general">智能助手</string>
 
     <string name="ai_hint_dish_how_to_cook">怎么做这道菜？</string>
