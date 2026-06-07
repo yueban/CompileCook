@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 interface AiChatRepo {
-  suspend fun chat(conversationId: Long, userMessage: String, messages: List<AiChatMessage>, systemMessage: String)
+  suspend fun chat(conversationId: Long, userContent: String, messages: List<AiChatMessage>, systemMessage: String)
   suspend fun insertUserMessage(conversationId: Long, content: String): Long
   suspend fun getContextContent(context: AiChatContext): String
   fun getConversations(): Flow<List<AiChatConversation>>
@@ -46,7 +46,7 @@ internal class AiChatRepoImpl(
   @Suppress("TooGenericExceptionCaught")
   override suspend fun chat(
     conversationId: Long,
-    userMessage: String,
+    userContent: String,
     messages: List<AiChatMessage>,
     systemMessage: String,
   ) {
@@ -59,10 +59,10 @@ internal class AiChatRepoImpl(
     )
     val assistantMessageId = aiLocalDataSource.insertMessage(assistantPlaceholder.toLocalEntity(conversationId))
 
+    val requestMessages = messages.map { AiChatRequestMessage(role = it.role.serialName(), content = it.content) } +
+      AiChatRequestMessage(role = AiChatRole.USER.serialName(), content = userContent)
     val request = AiChatRequest(
-      messages = messages.map {
-        AiChatRequestMessage(role = it.role.serialName(), content = it.content)
-      },
+      messages = requestMessages,
       systemMessage = systemMessage,
     )
     try {
