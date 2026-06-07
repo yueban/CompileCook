@@ -19,6 +19,7 @@ import compilecook.composeapp.generated.resources.ai_system_dishlist_context
 import compilecook.composeapp.generated.resources.ai_system_general_context
 import compilecook.composeapp.generated.resources.ai_system_prompt
 import compilecook.composeapp.generated.resources.ai_system_tip_context
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -58,6 +59,8 @@ class DefaultAiChatComponent(
   initialState = AiChatState(),
   serializer = AiChatState.serializer(),
 ) {
+  private var chatJob: Job? = null
+
   init {
     uiState
       .map { it.conversationId }
@@ -83,7 +86,7 @@ class DefaultAiChatComponent(
 
     setState { copy(isLoading = true) }
 
-    componentScope.launch {
+    chatJob = componentScope.launch {
       try {
         val conversationId = getOrCreateConversationId()
         val messages = uiState.value.messages // snapshot BEFORE insert to avoid stale read
@@ -100,6 +103,8 @@ class DefaultAiChatComponent(
   }
 
   override fun clearMessages() {
+    chatJob?.cancel()
+    chatJob = null
     val convId = uiState.value.conversationId
     if (convId != 0L) {
       componentScope.launch {
@@ -119,6 +124,8 @@ class DefaultAiChatComponent(
   }
 
   override fun switchContext() {
+    chatJob?.cancel()
+    chatJob = null
     setState {
       val newContext = pendingContext ?: return@setState this
       copy(
