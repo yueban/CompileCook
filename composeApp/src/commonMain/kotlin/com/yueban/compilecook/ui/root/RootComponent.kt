@@ -24,7 +24,7 @@ import com.yueban.compilecook.repo.entity.AiChatContext
 import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.service.UiMessage
 import com.yueban.compilecook.ui.about.AboutComponent
-import com.yueban.compilecook.ui.ai.AiChatComponent
+import com.yueban.compilecook.ui.ai.AiComponent
 import com.yueban.compilecook.ui.base.BackOutput
 import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
@@ -76,7 +76,7 @@ interface RootComponent :
   WebNavigationOwner,
   UiStateComponent<RootState> {
   val stack: Value<ChildStack<Config, Child>>
-  val aiChatSlot: Value<ChildSlot<Unit, AiChatComponent>>
+  val aiChatSlot: Value<ChildSlot<Unit, AiComponent>>
   val messages: Flow<UiMessage>
   fun onDeepLink(url: String)
   fun onUriClicked(uri: String): Boolean
@@ -105,13 +105,13 @@ class DefaultRootComponent(
   private val deepLinkHandler: DeepLinkHandler = get()
   private val navigation = StackNavigation<Config>()
   private val aiChatNavigation = SlotNavigation<Unit>()
-  override val aiChatSlot: Value<ChildSlot<Unit, AiChatComponent>> =
+  override val aiChatSlot: Value<ChildSlot<Unit, AiComponent>> =
     componentContext.childSlot(
       source = aiChatNavigation,
       serializer = Unit.serializer(),
       key = KEY_AI_CHAT_SLOT,
       handleBackButton = false,
-      childFactory = { _, childContext -> get<AiChatComponent> { parametersOf(childContext) } },
+      childFactory = { _, childContext -> get<AiComponent> { parametersOf(childContext, ::onAiOutput) } },
     )
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
     childStack(
@@ -207,6 +207,12 @@ class DefaultRootComponent(
   private fun onDishOutput(output: DishComponent.Output) = navigation.onOutput(output)
 
   private fun onAboutOutput(output: AboutComponent.Output) = navigation.onOutput(output)
+
+  private fun onAiOutput(output: AiComponent.Output) {
+    when (output) {
+      is AiComponent.Output.CameraClicked -> { /* TODO: Camera integration */ }
+    }
+  }
 
   override fun onBackClicked() {
     navigation.pop()

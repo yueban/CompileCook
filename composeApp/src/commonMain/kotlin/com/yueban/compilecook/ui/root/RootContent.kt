@@ -24,8 +24,8 @@ import com.yueban.compilecook.service.UiMessage.Error
 import com.yueban.compilecook.service.UiMessage.Resource
 import com.yueban.compilecook.service.UiMessage.Text
 import com.yueban.compilecook.ui.about.AboutContent
-import com.yueban.compilecook.ui.ai.AiChatContent
 import com.yueban.compilecook.ui.ai.AiChatDrawerLayout
+import com.yueban.compilecook.ui.ai.AiContent
 import com.yueban.compilecook.ui.dish.DishContent
 import com.yueban.compilecook.ui.dish.DishListContent
 import com.yueban.compilecook.ui.main.MainContent
@@ -118,10 +118,7 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
     },
     aiContent = {
       aiChatSlot.child?.instance?.let { component ->
-        AiChatContent(
-          component = component,
-          onCameraClick = { /* TODO: Camera integration */ },
-        )
+        AiContent(component = component)
       }
     },
   )

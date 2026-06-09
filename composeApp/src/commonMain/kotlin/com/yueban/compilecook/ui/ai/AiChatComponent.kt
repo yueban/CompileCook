@@ -44,17 +44,24 @@ data class AiChatState(
 )
 
 interface AiChatComponent : UiStateComponent<AiChatState> {
+  val onOutput: (Output) -> Unit
+  fun onCameraClick()
   fun sendMessage(text: String)
   fun retryMessage(assistantMessageId: Long)
   fun clearMessages()
   fun updateContext(context: AiChatContext)
   fun switchContext()
   fun dismissContextChange()
+
+  sealed interface Output {
+    data object CameraClicked : Output
+  }
 }
 
 class DefaultAiChatComponent(
   componentContext: ComponentContext,
   private val aiRepo: AiChatRepo,
+  override val onOutput: (AiChatComponent.Output) -> Unit,
 ) : AiChatComponent, UiStateComponentImpl<AiChatState>(
   componentContext = componentContext,
   initialState = AiChatState(),
@@ -80,6 +87,8 @@ class DefaultAiChatComponent(
       .onEach { setState { copy(messages = it) } }
       .launchIn(componentScope)
   }
+
+  override fun onCameraClick() = onOutput(AiChatComponent.Output.CameraClicked)
 
   @Suppress("TooGenericExceptionCaught")
   override fun sendMessage(text: String) {

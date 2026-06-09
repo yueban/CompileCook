@@ -93,7 +93,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AiChatContent(
   component: AiChatComponent,
-  onCameraClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val state by component.uiState.collectAsStateWithLifecycle()
@@ -182,7 +181,7 @@ fun AiChatContent(
         component.sendMessage(inputText)
         inputText = ""
       },
-      onCameraClick = onCameraClick,
+      onCameraClick = component::onCameraClick,
     )
   }
 }
