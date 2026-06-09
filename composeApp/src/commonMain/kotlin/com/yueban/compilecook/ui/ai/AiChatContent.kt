@@ -140,6 +140,7 @@ fun AiChatContent(
       onNewConversation = { component.clearMessages() },
       onSwitchContext = component::switchContext,
       onDismissContextChange = component::dismissContextChange,
+      onHistoryClick = component::onHistoryClick,
     )
 
     if (state.messages.isEmpty()) {
@@ -404,6 +405,7 @@ private fun TopBar(
   onNewConversation: () -> Unit,
   onSwitchContext: () -> Unit,
   onDismissContextChange: () -> Unit,
+  onHistoryClick: () -> Unit,
 ) {
   var showNewConversationDialog by remember { mutableStateOf(false) }
 
@@ -444,6 +446,7 @@ private fun TopBar(
         hasMessages = state.messages.isNotEmpty(),
         onTopBarColor = onTopBarColor,
         onNewConversation = { showNewConversationDialog = true },
+        onHistoryClick = onHistoryClick,
       )
     }
   }
@@ -511,6 +514,7 @@ private fun RowScope.NormalTopBarContent(
   hasMessages: Boolean,
   onTopBarColor: Color,
   onNewConversation: () -> Unit,
+  onHistoryClick: () -> Unit,
 ) {
   if (context.displayName.isNotBlank()) {
     Text(
@@ -530,8 +534,7 @@ private fun RowScope.NormalTopBarContent(
     modifier = Modifier.padding(end = AppTheme.dimens.tinyGap),
   ) {
     IconButton(
-      onClick = { /* TODO: conversation history */ },
-      enabled = false,
+      onClick = onHistoryClick,
       modifier = Modifier.size(AppTheme.dimens.iconLarge),
       colors = IconButtonDefaults.iconButtonColors(contentColor = onTopBarColor),
     ) {

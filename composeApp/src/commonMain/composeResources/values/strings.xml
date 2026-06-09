@@ -75,6 +75,16 @@
     <string name="ai_chat_error_server">Server error, please try again later</string>
     <string name="ai_chat_error_unknown">Something went wrong</string>
     <string name="ai_chat_retry">Retry</string>
+    <string name="ai_chat_list_title">History</string>
+    <string name="ai_chat_list_empty">No conversation history</string>
+    <string name="ai_chat_list_des_delete">Delete conversation</string>
+    <string name="ai_chat_list_delete_confirm_title">Delete conversation</string>
+    <string name="ai_chat_list_delete_confirm_message">Are you sure you want to delete this conversation? This cannot be undone.</string>
+    <string name="ai_chat_list_time_just_now">Just now</string>
+    <string name="ai_chat_list_time_minutes_ago">%1$d min ago</string>
+    <string name="ai_chat_list_time_hours_ago">%1$d hr ago</string>
+    <string name="ai_chat_list_time_yesterday">Yesterday</string>
+    <string name="ai_chat_list_time_days_ago">%1$d days ago</string>
 
     <string name="ai_hint_dish_how_to_cook">How to cook this?</string>
     <string name="ai_hint_dish_substitutions">What substitutions?</string>

@@ -31,7 +31,7 @@ interface AiChatRepo {
   suspend fun insertUserMessage(conversationId: Long, content: String): Long
   suspend fun getContextContent(context: AiChatContext): String
   fun getConversations(): Flow<List<AiChatConversation>>
-  suspend fun getConversationById(id: Long): AiChatConversation?
+  fun getConversationById(id: Long): Flow<AiChatConversation?>
   fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessage>>
   suspend fun saveConversation(conversation: AiChatConversation): Long
   suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long)
@@ -147,8 +147,8 @@ internal class AiChatRepoImpl(
   override fun getConversations(): Flow<List<AiChatConversation>> =
     aiLocalDataSource.getConversations().map { list -> list.map { it.toAiChatConversation() } }
 
-  override suspend fun getConversationById(id: Long): AiChatConversation? =
-    aiLocalDataSource.getConversationById(id)?.toAiChatConversation()
+  override fun getConversationById(id: Long): Flow<AiChatConversation?> =
+    aiLocalDataSource.getConversationById(id).map { it?.toAiChatConversation() }
 
   override fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessage>> =
     aiLocalDataSource.getMessagesByConversationId(conversationId).map { list -> list.map { it.toAiChatMessage() } }

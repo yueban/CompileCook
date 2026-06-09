@@ -56,7 +56,7 @@ class AiChatLocalDataSourceTest {
     val (dataSource, cleanup) = createDataSource()
     val convId = dataSource.insertConversation(AiChatConversationLocalEntity(0L, "Chat", "dish", "Pizza", 1000L, 2000L))
 
-    val conversation = dataSource.getConversationById(convId)
+    val conversation = dataSource.getConversationById(convId).first()
     assertNotNull(conversation)
     assertEquals(convId, conversation.id)
     assertEquals("Chat", conversation.title)
@@ -70,7 +70,7 @@ class AiChatLocalDataSourceTest {
   fun getConversationById_notFound() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
 
-    val conversation = dataSource.getConversationById(999L)
+    val conversation = dataSource.getConversationById(999L).first()
     assertNull(conversation)
 
     cleanup()
@@ -98,7 +98,7 @@ class AiChatLocalDataSourceTest {
 
     dataSource.updateConversationTitle(convId, "Updated", 2000L)
 
-    val conversation = dataSource.getConversationById(convId)
+    val conversation = dataSource.getConversationById(convId).first()
     assertNotNull(conversation)
     assertEquals("Updated", conversation.title)
     assertEquals(2000L, conversation.updatedAt)
@@ -113,7 +113,7 @@ class AiChatLocalDataSourceTest {
 
     dataSource.updateConversationTimestamp(convId, 5000L)
 
-    val conversation = dataSource.getConversationById(convId)
+    val conversation = dataSource.getConversationById(convId).first()
     assertNotNull(conversation)
     assertEquals(5000L, conversation.updatedAt)
     assertEquals("Title", conversation.title) // unchanged
@@ -131,8 +131,8 @@ class AiChatLocalDataSourceTest {
 
     dataSource.deleteConversationById(conv1)
 
-    assertNull(dataSource.getConversationById(conv1))
-    assertNotNull(dataSource.getConversationById(conv2))
+    assertNull(dataSource.getConversationById(conv1).first())
+    assertNotNull(dataSource.getConversationById(conv2).first())
     assertTrue(dataSource.getMessagesByConversationId(conv1).first().isEmpty())
     assertEquals(1, dataSource.getMessagesByConversationId(conv2).first().size)
 

@@ -4,6 +4,7 @@ import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.yueban.compilecook.data.db.entity.AiChatConversationLocalEntity
 import com.yueban.compilecook.data.db.entity.AiChatMessageLocalEntity
 import com.yueban.compilecook.data.db.entity.AiChatQueries
@@ -14,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 interface AiChatLocalDataSource {
   fun getConversations(): Flow<List<AiChatConversationLocalEntity>>
-  suspend fun getConversationById(id: Long): AiChatConversationLocalEntity?
+  fun getConversationById(id: Long): Flow<AiChatConversationLocalEntity?>
   suspend fun insertConversation(conversation: AiChatConversationLocalEntity): Long
   suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long)
   suspend fun updateConversationTimestamp(id: Long, updatedAt: Long)
@@ -41,8 +42,8 @@ class AiChatLocalDataSourceImpl(
   override fun getConversations(): Flow<List<AiChatConversationLocalEntity>> =
     aiChatQueries.getConversations().asFlow().mapToList(defaultDispatcher)
 
-  override suspend fun getConversationById(id: Long): AiChatConversationLocalEntity? =
-    withContext(defaultDispatcher) { aiChatQueries.getConversationById(id).awaitAsOneOrNull() }
+  override fun getConversationById(id: Long): Flow<AiChatConversationLocalEntity?> =
+    aiChatQueries.getConversationById(id).asFlow().mapToOneOrNull(defaultDispatcher)
 
   override suspend fun insertConversation(conversation: AiChatConversationLocalEntity): Long = write {
     aiChatQueries.transactionWithResult {

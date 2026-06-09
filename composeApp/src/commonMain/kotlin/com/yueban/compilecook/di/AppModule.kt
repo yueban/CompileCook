@@ -6,9 +6,12 @@ import com.yueban.compilecook.service.MessageService
 import com.yueban.compilecook.ui.about.AboutComponent
 import com.yueban.compilecook.ui.about.DefaultAboutComponent
 import com.yueban.compilecook.ui.ai.AiChatComponent
+import com.yueban.compilecook.ui.ai.AiChatListComponent
 import com.yueban.compilecook.ui.ai.AiComponent
 import com.yueban.compilecook.ui.ai.AiComponent.Child.AiChatChild
+import com.yueban.compilecook.ui.ai.AiComponent.Child.AiChatListChild
 import com.yueban.compilecook.ui.ai.DefaultAiChatComponent
+import com.yueban.compilecook.ui.ai.DefaultAiChatListComponent
 import com.yueban.compilecook.ui.ai.DefaultAiComponent
 import com.yueban.compilecook.ui.dish.DefaultDishComponent
 import com.yueban.compilecook.ui.dish.DefaultDishListComponent
@@ -67,5 +70,15 @@ val uiModule = module {
 
   factory { (ctx: ComponentContext, config: AiComponent.Config.Chat, onOutput: (AiChatComponent.Output) -> Unit) ->
     AiChatChild(DefaultAiChatComponent(ctx, get(), onOutput))
+  }
+
+  factory {
+      (
+        ctx: ComponentContext,
+        config: AiComponent.Config.ChatList,
+        onOutput: (AiChatListComponent.Output) -> Unit,
+      ),
+    ->
+    AiChatListChild(DefaultAiChatListComponent(ctx, get(), onOutput))
   }
 }

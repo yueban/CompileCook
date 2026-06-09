@@ -46,18 +46,22 @@ data class AiChatState(
 interface AiChatComponent : UiStateComponent<AiChatState> {
   val onOutput: (Output) -> Unit
   fun onCameraClick()
+  fun onHistoryClick()
   fun sendMessage(text: String)
   fun retryMessage(assistantMessageId: Long)
   fun clearMessages()
   fun updateContext(context: AiChatContext)
   fun switchContext()
   fun dismissContextChange()
+  fun selectConversation(conversationId: Long)
 
   sealed interface Output {
     data object CameraClicked : Output
+    data object HistoryClicked : Output
   }
 }
 
+@Suppress("TooManyFunctions")
 class DefaultAiChatComponent(
   componentContext: ComponentContext,
   private val aiRepo: AiChatRepo,
@@ -73,10 +77,7 @@ class DefaultAiChatComponent(
     uiState
       .map { it.conversationId }
       .distinctUntilChanged()
-      .onEach { convId ->
-        // Reset messages stuck in STREAMING status before observing (e.g. app killed mid-stream)
-        if (convId != 0L) aiRepo.resetStreamingMessages(convId)
-      }
+      .onEach { if (it != 0L) aiRepo.resetStreamingMessages(it) }
       .flatMapLatest { convId ->
         if (convId == 0L) {
           flowOf(emptyList())
@@ -86,9 +87,29 @@ class DefaultAiChatComponent(
       }
       .onEach { setState { copy(messages = it) } }
       .launchIn(componentScope)
+
+    uiState
+      .map { it.conversationId }
+      .distinctUntilChanged()
+      .flatMapLatest { convId ->
+        if (convId == 0L) {
+          flowOf(null)
+        } else {
+          aiRepo.getConversationById(convId)
+        }
+      }
+      .onEach { conversation ->
+        if (conversation != null) {
+          setState { copy(currentContext = conversation.context) }
+        } else if (uiState.value.conversationId != 0L) { // conversation has been deleted
+          setState { copy(conversationId = 0L) }
+        }
+      }
+      .launchIn(componentScope)
   }
 
   override fun onCameraClick() = onOutput(AiChatComponent.Output.CameraClicked)
+  override fun onHistoryClick() = onOutput(AiChatComponent.Output.HistoryClicked)
 
   @Suppress("TooGenericExceptionCaught")
   override fun sendMessage(text: String) {
@@ -165,6 +186,17 @@ class DefaultAiChatComponent(
 
   override fun dismissContextChange() {
     setState { copy(pendingContext = null) }
+  }
+
+  override fun selectConversation(conversationId: Long) {
+    chatJob?.cancel()
+    chatJob = null
+    setState {
+      copy(
+        conversationId = conversationId,
+        pendingContext = null,
+      )
+    }
   }
 
   private suspend fun getOrCreateConversationId(): Long {
