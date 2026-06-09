@@ -52,7 +52,7 @@ val uiModule = module {
     )
   }
 
-  factory { (ctx: ComponentContext, onOut: (AboutComponent.Output) -> Unit) ->
+  factory { (ctx: ComponentContext, config: Config.About, onOut: (AboutComponent.Output) -> Unit) ->
     AboutChild(
       DefaultAboutComponent(ctx, onOut)
     )

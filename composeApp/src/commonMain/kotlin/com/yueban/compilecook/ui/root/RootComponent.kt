@@ -176,7 +176,7 @@ class DefaultRootComponent(
       is Tip -> get<TipChild> { parametersOf(componentContext, config, ::onTipOutput) }
       is DishList -> get<DishListChild> { parametersOf(componentContext, config, ::onDishListOutput) }
       is Dish -> get<DishChild> { parametersOf(componentContext, config, ::onDishOutput) }
-      About -> get<AboutChild> { parametersOf(componentContext, ::onAboutOutput) }
+      About -> get<AboutChild> { parametersOf(componentContext, config, ::onAboutOutput) }
     }
 
   private fun onMainOutput(output: MainComponent.Output) {
