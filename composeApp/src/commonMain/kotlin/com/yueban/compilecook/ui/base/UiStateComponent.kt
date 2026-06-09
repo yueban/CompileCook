@@ -53,7 +53,9 @@ abstract class UiStateComponentImpl<S : Any>(
   private val messageService = KoinPlatform.getKoin().get<MessageService>()
 
   protected fun setState(reducer: S.() -> S) {
+    val old = _uiState.value
     _uiState.update(reducer)
+    if (_uiState.value != old) Logger.d("${_uiState.value}")
   }
 
   @Suppress("TooGenericExceptionCaught")
