@@ -124,6 +124,7 @@ abstract class UiStateComponentImpl<S : Any>(
     }
 
     val flow = MutableStateFlow(restored)
+    Logger.d("$restored")
 
     // Auto-Save
     if (serializer != null) {
