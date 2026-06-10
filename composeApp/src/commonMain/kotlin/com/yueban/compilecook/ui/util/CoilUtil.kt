@@ -10,9 +10,8 @@ import coil3.util.Logger.Level.Info
 import coil3.util.Logger.Level.Verbose
 import coil3.util.Logger.Level.Warn
 import com.yueban.compilecook.logger.Logger
-
-typealias CoilLogger = coil3.util.Logger
-typealias CoilLoggerLevel = coil3.util.Logger.Level
+import coil3.util.Logger as CoilLogger
+import coil3.util.Logger.Level as CoilLoggerLevel
 
 object CoilUtil : CoilLogger {
   fun init() {

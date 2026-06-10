@@ -7,9 +7,8 @@ import io.github.aakira.napier.Napier
 import org.koin.core.logger.Level
 import org.koin.core.logger.MESSAGE
 import com.aallam.openai.api.logging.LogLevel as OpenAiLogLevel
-
-typealias KoinLogger = org.koin.core.logger.Logger
-typealias OpenAiLogger = com.aallam.openai.api.logging.Logger
+import com.aallam.openai.api.logging.Logger as OpenAiLogger
+import org.koin.core.logger.Logger as KoinLogger
 
 object Logger {
   fun init() {

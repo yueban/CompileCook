@@ -14,12 +14,11 @@ import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import io.ktor.client.plugins.logging.Logger as KtorLogger
 
 internal const val PROD_DOMAIN = "https://static.yueban.site"
 internal const val API_PATH = "/api/compilecook"
 internal const val BASE_URL = "$PROD_DOMAIN$API_PATH"
-
-typealias KtorLogger = io.ktor.client.plugins.logging.Logger
 
 val remoteDataSourceModule = module {
   single {
