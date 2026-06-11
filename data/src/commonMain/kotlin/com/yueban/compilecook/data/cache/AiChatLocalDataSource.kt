@@ -89,6 +89,7 @@ class AiChatLocalDataSourceImpl(
     aiChatQueries.transactionWithResult {
       aiChatQueries.insertMessage(message)
       val id = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+      aiChatQueries.updateConversationTimestamp(updatedAt = message.timestamp, id = message.conversationId)
       Logger.d("insert message: $id")
       id
     }
@@ -100,6 +101,9 @@ class AiChatLocalDataSourceImpl(
       messages.forEach { message ->
         aiChatQueries.insertMessage(message)
         ids.add(aiChatQueries.selectLastInsertRowId().awaitAsOne())
+      }
+      messages.groupBy { it.conversationId }.forEach { (conversationId, msgs) ->
+        aiChatQueries.updateConversationTimestamp(updatedAt = msgs.maxOf { it.timestamp }, id = conversationId)
       }
       Logger.d("insert messages: ${ids.size}")
       ids
