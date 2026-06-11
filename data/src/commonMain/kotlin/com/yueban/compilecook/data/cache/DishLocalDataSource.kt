@@ -1,5 +1,6 @@
 package com.yueban.compilecook.data.cache
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
@@ -26,11 +27,11 @@ interface DishLocalDataSource {
   fun getTipSummaries(): Flow<List<TipSummaryLocalEntity>>
   fun getTipDetail(name: String): Flow<TipDetailLocalEntity?>
   suspend fun upsertDish(dish: DishLocalEntity)
-  suspend fun upsertDishes(dishes: List<DishLocalEntity>)
+  suspend fun updateDishes(dishes: List<DishLocalEntity>)
   suspend fun deleteDishByName(name: String)
   suspend fun deleteAllDishes()
   suspend fun upsertTip(tip: TipLocalEntity)
-  suspend fun upsertTips(tips: List<TipLocalEntity>)
+  suspend fun updateTips(tips: List<TipLocalEntity>)
   suspend fun deleteTipByName(name: String)
   suspend fun deleteAllTips()
   suspend fun toggleTipFavorite(name: String)
@@ -75,11 +76,15 @@ class DishLocalDataSourceImpl(
     Logger.d("upsert dish: $dish")
   }
 
-  override suspend fun upsertDishes(dishes: List<DishLocalEntity>) = transactionWrite {
+  override suspend fun updateDishes(dishes: List<DishLocalEntity>) = transactionWrite {
     dishQueries.transaction {
+      val newNames = dishes.map { it.name }.toSet()
+      val favoritesToRemove = dishQueries.getDishFavoriteNames().awaitAsList().filter { it !in newNames }
+      if (favoritesToRemove.isNotEmpty()) dishQueries.deleteDishFavoritesByNames(favoritesToRemove)
+      dishQueries.deleteAllDishes()
       dishes.forEach { dishQueries.upsertDish(it) }
     }
-    Logger.d("upsert dishes: ${dishes.size}")
+    Logger.d("update dishes: ${dishes.size}")
   }
 
   override suspend fun deleteDishByName(name: String) = write {
@@ -97,11 +102,15 @@ class DishLocalDataSourceImpl(
     Logger.d("upsert tip: $tip")
   }
 
-  override suspend fun upsertTips(tips: List<TipLocalEntity>) = transactionWrite {
+  override suspend fun updateTips(tips: List<TipLocalEntity>) = transactionWrite {
     tipQueries.transaction {
+      val newNames = tips.map { it.name }.toSet()
+      val favoritesToRemove = tipQueries.getTipFavoriteNames().awaitAsList().filter { it !in newNames }
+      if (favoritesToRemove.isNotEmpty()) tipQueries.deleteTipFavoritesByNames(favoritesToRemove)
+      tipQueries.deleteAllTips()
       tips.forEach { tipQueries.upsertTip(it) }
     }
-    Logger.d("upsert tips: ${tips.size}")
+    Logger.d("update tips: ${tips.size}")
   }
 
   override suspend fun deleteTipByName(name: String) = write {

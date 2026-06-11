@@ -160,14 +160,14 @@ class DishLocalDataSourceTest {
   }
 
   @Test
-  fun upsertDishes() = runTest(UnconfinedTestDispatcher()) {
+  fun updateDishes() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
     val dishes = listOf(
       DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake."),
       DishLocalEntity("Salad", "salad", "Fresh", "vegetable_dish", 1L, "img", "Toss."),
       DishLocalEntity("Soup", "soup", "Warm", "soup", 2L, "img", "Simmer."),
     )
-    dataSource.upsertDishes(dishes)
+    dataSource.updateDishes(dishes)
 
     val all = dataSource.getDishSummaries(null, null, false).first()
     assertEquals(3, all.size)
@@ -278,9 +278,9 @@ class DishLocalDataSourceTest {
   }
 
   @Test
-  fun upsertTips() = runTest(UnconfinedTestDispatcher()) {
+  fun updateTips() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTips(
+    dataSource.updateTips(
       listOf(
         TipLocalEntity("Tip 1", "tip 1", "basic", "Content 1"),
         TipLocalEntity("Tip 2", "tip 2", "learn", "Content 2"),

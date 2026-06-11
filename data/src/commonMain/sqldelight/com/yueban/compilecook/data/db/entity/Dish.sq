@@ -49,6 +49,9 @@ SELECT name FROM DishLocalEntity ORDER BY RANDOM() LIMIT 1;
 isDishFavorite:
 SELECT EXISTS(SELECT 1 FROM DishFavoriteLocalEntity WHERE name = ?);
 
+getDishFavoriteNames:
+SELECT name FROM DishFavoriteLocalEntity;
+
 -- Insert/Update Operation
 upsertDish:
 INSERT OR REPLACE INTO DishLocalEntity(name,pinyin,description,category,difficulty,image,content)
@@ -66,3 +69,6 @@ DELETE FROM DishLocalEntity;
 
 deleteDishFavorite:
 DELETE FROM DishFavoriteLocalEntity WHERE name = ?;
+
+deleteDishFavoritesByNames:
+DELETE FROM DishFavoriteLocalEntity WHERE name IN ?;

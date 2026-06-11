@@ -72,13 +72,13 @@ internal class DishRepoImpl(
   override suspend fun updateDishes() {
     val dishes = dishRemoteDataSource.getDishes().map { it.toLocalEntity() }
     Logger.d("remote dishes: ${dishes.size}")
-    dishLocalDataSource.upsertDishes(dishes)
+    dishLocalDataSource.updateDishes(dishes)
   }
 
   override suspend fun updateTips() {
     val tips = dishRemoteDataSource.getTips().map { it.toLocalEntity() }
     Logger.d("remote tips: ${tips.size}")
-    dishLocalDataSource.upsertTips(tips)
+    dishLocalDataSource.updateTips(tips)
   }
 
   override suspend fun deleteDishByName(name: String) = dishLocalDataSource.deleteDishByName(name)

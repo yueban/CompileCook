@@ -31,6 +31,9 @@ WHERE T.name = ?;
 isTipFavorite:
 SELECT EXISTS(SELECT 1 FROM TipFavoriteLocalEntity WHERE name = ?);
 
+getTipFavoriteNames:
+SELECT name FROM TipFavoriteLocalEntity;
+
 -- Insert/Update Operation
 upsertTip:
 INSERT OR REPLACE INTO TipLocalEntity(name,pinyin,type,content)
@@ -48,3 +51,6 @@ DELETE FROM TipLocalEntity;
 
 deleteTipFavorite:
 DELETE FROM TipFavoriteLocalEntity WHERE name = ?;
+
+deleteTipFavoritesByNames:
+DELETE FROM TipFavoriteLocalEntity WHERE name IN ?;
