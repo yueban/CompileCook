@@ -43,6 +43,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yueban.compilecook.repo.entity.AiChatContext
@@ -202,11 +208,22 @@ private fun ChatInputArea(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap),
   ) {
-    // TODO: support keyboard submit (Enter to send) on desktop/web platforms
+    val canSend = inputText.isNotBlank() && !isLoading
     OutlinedTextField(
       value = inputText,
       onValueChange = onInputChange,
-      modifier = Modifier.weight(1f),
+      modifier = Modifier.weight(1f).onPreviewKeyEvent { event ->
+        if (event.type == KeyEventType.KeyDown && (event.key == Key.Enter || event.key == Key.NumPadEnter)) {
+          if (event.isShiftPressed) {
+            false // Shift+Enter → default newline behavior
+          } else {
+            if (canSend) onSend()
+            true // always consume plain Enter to prevent newline
+          }
+        } else {
+          false
+        }
+      },
       placeholder = { Text(stringResource(Res.string.ai_chat_input_hint)) },
       maxLines = 3,
       shape = RoundedCornerShape(AppTheme.dimens.aiChatInputFieldRadius),
@@ -223,7 +240,6 @@ private fun ChatInputArea(
       )
     }
 
-    val canSend = inputText.isNotBlank() && !isLoading
     IconButton(
       onClick = {
         if (canSend) {
@@ -294,7 +310,7 @@ private fun MessageBubble(message: AiChatMessage, isLoading: Boolean, onRetry: (
 private fun MessageBubbleContent(
   content: String,
   isUser: Boolean,
-  status: AiChatMessageStatus = AiChatMessageStatus.COMPLETED
+  status: AiChatMessageStatus = AiChatMessageStatus.COMPLETED,
 ) {
   val isError = status != AiChatMessageStatus.COMPLETED &&
     status != AiChatMessageStatus.STREAMING &&
