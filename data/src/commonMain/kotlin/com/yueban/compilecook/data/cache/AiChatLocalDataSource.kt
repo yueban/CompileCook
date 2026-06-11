@@ -17,22 +17,15 @@ interface AiChatLocalDataSource {
   fun getConversations(): Flow<List<AiChatConversationLocalEntity>>
   fun getConversationById(id: Long): Flow<AiChatConversationLocalEntity?>
   suspend fun insertConversation(conversation: AiChatConversationLocalEntity): Long
-  suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long)
-  suspend fun updateConversationTimestamp(id: Long, updatedAt: Long)
   suspend fun deleteConversationById(id: Long)
-  suspend fun deleteAllConversations()
   fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>>
   suspend fun getMessageById(id: Long): AiChatMessageLocalEntity?
-  suspend fun getMessageCount(conversationId: Long): Long
   suspend fun insertMessage(message: AiChatMessageLocalEntity): Long
-  suspend fun insertMessages(messages: List<AiChatMessageLocalEntity>): List<Long>
   suspend fun updateMessageContent(id: Long, content: String)
   suspend fun updateMessageStatus(id: Long, status: Long)
   suspend fun updateMessageStatusByConversationAndStatus(conversationId: Long, fromStatus: Long, toStatus: Long)
-  suspend fun deleteMessageById(id: Long)
   suspend fun deleteMessagesByIds(ids: List<Long>)
   suspend fun deleteMessagesByConversationId(conversationId: Long)
-  suspend fun deleteAllMessages()
 }
 
 class AiChatLocalDataSourceImpl(
@@ -54,33 +47,14 @@ class AiChatLocalDataSourceImpl(
     }
   }
 
-  override suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long) = write {
-    aiChatQueries.updateConversationTitle(title = title, updatedAt = updatedAt, id = id)
-    Logger.d("update conversation title: $id")
-  }
-
-  override suspend fun updateConversationTimestamp(id: Long, updatedAt: Long) = write {
-    aiChatQueries.updateConversationTimestamp(updatedAt = updatedAt, id = id)
-    Logger.d("update conversation timestamp: $id")
-  }
-
   override suspend fun deleteConversationById(id: Long) = write {
     aiChatQueries.deleteMessagesByConversationId(id)
     aiChatQueries.deleteConversationById(id)
     Logger.d("delete conversation: $id")
   }
 
-  override suspend fun deleteAllConversations() = transactionWrite {
-    aiChatQueries.deleteAllMessages()
-    aiChatQueries.deleteAllConversations()
-    Logger.d("delete all conversations and messages")
-  }
-
   override fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>> =
     aiChatQueries.getMessagesByConversationId(conversationId).asFlow().mapToList(defaultDispatcher)
-
-  override suspend fun getMessageCount(conversationId: Long): Long =
-    withContext(defaultDispatcher) { aiChatQueries.getMessageCount(conversationId).awaitAsOne() }
 
   override suspend fun getMessageById(id: Long): AiChatMessageLocalEntity? =
     withContext(defaultDispatcher) { aiChatQueries.getMessageById(id).awaitAsOneOrNull() }
@@ -92,21 +66,6 @@ class AiChatLocalDataSourceImpl(
       aiChatQueries.updateConversationTimestamp(updatedAt = message.timestamp, id = message.conversationId)
       Logger.d("insert message: $id")
       id
-    }
-  }
-
-  override suspend fun insertMessages(messages: List<AiChatMessageLocalEntity>): List<Long> = transactionWrite {
-    aiChatQueries.transactionWithResult {
-      val ids = mutableListOf<Long>()
-      messages.forEach { message ->
-        aiChatQueries.insertMessage(message)
-        ids.add(aiChatQueries.selectLastInsertRowId().awaitAsOne())
-      }
-      messages.groupBy { it.conversationId }.forEach { (conversationId, msgs) ->
-        aiChatQueries.updateConversationTimestamp(updatedAt = msgs.maxOf { it.timestamp }, id = conversationId)
-      }
-      Logger.d("insert messages: ${ids.size}")
-      ids
     }
   }
 
@@ -133,11 +92,6 @@ class AiChatLocalDataSourceImpl(
     Logger.d("update message status by conversation: $conversationId, from=$fromStatus, to=$toStatus")
   }
 
-  override suspend fun deleteMessageById(id: Long) = write {
-    aiChatQueries.deleteMessageById(id)
-    Logger.d("delete message: $id")
-  }
-
   override suspend fun deleteMessagesByIds(ids: List<Long>) = write {
     aiChatQueries.deleteMessagesByIds(ids)
     Logger.d("delete messages by ids: ${ids.size}")
@@ -146,11 +100,6 @@ class AiChatLocalDataSourceImpl(
   override suspend fun deleteMessagesByConversationId(conversationId: Long) = write {
     aiChatQueries.deleteMessagesByConversationId(conversationId)
     Logger.d("delete messages by conversation: $conversationId")
-  }
-
-  override suspend fun deleteAllMessages() = write {
-    aiChatQueries.deleteAllMessages()
-    Logger.d("delete all messages")
   }
 }
 

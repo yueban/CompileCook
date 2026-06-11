@@ -28,20 +28,13 @@ import kotlinx.coroutines.flow.map
 interface AiChatRepo {
   suspend fun chat(conversationId: Long, userContent: String, messages: List<AiChatMessage>, systemMessage: String)
   suspend fun retryMessage(assistantMessageId: Long, systemMessage: String)
-  suspend fun insertUserMessage(conversationId: Long, content: String): Long
   suspend fun getContextContent(context: AiChatContext): String
   fun getConversations(): Flow<List<AiChatConversation>>
   fun getConversationById(id: Long): Flow<AiChatConversation?>
   fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessage>>
   suspend fun saveConversation(conversation: AiChatConversation): Long
-  suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long)
-  suspend fun updateConversationTimestamp(id: Long, updatedAt: Long)
-  suspend fun updateMessageContent(id: Long, content: String)
-  suspend fun updateMessageStatus(id: Long, status: AiChatMessageStatus)
   suspend fun deleteConversation(id: Long)
   suspend fun deleteMessagesByConversationId(conversationId: Long)
-  suspend fun deleteAllConversations()
-  suspend fun deleteAllMessages()
   suspend fun resetStreamingMessages(conversationId: Long)
 }
 
@@ -56,6 +49,14 @@ internal class AiChatRepoImpl(
     messages: List<AiChatMessage>,
     systemMessage: String,
   ) {
+    val userMsg = AiChatMessage(
+      id = 0L,
+      role = AiChatRole.USER,
+      content = userContent,
+      timestamp = currentTimeMillis,
+    )
+    aiLocalDataSource.insertMessage(userMsg.toLocalEntity(conversationId))
+
     val assistantPlaceholder = AiChatMessage(
       id = 0L,
       role = AiChatRole.ASSISTANT,
@@ -128,16 +129,6 @@ internal class AiChatRepoImpl(
     }
   }
 
-  override suspend fun insertUserMessage(conversationId: Long, content: String): Long {
-    val userMsg = AiChatMessage(
-      id = 0L,
-      role = AiChatRole.USER,
-      content = content,
-      timestamp = currentTimeMillis,
-    )
-    return aiLocalDataSource.insertMessage(userMsg.toLocalEntity(conversationId))
-  }
-
   override suspend fun getContextContent(context: AiChatContext): String = when (context) {
     is AiChatContext.Dish -> dishLocalDataSource.getDishByName(context.name).firstOrNull()?.content.orEmpty()
     is AiChatContext.Tip -> dishLocalDataSource.getTipDetail(context.name).firstOrNull()?.content.orEmpty()
@@ -156,29 +147,11 @@ internal class AiChatRepoImpl(
   override suspend fun saveConversation(conversation: AiChatConversation): Long =
     aiLocalDataSource.insertConversation(conversation.toLocalEntity())
 
-  override suspend fun updateConversationTitle(id: Long, title: String, updatedAt: Long) =
-    aiLocalDataSource.updateConversationTitle(id, title, updatedAt)
-
-  override suspend fun updateConversationTimestamp(id: Long, updatedAt: Long) =
-    aiLocalDataSource.updateConversationTimestamp(id, updatedAt)
-
-  override suspend fun updateMessageContent(id: Long, content: String) =
-    aiLocalDataSource.updateMessageContent(id, content)
-
-  override suspend fun updateMessageStatus(id: Long, status: AiChatMessageStatus) =
-    aiLocalDataSource.updateMessageStatus(id, status.value.toLong())
-
   override suspend fun deleteConversation(id: Long) =
     aiLocalDataSource.deleteConversationById(id)
 
   override suspend fun deleteMessagesByConversationId(conversationId: Long) =
     aiLocalDataSource.deleteMessagesByConversationId(conversationId)
-
-  override suspend fun deleteAllConversations() =
-    aiLocalDataSource.deleteAllConversations()
-
-  override suspend fun deleteAllMessages() =
-    aiLocalDataSource.deleteAllMessages()
 
   override suspend fun resetStreamingMessages(conversationId: Long) {
     aiLocalDataSource.updateMessageStatusByConversationAndStatus(

@@ -60,21 +60,6 @@ class TipTest {
   }
 
   @Test
-  fun deleteTipByName_removesCorrectEntry() = testingDb {
-    tipQueries.upsertTip("Mise en place", "mise en place", "basic", "Prepare everything.")
-    tipQueries.upsertTip("Sous Vide", "sous vide", "advanced", "Vacuum seal the food.")
-
-    tipQueries.deleteTipByName("Mise en place")
-
-    val remaining = tipQueries.getTipSummaries().awaitAsList()
-    assertEquals(1, remaining.size)
-    assertEquals("Sous Vide", remaining.first().name)
-
-    val deleted = tipQueries.getTipDetail("Mise en place").awaitAsOneOrNull()
-    assertNull(deleted)
-  }
-
-  @Test
   fun deleteAllTips_clearsTable() = testingDb {
     tipQueries.upsertTip("Tip 1", "tip 1", "basic", "Content 1")
     tipQueries.upsertTip("Tip 2", "tip 2", "learn", "Content 2")

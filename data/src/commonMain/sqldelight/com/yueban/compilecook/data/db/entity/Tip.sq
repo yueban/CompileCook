@@ -43,9 +43,6 @@ insertTipFavorite:
 INSERT OR IGNORE INTO TipFavoriteLocalEntity(name) VALUES (?);
 
 -- Delete Operations
-deleteTipByName:
-DELETE FROM TipLocalEntity WHERE name = ?;
-
 deleteAllTips:
 DELETE FROM TipLocalEntity;
 

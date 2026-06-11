@@ -34,10 +34,6 @@ SELECT * FROM AiChatMessageLocalEntity
 WHERE conversationId = ?
 ORDER BY timestamp ASC, id ASC;
 
-getMessageCount:
-SELECT COUNT(*) FROM AiChatMessageLocalEntity
-WHERE conversationId = ?;
-
 getMessageById:
 SELECT * FROM AiChatMessageLocalEntity
 WHERE id = ?;
@@ -73,20 +69,12 @@ SET status = :newStatus
 WHERE conversationId = ? AND status = ?;
 
 -- Update: Conversations
-updateConversationTitle:
-UPDATE AiChatConversationLocalEntity
-SET title = ?, updatedAt = ?
-WHERE id = ?;
-
 updateConversationTimestamp:
 UPDATE AiChatConversationLocalEntity
 SET updatedAt = ?
 WHERE id = ?;
 
 -- Delete
-deleteMessageById:
-DELETE FROM AiChatMessageLocalEntity WHERE id = ?;
-
 deleteMessagesByIds:
 DELETE FROM AiChatMessageLocalEntity WHERE id IN ?;
 
@@ -95,9 +83,3 @@ DELETE FROM AiChatConversationLocalEntity WHERE id = ?;
 
 deleteMessagesByConversationId:
 DELETE FROM AiChatMessageLocalEntity WHERE conversationId = ?;
-
-deleteAllConversations:
-DELETE FROM AiChatConversationLocalEntity;
-
-deleteAllMessages:
-DELETE FROM AiChatMessageLocalEntity;

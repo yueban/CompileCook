@@ -121,7 +121,6 @@ class DefaultAiChatComponent(
       try {
         val conversationId = getOrCreateConversationId()
         val messages = uiState.value.messages // snapshot BEFORE insert to avoid stale read
-        aiRepo.insertUserMessage(conversationId, text)
         val systemMessage = buildSystemMessage(uiState.value.currentContext)
         aiRepo.chat(conversationId, text, messages, systemMessage)
       } catch (e: Exception) {

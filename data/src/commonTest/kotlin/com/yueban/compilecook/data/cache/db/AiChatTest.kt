@@ -50,29 +50,6 @@ class AiChatTest {
   }
 
   @Test
-  fun updateConversationTitle() = testingDb {
-    aiChatQueries.insertConversation("Original", "general", "", 1000L, 1000L)
-    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
-    aiChatQueries.updateConversationTitle(title = "New Title", updatedAt = 2000L, id = convId)
-
-    val updated = aiChatQueries.getConversationById(convId).awaitAsOne()
-    assertEquals("New Title", updated.title)
-    assertEquals(2000L, updated.updatedAt)
-    assertEquals("general", updated.contextType) // unchanged
-  }
-
-  @Test
-  fun updateConversationTimestamp() = testingDb {
-    aiChatQueries.insertConversation("Title", "general", "", 1000L, 1000L)
-    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
-    aiChatQueries.updateConversationTimestamp(updatedAt = 5000L, id = convId)
-
-    val updated = aiChatQueries.getConversationById(convId).awaitAsOne()
-    assertEquals(5000L, updated.updatedAt)
-    assertEquals("Title", updated.title) // unchanged
-  }
-
-  @Test
   fun deleteConversationById_removesCorrectEntry() = testingDb {
     aiChatQueries.insertConversation("First", "general", "", 1000L, 1000L)
     val conv1 = aiChatQueries.selectLastInsertRowId().awaitAsOne()
@@ -87,16 +64,6 @@ class AiChatTest {
 
     val deleted = aiChatQueries.getConversationById(conv1).awaitAsOneOrNull()
     assertNull(deleted)
-  }
-
-  @Test
-  fun deleteAllConversations_clearsTable() = testingDb {
-    aiChatQueries.insertConversation("First", "general", "", 1000L, 1000L)
-    aiChatQueries.insertConversation("Second", "general", "", 2000L, 2000L)
-
-    aiChatQueries.deleteAllConversations()
-
-    assertTrue(aiChatQueries.getConversations().awaitAsList().isEmpty())
   }
 
   @Test
@@ -148,17 +115,6 @@ class AiChatTest {
   }
 
   @Test
-  fun getMessageCount() = testingDb {
-    aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
-    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
-    aiChatQueries.insertMessage(convId, "user", "Hello!", 1001L, 0L)
-    aiChatQueries.insertMessage(convId, "assistant", "Hi!", 1002L, 0L)
-
-    val count = aiChatQueries.getMessageCount(convId).awaitAsOne()
-    assertEquals(2L, count)
-  }
-
-  @Test
   fun updateMessageContent() = testingDb {
     aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
     val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
@@ -185,17 +141,5 @@ class AiChatTest {
 
     assertTrue(aiChatQueries.getMessagesByConversationId(conv1).awaitAsList().isEmpty())
     assertEquals(1, aiChatQueries.getMessagesByConversationId(conv2).awaitAsList().size)
-  }
-
-  @Test
-  fun deleteAllMessages() = testingDb {
-    aiChatQueries.insertConversation("Chat", "general", "", 1000L, 1000L)
-    val convId = aiChatQueries.selectLastInsertRowId().awaitAsOne()
-    aiChatQueries.insertMessage(convId, "user", "Hello!", 1001L, 0L)
-    aiChatQueries.insertMessage(convId, "assistant", "Hi!", 1002L, 0L)
-
-    aiChatQueries.deleteAllMessages()
-
-    assertTrue(aiChatQueries.getMessagesByConversationId(convId).awaitAsList().isEmpty())
   }
 }

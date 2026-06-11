@@ -61,9 +61,6 @@ insertDishFavorite:
 INSERT OR IGNORE INTO DishFavoriteLocalEntity(name) VALUES (?);
 
 -- Delete Operations
-deleteDishByName:
-DELETE FROM DishLocalEntity WHERE name = ?;
-
 deleteAllDishes:
 DELETE FROM DishLocalEntity;
 

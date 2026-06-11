@@ -28,8 +28,6 @@ interface DishRepo {
   fun getTipByName(name: String): Flow<TipDetail?>
   suspend fun updateDishes()
   suspend fun updateTips()
-  suspend fun deleteDishByName(name: String)
-  suspend fun clearAllDishes()
   suspend fun toggleDishFavorite(name: String)
 }
 
@@ -80,10 +78,6 @@ internal class DishRepoImpl(
     Logger.d("remote tips: ${tips.size}")
     dishLocalDataSource.updateTips(tips)
   }
-
-  override suspend fun deleteDishByName(name: String) = dishLocalDataSource.deleteDishByName(name)
-
-  override suspend fun clearAllDishes() = dishLocalDataSource.deleteAllDishes()
 
   override suspend fun toggleDishFavorite(name: String) = dishLocalDataSource.toggleDishFavorite(name)
 }

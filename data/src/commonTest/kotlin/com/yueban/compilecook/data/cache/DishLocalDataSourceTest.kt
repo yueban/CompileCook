@@ -33,8 +33,10 @@ class DishLocalDataSourceTest {
 
     assertTrue(dataSource.getDishSummaries(null, null, false).first().isEmpty())
 
-    dataSource.upsertDish(
-      DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake.")
+    dataSource.updateDishes(
+      listOf(
+        DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake.")
+      )
     )
     val dishes = dataSource.getDishSummaries(null, null, false).first()
     assertEquals(1, dishes.size)
@@ -48,9 +50,13 @@ class DishLocalDataSourceTest {
   @Test
   fun getDishSummaries_filterByCategory() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Pancakes", "pancakes", "Fluffy", "breakfast", 2L, "img", "Mix."))
-    dataSource.upsertDish(DishLocalEntity("Steak", "steak", "Beef", "meat_dish", 4L, "img", "Grill."))
-    dataSource.upsertDish(DishLocalEntity("Omelette", "omelette", "Eggs", "breakfast", 3L, "img", "Cook."))
+    dataSource.updateDishes(
+      listOf(
+        DishLocalEntity("Pancakes", "pancakes", "Fluffy", "breakfast", 2L, "img", "Mix."),
+        DishLocalEntity("Steak", "steak", "Beef", "meat_dish", 4L, "img", "Grill."),
+        DishLocalEntity("Omelette", "omelette", "Eggs", "breakfast", 3L, "img", "Cook."),
+      )
+    )
 
     val breakfast = dataSource.getDishSummaries("breakfast", null, false).first()
     assertEquals(2, breakfast.size)
@@ -69,9 +75,13 @@ class DishLocalDataSourceTest {
   @Test
   fun getDishSummaries_filterByDifficulty() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Sushi", "sushi", "Rolls", "aquatic", 2L, "img", "Roll."))
-    dataSource.upsertDish(DishLocalEntity("Ramen", "ramen", "Noodles", "staple", 2L, "img", "Boil."))
-    dataSource.upsertDish(DishLocalEntity("Wellington", "wellington", "Hard", "meat_dish", 4L, "img", "Wrap."))
+    dataSource.updateDishes(
+      listOf(
+        DishLocalEntity("Sushi", "sushi", "Rolls", "aquatic", 2L, "img", "Roll."),
+        DishLocalEntity("Ramen", "ramen", "Noodles", "staple", 2L, "img", "Boil."),
+        DishLocalEntity("Wellington", "wellington", "Hard", "meat_dish", 4L, "img", "Wrap."),
+      )
+    )
 
     val level2 = dataSource.getDishSummaries(null, 2, false).first()
     assertEquals(2, level2.size)
@@ -87,8 +97,12 @@ class DishLocalDataSourceTest {
   @Test
   fun getDishSummaries_filterByFavorite() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake."))
-    dataSource.upsertDish(DishLocalEntity("Salad", "salad", "Fresh", "vegetable_dish", 1L, "img", "Toss."))
+    dataSource.updateDishes(
+      listOf(
+        DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake."),
+        DishLocalEntity("Salad", "salad", "Fresh", "vegetable_dish", 1L, "img", "Toss."),
+      )
+    )
 
     dataSource.toggleDishFavorite("Pizza")
 
@@ -103,8 +117,10 @@ class DishLocalDataSourceTest {
   @Test
   fun getDishByName() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(
-      DishLocalEntity("Carbonara", "carbonara", "Pasta dish", "staple", 2L, "img", "Cook pasta. Mix eggs.")
+    dataSource.updateDishes(
+      listOf(
+        DishLocalEntity("Carbonara", "carbonara", "Pasta dish", "staple", 2L, "img", "Cook pasta. Mix eggs.")
+      )
     )
 
     // First emission is the data after upsert
@@ -123,9 +139,13 @@ class DishLocalDataSourceTest {
   @Test
   fun getDishCategories() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake."))
-    dataSource.upsertDish(DishLocalEntity("Pasta", "pasta", "Italian", "staple", 2L, "img", "Boil."))
-    dataSource.upsertDish(DishLocalEntity("Salad", "salad", "Healthy", "vegetable_dish", 1L, "img", "Toss."))
+    dataSource.updateDishes(
+      listOf(
+        DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake."),
+        DishLocalEntity("Pasta", "pasta", "Italian", "staple", 2L, "img", "Boil."),
+        DishLocalEntity("Salad", "salad", "Healthy", "vegetable_dish", 1L, "img", "Toss."),
+      )
+    )
 
     val categories = dataSource.getDishCategories().first()
     assertEquals(2, categories.size)
@@ -138,23 +158,12 @@ class DishLocalDataSourceTest {
   @Test
   fun getRandomDishName() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Test Dish", "test dish", "A test", "staple", 1L, "img", "Content."))
+    dataSource.updateDishes(
+      listOf(DishLocalEntity("Test Dish", "test dish", "A test", "staple", 1L, "img", "Content."))
+    )
 
     val name = dataSource.getRandomDishName()
     assertEquals("Test Dish", name)
-
-    cleanup()
-  }
-
-  @Test
-  fun upsertDish() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    val dish = DishLocalEntity("Burger", "burger", "Beef burger", "meat_dish", 3L, "img", "Grill patty.")
-    dataSource.upsertDish(dish)
-
-    val dishes = dataSource.getDishSummaries(null, null, false).first()
-    assertEquals(1, dishes.size)
-    assertEquals("Burger", dishes.first().name)
 
     cleanup()
   }
@@ -176,38 +185,9 @@ class DishLocalDataSourceTest {
   }
 
   @Test
-  fun deleteDishByName() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Steak", "steak", "Beef", "meat_dish", 4L, "img", "Grill."))
-    dataSource.upsertDish(DishLocalEntity("Fries", "fries", "Crispy", "semi_finished", 1L, "img", "Fry."))
-
-    dataSource.deleteDishByName("Steak")
-
-    val remaining = dataSource.getDishSummaries(null, null, false).first()
-    assertEquals(1, remaining.size)
-    assertEquals("Fries", remaining.first().name)
-
-    cleanup()
-  }
-
-  @Test
-  fun deleteAllDishes() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("One", "one", "First", "staple", 1L, "img", "A."))
-    dataSource.upsertDish(DishLocalEntity("Two", "two", "Second", "meat_dish", 2L, "img", "B."))
-
-    dataSource.deleteAllDishes()
-
-    val all = dataSource.getDishSummaries(null, null, false).first()
-    assertTrue(all.isEmpty())
-
-    cleanup()
-  }
-
-  @Test
   fun toggleDishFavorite_on() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake."))
+    dataSource.updateDishes(listOf(DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake.")))
 
     dataSource.toggleDishFavorite("Pizza")
     val dishes = dataSource.getDishSummaries(null, null, true).first()
@@ -220,7 +200,7 @@ class DishLocalDataSourceTest {
   @Test
   fun toggleDishFavorite_off() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertDish(DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake."))
+    dataSource.updateDishes(listOf(DishLocalEntity("Pizza", "pizza", "Cheesy", "staple", 2L, "img", "Bake.")))
 
     dataSource.toggleDishFavorite("Pizza")
     assertTrue(dataSource.getDishSummaries(null, null, true).first().isNotEmpty())
@@ -237,8 +217,12 @@ class DishLocalDataSourceTest {
   @Test
   fun getTipSummaries() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTip(TipLocalEntity("Knife Skills", "knife skills", "basic", "Keep fingers curled."))
-    dataSource.upsertTip(TipLocalEntity("Searing", "searing", "learn", "Dry the meat first."))
+    dataSource.updateTips(
+      listOf(
+        TipLocalEntity("Knife Skills", "knife skills", "basic", "Keep fingers curled."),
+        TipLocalEntity("Searing", "searing", "learn", "Dry the meat first."),
+      )
+    )
 
     val tips = dataSource.getTipSummaries().first()
     assertEquals(2, tips.size)
@@ -252,7 +236,7 @@ class DishLocalDataSourceTest {
   @Test
   fun getTipDetail() = runTest(UnconfinedTestDispatcher()) {
     val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTip(TipLocalEntity("Knife Skills", "knife skills", "basic", "Keep fingers curled."))
+    dataSource.updateTips(listOf(TipLocalEntity("Knife Skills", "knife skills", "basic", "Keep fingers curled.")))
 
     val detail = dataSource.getTipDetail("Knife Skills").first()
     assertNotNull(detail)
@@ -261,18 +245,6 @@ class DishLocalDataSourceTest {
 
     val nonExistent = dataSource.getTipDetail("NonExistent").first()
     assertNull(nonExistent)
-
-    cleanup()
-  }
-
-  @Test
-  fun upsertTip() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTip(TipLocalEntity("Test Tip", "test tip", "basic", "Content."))
-
-    val tips = dataSource.getTipSummaries().first()
-    assertEquals(1, tips.size)
-    assertEquals("Test Tip", tips.first().name)
 
     cleanup()
   }
@@ -289,62 +261,6 @@ class DishLocalDataSourceTest {
 
     val tips = dataSource.getTipSummaries().first()
     assertEquals(2, tips.size)
-
-    cleanup()
-  }
-
-  @Test
-  fun deleteTipByName() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTip(TipLocalEntity("Keep", "keep", "basic", "Keep."))
-    dataSource.upsertTip(TipLocalEntity("Remove", "remove", "learn", "Remove."))
-
-    dataSource.deleteTipByName("Remove")
-
-    val tips = dataSource.getTipSummaries().first()
-    assertEquals(1, tips.size)
-    assertEquals("Keep", tips.first().name)
-
-    cleanup()
-  }
-
-  @Test
-  fun deleteAllTips() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTip(TipLocalEntity("A", "a", "basic", "A."))
-    dataSource.upsertTip(TipLocalEntity("B", "b", "learn", "B."))
-
-    dataSource.deleteAllTips()
-
-    assertTrue(dataSource.getTipSummaries().first().isEmpty())
-
-    cleanup()
-  }
-
-  @Test
-  fun toggleTipFavorite_on() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTip(TipLocalEntity("Knife Skills", "knife skills", "basic", "Keep fingers curled."))
-
-    dataSource.toggleTipFavorite("Knife Skills")
-    val tips = dataSource.getTipDetail("Knife Skills").first()
-    assertNotNull(tips)
-    assertTrue(tips.isFavorite)
-
-    cleanup()
-  }
-
-  @Test
-  fun toggleTipFavorite_off() = runTest(UnconfinedTestDispatcher()) {
-    val (dataSource, cleanup) = createDataSource()
-    dataSource.upsertTip(TipLocalEntity("Knife Skills", "knife skills", "basic", "Keep fingers curled."))
-
-    dataSource.toggleTipFavorite("Knife Skills")
-    dataSource.toggleTipFavorite("Knife Skills")
-
-    val tips = dataSource.getTipDetail("Knife Skills").first()
-    assertNotNull(tips)
-    assertEquals(false, tips.isFavorite)
 
     cleanup()
   }

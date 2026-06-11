@@ -26,15 +26,8 @@ interface DishLocalDataSource {
   suspend fun getRandomDishName(): String?
   fun getTipSummaries(): Flow<List<TipSummaryLocalEntity>>
   fun getTipDetail(name: String): Flow<TipDetailLocalEntity?>
-  suspend fun upsertDish(dish: DishLocalEntity)
   suspend fun updateDishes(dishes: List<DishLocalEntity>)
-  suspend fun deleteDishByName(name: String)
-  suspend fun deleteAllDishes()
-  suspend fun upsertTip(tip: TipLocalEntity)
   suspend fun updateTips(tips: List<TipLocalEntity>)
-  suspend fun deleteTipByName(name: String)
-  suspend fun deleteAllTips()
-  suspend fun toggleTipFavorite(name: String)
   suspend fun toggleDishFavorite(name: String)
 }
 
@@ -71,11 +64,6 @@ class DishLocalDataSourceImpl(
   override fun getTipDetail(name: String): Flow<TipDetailLocalEntity?> =
     tipQueries.getTipDetail(name, mapper = ::TipDetailLocalEntity).asFlow().mapToOneOrNull(defaultDispatcher)
 
-  override suspend fun upsertDish(dish: DishLocalEntity) = write {
-    dishQueries.upsertDish(dish)
-    Logger.d("upsert dish: $dish")
-  }
-
   override suspend fun updateDishes(dishes: List<DishLocalEntity>) = transactionWrite {
     dishQueries.transaction {
       val newNames = dishes.map { it.name }.toSet()
@@ -87,21 +75,6 @@ class DishLocalDataSourceImpl(
     Logger.d("update dishes: ${dishes.size}")
   }
 
-  override suspend fun deleteDishByName(name: String) = write {
-    dishQueries.deleteDishByName(name)
-    Logger.d("delete dish by name: $name")
-  }
-
-  override suspend fun deleteAllDishes() = write {
-    dishQueries.deleteAllDishes()
-    Logger.d("delete all dishes")
-  }
-
-  override suspend fun upsertTip(tip: TipLocalEntity) = write {
-    tipQueries.upsertTip(tip)
-    Logger.d("upsert tip: $tip")
-  }
-
   override suspend fun updateTips(tips: List<TipLocalEntity>) = transactionWrite {
     tipQueries.transaction {
       val newNames = tips.map { it.name }.toSet()
@@ -111,26 +84,6 @@ class DishLocalDataSourceImpl(
       tips.forEach { tipQueries.upsertTip(it) }
     }
     Logger.d("update tips: ${tips.size}")
-  }
-
-  override suspend fun deleteTipByName(name: String) = write {
-    tipQueries.deleteTipByName(name)
-    Logger.d("delete tip by name: $name")
-  }
-
-  override suspend fun deleteAllTips() = write {
-    tipQueries.deleteAllTips()
-    Logger.d("delete all tips")
-  }
-
-  override suspend fun toggleTipFavorite(name: String) = transactionWrite {
-    val exists = tipQueries.isTipFavorite(name).awaitAsOne()
-    if (exists) {
-      tipQueries.deleteTipFavorite(name)
-    } else {
-      tipQueries.insertTipFavorite(name)
-    }
-    Logger.d("toggle tip favorite: $name, updated: ${!exists}")
   }
 
   override suspend fun toggleDishFavorite(name: String) = transactionWrite {

@@ -81,21 +81,6 @@ class DishTest {
   }
 
   @Test
-  fun deleteDishByName_removesCorrectEntry() = testingDb {
-    dishQueries.upsertDish("Steak", "steak", "Ribeye", "meat_dish", 4L, "s.jpg", "Sear both sides.")
-    dishQueries.upsertDish("Fries", "fries", "Crispy", "semi_finished", 1L, "f.jpg", "Cut and fry.")
-
-    dishQueries.deleteDishByName("Steak")
-
-    val remaining = dishQueries.getDishSummaries(null, null, 0L).awaitAsList()
-    assertEquals(1, remaining.size)
-    assertEquals("Fries", remaining.first().name)
-
-    val deleted = dishQueries.getDishDetail("Steak").awaitAsOneOrNull()
-    assertNull(deleted)
-  }
-
-  @Test
   fun deleteAllDishes_clearsTable() = testingDb {
     val categories = listOf("aquatic", "soup", "drink", "dessert", "condiment")
     repeat(5) { i ->
