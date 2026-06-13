@@ -8,15 +8,15 @@ import web.window.window
  *   (The Webpack proxy will pick this up and forward it).
  * - If running in Production, returns "https://static.yueban.site/api/compilecook"
  */
-actual fun resolveBaseUrl(): String {
+actual fun resolveBaseUrl(baseUrl: String, path: String): String {
   return try {
     val hostname = window.location.hostname
     if (hostname == "localhost" || hostname == "127.0.0.1") {
-      API_PATH
+      path
     } else {
-      BASE_URL
+      baseUrl
     }
   } catch (_: Throwable) {
-    BASE_URL
+    baseUrl
   }
 }

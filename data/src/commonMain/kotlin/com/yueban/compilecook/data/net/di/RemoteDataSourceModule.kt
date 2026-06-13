@@ -16,9 +16,9 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
-internal const val PROD_DOMAIN = "https://static.yueban.site"
-internal const val API_PATH = "/api/compilecook"
-internal const val BASE_URL = "$PROD_DOMAIN$API_PATH"
+private const val PROD_DOMAIN = "https://static.yueban.site"
+private const val API_PATH = "/api/compilecook"
+private const val BASE_URL = "$PROD_DOMAIN$API_PATH"
 
 val remoteDataSourceModule = module {
   single {
@@ -35,10 +35,10 @@ val remoteDataSourceModule = module {
     }
   }
   single {
-    NetClient(get(), resolveBaseUrl())
+    NetClient(get(), resolveBaseUrl(BASE_URL, API_PATH))
   }
   singleOf(::DishRemoteDataSourceImpl) bind DishRemoteDataSource::class
   singleOf(::AiChatRemoteDataSourceImpl) bind AiChatRemoteDataSource::class
 }
 
-expect fun resolveBaseUrl(): String
+expect fun resolveBaseUrl(baseUrl: String, path: String): String
