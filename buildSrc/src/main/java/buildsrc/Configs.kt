@@ -28,9 +28,10 @@ object Configs {
   const val jvmTarget = "17"
   const val jvmToolchain = 21
 
-  val mimoApiKey: String get() = localProperties.getProperty("MIMO_API_KEY", "")
-  val mimoBaseUrl: String get() = localProperties.getProperty("MIMO_BASE_URL", "")
-  val mimoModel: String get() = localProperties.getProperty("MIMO_MODEL", "")
+  val openAiApiToken: String get() = localProperties.getProperty("OPEN_AI_API_TOKEN", "")
+  val openAiApiDomain: String get() = localProperties.getProperty("OPEN_AI_API_DOMAIN", "")
+  val openAiApiPath: String get() = localProperties.getProperty("OPEN_AI_API_PATH", "")
+  val openAiModel: String get() = localProperties.getProperty("OPEN_AI_MODEL", "")
 }
 
 private val localProperties: Properties by lazy {

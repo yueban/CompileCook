@@ -10,5 +10,12 @@ config.devServer.proxy = [
         changeOrigin: true,
         // Optional log to see if proxy is working in browser console
         logLevel: 'debug'
+    },
+    {
+        context: ['/v1/'],
+        target: 'https://token-plan-cn.xiaomimimo.com',
+        secure: false,
+        changeOrigin: true,
+        logLevel: 'debug'
     }
 ];

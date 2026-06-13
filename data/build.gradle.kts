@@ -16,9 +16,10 @@ buildConfig {
   className("AIKonfig")
   packageName(Configs.packageName)
 
-  buildConfigField("MIMO_API_KEY", Configs.mimoApiKey)
-  buildConfigField("MIMO_BASE_URL", Configs.mimoBaseUrl)
-  buildConfigField("MIMO_MODEL", Configs.mimoModel)
+  buildConfigField("OPEN_AI_API_TOKEN", Configs.openAiApiToken)
+  buildConfigField("OPEN_AI_API_DOMAIN", Configs.openAiApiDomain)
+  buildConfigField("OPEN_AI_API_PATH", Configs.openAiApiPath)
+  buildConfigField("OPEN_AI_MODEL", Configs.openAiModel)
 }
 
 kotlin {

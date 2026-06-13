@@ -45,12 +45,17 @@ val remoteDataSourceModule = module {
   singleOf(::DishRemoteDataSourceImpl) bind DishRemoteDataSource::class
   single {
     OpenAI(
-      host = OpenAIHost(baseUrl = AIKonfig.MIMO_BASE_URL),
-      token = AIKonfig.MIMO_API_KEY,
+      host = OpenAIHost(
+        baseUrl = resolveBaseUrl(
+          baseUrl = "${AIKonfig.OPEN_AI_API_DOMAIN}${AIKonfig.OPEN_AI_API_PATH}",
+          path = AIKonfig.OPEN_AI_API_PATH
+        )
+      ),
+      token = AIKonfig.OPEN_AI_API_TOKEN,
       logging = openAiLoggingConfig,
     )
   }
-  single { ModelId(AIKonfig.MIMO_MODEL) }
+  single { ModelId(AIKonfig.OPEN_AI_MODEL) }
   singleOf(::AiChatRemoteDataSourceImpl) bind AiChatRemoteDataSource::class
 }
 
