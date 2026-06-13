@@ -1,11 +1,16 @@
 package com.yueban.compilecook.data.net.di
 
+import com.aallam.openai.api.model.ModelId
+import com.aallam.openai.client.OpenAI
+import com.aallam.openai.client.OpenAIHost
+import com.yueban.compilecook.AIKonfig
 import com.yueban.compilecook.data.net.service.AiChatRemoteDataSource
 import com.yueban.compilecook.data.net.service.AiChatRemoteDataSourceImpl
 import com.yueban.compilecook.data.net.service.DishRemoteDataSource
 import com.yueban.compilecook.data.net.service.DishRemoteDataSourceImpl
 import com.yueban.compilecook.json.json
 import com.yueban.compilecook.logger.Logger
+import com.yueban.compilecook.logger.openAiLoggingConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
@@ -38,6 +43,14 @@ val remoteDataSourceModule = module {
     NetClient(get(), resolveBaseUrl(BASE_URL, API_PATH))
   }
   singleOf(::DishRemoteDataSourceImpl) bind DishRemoteDataSource::class
+  single {
+    OpenAI(
+      host = OpenAIHost(baseUrl = AIKonfig.MIMO_BASE_URL),
+      token = AIKonfig.MIMO_API_KEY,
+      logging = openAiLoggingConfig,
+    )
+  }
+  single { ModelId(AIKonfig.MIMO_MODEL) }
   singleOf(::AiChatRemoteDataSourceImpl) bind AiChatRemoteDataSource::class
 }
 

@@ -9,15 +9,12 @@ import com.aallam.openai.api.exception.OpenAIServerException
 import com.aallam.openai.api.exception.OpenAITimeoutException
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
-import com.aallam.openai.client.OpenAIHost
-import com.yueban.compilecook.AIKonfig
 import com.yueban.compilecook.data.net.entity.AiChatRequest
 import com.yueban.compilecook.data.net.error.AiChatApiError
 import com.yueban.compilecook.data.net.error.AiChatNetworkError
 import com.yueban.compilecook.data.net.error.AiChatServerError
 import com.yueban.compilecook.data.net.error.AiChatTimeoutError
 import com.yueban.compilecook.data.net.error.AiChatUnknownError
-import com.yueban.compilecook.logger.openAiLoggingConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -26,15 +23,10 @@ interface AiChatRemoteDataSource {
   suspend fun chat(request: AiChatRequest): Flow<String>
 }
 
-internal class AiChatRemoteDataSourceImpl : AiChatRemoteDataSource {
-  private val openAi: OpenAI by lazy {
-    OpenAI(
-      host = OpenAIHost(baseUrl = AIKonfig.MIMO_BASE_URL),
-      token = AIKonfig.MIMO_API_KEY,
-      logging = openAiLoggingConfig,
-    )
-  }
-
+internal class AiChatRemoteDataSourceImpl(
+  private val openAi: OpenAI,
+  private val modelId: ModelId,
+) : AiChatRemoteDataSource {
   @Suppress("TooGenericExceptionCaught")
   override suspend fun chat(request: AiChatRequest): Flow<String> = flow {
     val messages = request.messages.map {
@@ -48,7 +40,7 @@ internal class AiChatRemoteDataSourceImpl : AiChatRemoteDataSource {
       addAll(messages)
     }
     val chatRequest = ChatCompletionRequest(
-      model = ModelId(AIKonfig.MIMO_MODEL),
+      model = modelId,
       messages = allMessages,
     )
     try {
