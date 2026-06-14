@@ -13,9 +13,11 @@ plugins {
 
 buildConfig {
   useKotlinOutput { internalVisibility = true }
-  className("AIKonfig")
+  className("APIKonfig")
   packageName(Configs.packageName)
 
+  buildConfigField("API_DOMAIN", Configs.apiDomain)
+  buildConfigField("API_PATH", Configs.apiPath)
   buildConfigField("OPEN_AI_API_TOKEN", Configs.openAiApiToken)
   buildConfigField("OPEN_AI_API_DOMAIN", Configs.openAiApiDomain)
   buildConfigField("OPEN_AI_API_PATH", Configs.openAiApiPath)

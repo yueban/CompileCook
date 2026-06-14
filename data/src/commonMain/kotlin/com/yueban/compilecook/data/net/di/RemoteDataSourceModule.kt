@@ -3,7 +3,7 @@ package com.yueban.compilecook.data.net.di
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
-import com.yueban.compilecook.AIKonfig
+import com.yueban.compilecook.APIKonfig
 import com.yueban.compilecook.data.net.service.AiChatRemoteDataSource
 import com.yueban.compilecook.data.net.service.AiChatRemoteDataSourceImpl
 import com.yueban.compilecook.data.net.service.DishRemoteDataSource
@@ -21,10 +21,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
-private const val PROD_DOMAIN = "https://static.yueban.site"
-private const val API_PATH = "/api/compilecook"
-private const val BASE_URL = "$PROD_DOMAIN$API_PATH"
-
 val remoteDataSourceModule = module {
   single {
     HttpClient {
@@ -40,22 +36,28 @@ val remoteDataSourceModule = module {
     }
   }
   single {
-    NetClient(get(), resolveBaseUrl(BASE_URL, API_PATH))
+    NetClient(
+      get(),
+      resolveBaseUrl(
+        baseUrl = "${APIKonfig.API_DOMAIN}${APIKonfig.API_PATH}",
+        path = APIKonfig.API_PATH
+      )
+    )
   }
   singleOf(::DishRemoteDataSourceImpl) bind DishRemoteDataSource::class
   single {
     OpenAI(
       host = OpenAIHost(
         baseUrl = resolveBaseUrl(
-          baseUrl = "${AIKonfig.OPEN_AI_API_DOMAIN}${AIKonfig.OPEN_AI_API_PATH}",
-          path = AIKonfig.OPEN_AI_API_PATH
+          baseUrl = "${APIKonfig.OPEN_AI_API_DOMAIN}${APIKonfig.OPEN_AI_API_PATH}",
+          path = APIKonfig.OPEN_AI_API_PATH
         )
       ),
-      token = AIKonfig.OPEN_AI_API_TOKEN,
+      token = APIKonfig.OPEN_AI_API_TOKEN,
       logging = openAiLoggingConfig,
     )
   }
-  single { ModelId(AIKonfig.OPEN_AI_MODEL) }
+  single { ModelId(APIKonfig.OPEN_AI_MODEL) }
   singleOf(::AiChatRemoteDataSourceImpl) bind AiChatRemoteDataSource::class
 }
 

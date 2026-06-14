@@ -28,6 +28,8 @@ object Configs {
   const val jvmTarget = "17"
   const val jvmToolchain = 21
 
+  val apiDomain: String get() = localProperties.getProperty("API_DOMAIN", "")
+  val apiPath: String get() = localProperties.getProperty("API_PATH", "")
   val openAiApiToken: String get() = localProperties.getProperty("OPEN_AI_API_TOKEN", "")
   val openAiApiDomain: String get() = localProperties.getProperty("OPEN_AI_API_DOMAIN", "")
   val openAiApiPath: String get() = localProperties.getProperty("OPEN_AI_API_PATH", "")
