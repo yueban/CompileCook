@@ -55,7 +55,7 @@ abstract class UiStateComponentImpl<S : Any>(
   protected fun setState(reducer: S.() -> S) {
     val old = _uiState.value
     _uiState.update(reducer)
-    if (_uiState.value != old) Logger.d("${_uiState.value}")
+    if (_uiState.value != old) Logger.v("${_uiState.value}")
   }
 
   @Suppress("TooGenericExceptionCaught")
@@ -124,7 +124,7 @@ abstract class UiStateComponentImpl<S : Any>(
     }
 
     val flow = MutableStateFlow(restored)
-    Logger.d("$restored")
+    Logger.v("$restored")
 
     // Auto-Save
     if (serializer != null) {
