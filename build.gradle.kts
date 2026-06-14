@@ -90,6 +90,8 @@ subprojects {
     configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
       sourceSets.all {
         languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+        languageSettings.optIn("androidx.compose.ui.ExperimentalComposeUiApi")
+        languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
       }
     }
   }
