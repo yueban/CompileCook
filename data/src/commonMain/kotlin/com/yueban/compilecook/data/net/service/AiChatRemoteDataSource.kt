@@ -16,8 +16,10 @@ import com.yueban.compilecook.data.net.error.AiChatServerError
 import com.yueban.compilecook.data.net.error.AiChatTimeoutError
 import com.yueban.compilecook.data.net.error.AiChatUnknownError
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 interface AiChatRemoteDataSource {
   suspend fun chat(request: AiChatRequest): Flow<String>
@@ -26,6 +28,7 @@ interface AiChatRemoteDataSource {
 internal class AiChatRemoteDataSourceImpl(
   private val openAi: OpenAI,
   private val modelId: ModelId,
+  private val defaultDispatcher: CoroutineDispatcher,
 ) : AiChatRemoteDataSource {
   @Suppress("TooGenericExceptionCaught")
   override suspend fun chat(request: AiChatRequest): Flow<String> = flow {
@@ -60,7 +63,7 @@ internal class AiChatRemoteDataSourceImpl(
     } catch (e: Exception) {
       throw AiChatUnknownError(e)
     }
-  }
+  }.flowOn(defaultDispatcher)
 }
 
 private fun String.toChatRole(): ChatRole = when (this) {

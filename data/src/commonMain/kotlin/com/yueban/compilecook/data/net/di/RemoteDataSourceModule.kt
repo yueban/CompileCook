@@ -8,6 +8,7 @@ import com.yueban.compilecook.data.net.service.AiChatRemoteDataSource
 import com.yueban.compilecook.data.net.service.AiChatRemoteDataSourceImpl
 import com.yueban.compilecook.data.net.service.DishRemoteDataSource
 import com.yueban.compilecook.data.net.service.DishRemoteDataSourceImpl
+import com.yueban.compilecook.di.DispatcherType
 import com.yueban.compilecook.json.json
 import com.yueban.compilecook.logger.Logger
 import com.yueban.compilecook.logger.openAiLoggingConfig
@@ -17,6 +18,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import io.ktor.client.plugins.logging.Logger as KtorLogger
@@ -58,7 +60,13 @@ val remoteDataSourceModule = module {
     )
   }
   single { ModelId(APIKonfig.OPEN_AI_MODEL) }
-  singleOf(::AiChatRemoteDataSourceImpl) bind AiChatRemoteDataSource::class
+  single {
+    AiChatRemoteDataSourceImpl(
+      openAi = get(),
+      modelId = get(),
+      defaultDispatcher = get(named(DispatcherType.Default)),
+    )
+  } bind AiChatRemoteDataSource::class
 }
 
 expect fun resolveBaseUrl(baseUrl: String, path: String): String
