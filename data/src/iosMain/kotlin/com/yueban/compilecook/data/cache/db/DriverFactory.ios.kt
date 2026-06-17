@@ -7,5 +7,7 @@ import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 
 actual fun provideDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>, dbFileName: String): SqlDriver {
-  return NativeSqliteDriver(schema.synchronous(), dbFileName)
+  return NativeSqliteDriver(schema.synchronous(), dbFileName).also {
+    it.execute(null, "PRAGMA foreign_keys = ON", 0)
+  }
 }

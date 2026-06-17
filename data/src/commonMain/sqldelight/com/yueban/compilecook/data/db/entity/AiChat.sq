@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS AiChatConversationLocalEntity (
 
 CREATE TABLE IF NOT EXISTS AiChatMessageLocalEntity (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    conversationId INTEGER NOT NULL,
+    conversationId INTEGER NOT NULL REFERENCES AiChatConversationLocalEntity(id) ON DELETE CASCADE,
     role TEXT NOT NULL,
     content TEXT NOT NULL,
     timestamp INTEGER NOT NULL,

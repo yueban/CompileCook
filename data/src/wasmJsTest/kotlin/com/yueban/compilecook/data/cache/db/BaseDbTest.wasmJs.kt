@@ -6,4 +6,6 @@ import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.worker.createDefaultWebWorkerDriver
 
 actual fun provideInMemoryDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver =
-  createDefaultWebWorkerDriver()
+  createDefaultWebWorkerDriver().also {
+    it.execute(null, "PRAGMA foreign_keys = ON", 0)
+  }

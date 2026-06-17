@@ -8,6 +8,9 @@ import com.yueban.compilecook.util.FileUtils
 import java.io.File
 
 actual fun provideDbDriver(schema: SqlSchema<AsyncValue<Unit>>, dbFileName: String): SqlDriver =
-  JdbcSqliteDriver("jdbc:sqlite:${getDbFile(dbFileName).absolutePath}").also { schema.create(it) }
+  JdbcSqliteDriver("jdbc:sqlite:${getDbFile(dbFileName).absolutePath}").also {
+    schema.create(it)
+    it.execute(null, "PRAGMA foreign_keys = ON", 0)
+  }
 
 private fun getDbFile(dbFileName: String) = File(FileUtils.getUserDataDir(), dbFileName)

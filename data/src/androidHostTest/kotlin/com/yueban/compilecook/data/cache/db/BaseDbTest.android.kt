@@ -6,4 +6,7 @@ import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 
 actual fun provideInMemoryDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver =
-  JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).also { schema.create(it) }
+  JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).also {
+    schema.create(it)
+    it.execute(null, "PRAGMA foreign_keys = ON", 0)
+  }

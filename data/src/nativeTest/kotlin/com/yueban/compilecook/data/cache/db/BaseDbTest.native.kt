@@ -7,4 +7,6 @@ import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.native.inMemoryDriver
 
 actual fun provideInMemoryDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver =
-  inMemoryDriver(schema = schema.synchronous())
+  inMemoryDriver(schema = schema.synchronous()).also {
+    it.execute(null, "PRAGMA foreign_keys = ON", 0)
+  }

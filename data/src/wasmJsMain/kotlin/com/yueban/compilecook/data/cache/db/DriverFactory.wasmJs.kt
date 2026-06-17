@@ -7,4 +7,6 @@ import app.cash.sqldelight.driver.worker.createDefaultWebWorkerDriver
 
 actual fun provideDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>, dbFileName: String): SqlDriver =
   // TODO: manually specify sql.js worker
-  createDefaultWebWorkerDriver()
+  createDefaultWebWorkerDriver().also {
+    it.execute(null, "PRAGMA foreign_keys = ON", 0)
+  }

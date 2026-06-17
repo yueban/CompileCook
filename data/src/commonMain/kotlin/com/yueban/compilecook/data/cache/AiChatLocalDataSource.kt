@@ -48,7 +48,6 @@ class AiChatLocalDataSourceImpl(
   }
 
   override suspend fun deleteConversationById(id: Long) = write {
-    aiChatQueries.deleteMessagesByConversationId(id)
     aiChatQueries.deleteConversationById(id)
     Logger.d("delete conversation: $id")
   }
