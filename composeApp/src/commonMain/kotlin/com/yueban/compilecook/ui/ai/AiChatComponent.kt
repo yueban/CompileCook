@@ -34,13 +34,10 @@ import org.jetbrains.compose.resources.getString
 @Serializable
 data class AiChatState(
   val conversationId: Long = 0L,
-  @Transient
-  val messages: List<AiChatMessage> = emptyList(),
-  @Transient
-  val isLoading: Boolean = false,
+  @Transient val messages: List<AiChatMessage> = emptyList(),
+  @Transient val isLoading: Boolean = false,
   val currentContext: AiChatContext = AiChatContext.General,
-  @Transient
-  val pendingContext: AiChatContext? = null,
+  @Transient val pendingContext: AiChatContext? = null,
 )
 
 interface AiChatComponent : UiStateComponent<AiChatState> {

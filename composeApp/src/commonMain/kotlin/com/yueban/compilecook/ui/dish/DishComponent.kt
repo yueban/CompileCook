@@ -34,10 +34,8 @@ private const val KEY_DISH_IMAGE_CHILD_SLOT = "DISH_IMAGE_CHILD_SLOT"
 data class DishState(
   val dishName: String,
   val dishAsync: Async<DishDetail?> = Uninitialized,
-  @Transient
-  val contentAsync: Async<State> = Uninitialized,
-  @Transient
-  val tocAsync: Async<List<TocItem>> = Uninitialized,
+  @Transient val contentAsync: Async<State> = Uninitialized,
+  @Transient val tocAsync: Async<List<TocItem>> = Uninitialized,
 )
 
 interface DishComponent : UiStateComponent<DishState> {

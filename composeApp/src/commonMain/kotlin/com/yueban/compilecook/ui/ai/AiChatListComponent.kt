@@ -13,8 +13,7 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class AiChatListState(
-  @Transient
-  val conversationsAsync: Async<List<AiChatConversation>> = Uninitialized,
+  @Transient val conversationsAsync: Async<List<AiChatConversation>> = Uninitialized,
 )
 
 interface AiChatListComponent : UiStateComponent<AiChatListState> {
