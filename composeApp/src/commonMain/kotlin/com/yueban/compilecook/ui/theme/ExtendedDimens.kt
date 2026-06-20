@@ -73,6 +73,8 @@ data class ExtendedDimens(
   val aiChatLoadingSize: Dp = 16.dp,
   val aiChatLoadingStroke: Dp = 2.dp,
   val aiChatTopBarMinHeight: Dp = 48.dp,
+  val aiChatImageThumbnailSize: Dp = 80.dp,
+  val aiChatMessageImageHeight: Dp = 150.dp,
 )
 
 internal val LocalExtendedDimens = staticCompositionLocalOf { ExtendedDimens() }

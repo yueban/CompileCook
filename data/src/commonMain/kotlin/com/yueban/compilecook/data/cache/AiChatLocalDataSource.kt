@@ -1,5 +1,6 @@
 package com.yueban.compilecook.data.cache
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
@@ -8,7 +9,9 @@ import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.yueban.compilecook.data.db.entity.AiChatConversationLocalEntity
 import com.yueban.compilecook.data.db.entity.AiChatMessageLocalEntity
 import com.yueban.compilecook.data.db.entity.AiChatQueries
+import com.yueban.compilecook.data.db.entity.GetMessagesWithImagesByConversationId
 import com.yueban.compilecook.logger.Logger
+import com.yueban.compilecook.util.ImageFileCache
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -19,8 +22,11 @@ interface AiChatLocalDataSource {
   suspend fun insertConversation(conversation: AiChatConversationLocalEntity): Long
   suspend fun deleteConversationById(id: Long)
   fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>>
+  fun getMessagesWithImagesByConversationId(conversationId: Long): Flow<List<GetMessagesWithImagesByConversationId>>
   suspend fun getMessageById(id: Long): AiChatMessageLocalEntity?
   suspend fun insertMessage(message: AiChatMessageLocalEntity): Long
+  suspend fun insertMessageWithImages(message: AiChatMessageLocalEntity, imagePaths: List<String>): Long
+  suspend fun updateConversationTimestamp(updatedAt: Long, id: Long)
   suspend fun updateMessageContent(id: Long, content: String)
   suspend fun updateMessageStatus(id: Long, status: Long)
   suspend fun updateMessageStatusByConversationAndStatus(conversationId: Long, fromStatus: Long, toStatus: Long)
@@ -48,12 +54,20 @@ class AiChatLocalDataSourceImpl(
   }
 
   override suspend fun deleteConversationById(id: Long) = write {
+    val imagePaths = aiChatQueries.getImagePathsByConversationId(id).awaitAsList()
+    imagePaths.forEach { ImageFileCache.delete(it) }
     aiChatQueries.deleteConversationById(id)
-    Logger.d("delete conversation: $id")
+    Logger.d("delete conversation: $id, cleaned ${imagePaths.size} images")
   }
 
   override fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>> =
     aiChatQueries.getMessagesByConversationId(conversationId).asFlow().mapToList(defaultDispatcher)
+
+  override fun getMessagesWithImagesByConversationId(
+    conversationId: Long,
+  ): Flow<List<GetMessagesWithImagesByConversationId>> =
+    aiChatQueries.getMessagesWithImagesByConversationId(conversationId)
+      .asFlow().mapToList(defaultDispatcher)
 
   override suspend fun getMessageById(id: Long): AiChatMessageLocalEntity? =
     withContext(defaultDispatcher) { aiChatQueries.getMessageById(id).awaitAsOneOrNull() }
@@ -66,6 +80,27 @@ class AiChatLocalDataSourceImpl(
       Logger.d("insert message: $id")
       id
     }
+  }
+
+  override suspend fun insertMessageWithImages(
+    message: AiChatMessageLocalEntity,
+    imagePaths: List<String>,
+  ): Long = write {
+    aiChatQueries.transactionWithResult {
+      aiChatQueries.insertMessage(message)
+      val id = aiChatQueries.selectLastInsertRowId().awaitAsOne()
+      imagePaths.forEachIndexed { index, imagePath ->
+        aiChatQueries.insertImage(messageId = id, imagePath = imagePath, position = index.toLong())
+      }
+      aiChatQueries.updateConversationTimestamp(updatedAt = message.timestamp, id = message.conversationId)
+      Logger.d("insert message with images: $id, imageCount=${imagePaths.size}")
+      id
+    }
+  }
+
+  override suspend fun updateConversationTimestamp(updatedAt: Long, id: Long) = write {
+    aiChatQueries.updateConversationTimestamp(updatedAt = updatedAt, id = id)
+    Logger.d("update conversation timestamp: $id")
   }
 
   override suspend fun updateMessageContent(id: Long, content: String) = write {
@@ -92,13 +127,17 @@ class AiChatLocalDataSourceImpl(
   }
 
   override suspend fun deleteMessagesByIds(ids: List<Long>) = write {
+    if (ids.isEmpty()) return@write
+    aiChatQueries.getImagesByMessageIds(ids).awaitAsList().forEach { ImageFileCache.delete(it.imagePath) }
     aiChatQueries.deleteMessagesByIds(ids)
     Logger.d("delete messages by ids: ${ids.size}")
   }
 
   override suspend fun deleteMessagesByConversationId(conversationId: Long) = write {
+    val imagePaths = aiChatQueries.getImagePathsByConversationId(conversationId).awaitAsList()
+    imagePaths.forEach { ImageFileCache.delete(it) }
     aiChatQueries.deleteMessagesByConversationId(conversationId)
-    Logger.d("delete messages by conversation: $conversationId")
+    Logger.d("delete messages by conversation: $conversationId, cleaned ${imagePaths.size} images")
   }
 }
 

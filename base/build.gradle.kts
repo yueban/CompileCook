@@ -67,6 +67,7 @@ kotlin {
       implementation(libs.openai.client)
     }
     androidMain.dependencies {
+      implementation(libs.androidx.core.ktx)
     }
     jvmMain.dependencies {
       implementation(libs.appdirs)

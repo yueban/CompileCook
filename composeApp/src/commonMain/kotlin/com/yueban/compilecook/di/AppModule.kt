@@ -64,8 +64,8 @@ val uiModule = module {
     )
   }
 
-  factory<AiComponent> { (ctx: ComponentContext, onOutput: (AiComponent.Output) -> Unit) ->
-    DefaultAiComponent(ctx, onOutput)
+  factory<AiComponent> { (ctx: ComponentContext) ->
+    DefaultAiComponent(ctx)
   }
 
   factory { (ctx: ComponentContext, config: AiComponent.Config.Chat, onOutput: (AiChatComponent.Output) -> Unit) ->

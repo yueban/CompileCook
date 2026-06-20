@@ -2,6 +2,7 @@ package com.yueban.compilecook.repo.entity
 
 import com.yueban.compilecook.data.db.entity.AiChatConversationLocalEntity
 import com.yueban.compilecook.data.db.entity.AiChatMessageLocalEntity
+import com.yueban.compilecook.data.db.entity.GetMessagesWithImagesByConversationId
 import com.yueban.compilecook.util.serialName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,6 +19,7 @@ data class AiChatMessage(
   val id: Long,
   val role: AiChatRole,
   val content: String,
+  val images: List<String> = emptyList(),
   val timestamp: Long,
   val status: AiChatMessageStatus = AiChatMessageStatus.COMPLETED,
 ) {
@@ -94,6 +96,20 @@ fun AiChatMessageLocalEntity.toAiChatMessage(): AiChatMessage =
     timestamp = timestamp,
     status = AiChatMessageStatus.fromValue(status.toInt()),
   )
+
+fun List<GetMessagesWithImagesByConversationId>.toAiChatMessages(): List<AiChatMessage> =
+  groupBy({ it.id }, { it.imagePath })
+    .map { (id, rows) ->
+      val first = first { it.id == id }
+      AiChatMessage(
+        id = id,
+        role = AiChatRole.fromValue(first.role),
+        content = first.content,
+        images = rows.mapNotNull { it },
+        timestamp = first.timestamp,
+        status = AiChatMessageStatus.fromValue(first.status.toInt()),
+      )
+    }
 
 // -- Mapping: Domain -> Local --
 

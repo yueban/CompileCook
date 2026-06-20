@@ -59,6 +59,13 @@
     <string name="ai_chat_context_format">当前：%1$s</string>
     <string name="ai_chat_input_hint">问问做菜的事…</string>
     <string name="ai_chat_des_camera">拍照</string>
+    <string name="ai_chat_take_photo">拍照</string>
+    <string name="ai_chat_choose_gallery">从相册选择</string>
+    <string name="ai_chat_camera_permission_title">需要相机权限</string>
+    <string name="ai_chat_camera_permission_message">拍照需要使用相机权限，请在应用设置中开启。</string>
+    <string name="ai_chat_camera_permission_settings">前往设置</string>
+    <string name="ai_chat_image_limit_reached">每条消息最多%1$d张图片</string>
+    <string name="ai_chat_des_remove_image">移除图片</string>
     <string name="ai_chat_des_send">发送</string>
     <string name="ai_chat_des_new_conversation">新对话</string>
     <string name="ai_chat_des_history">历史记录</string>

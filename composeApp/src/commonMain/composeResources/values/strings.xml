@@ -44,7 +44,7 @@
     <string name="dish_list_favorite_title">Favorite Dishes</string>
     <string name="dish_list_difficulty_title_format">Level %1$d</string>
     <string name="dish_list_search_hint_format">Search%1$s...</string>
-    <string name="dish_list_des_search">Search menus</string>s
+    <string name="dish_list_des_search">Search menus</string>
     <string name="dish_list_empty">Dishes not found</string>
     <string name="dish_list_favorite_empty">No favorites yet</string>
     <string name="dish_list_item_difficulty">Difficulty: </string>
@@ -59,6 +59,13 @@
     <string name="ai_chat_context_format">Current: %1$s</string>
     <string name="ai_chat_input_hint">Ask about cooking…</string>
     <string name="ai_chat_des_camera">Camera</string>
+    <string name="ai_chat_take_photo">Take Photo</string>
+    <string name="ai_chat_choose_gallery">Choose from Gallery</string>
+    <string name="ai_chat_camera_permission_title">Camera Permission Required</string>
+    <string name="ai_chat_camera_permission_message">Camera permission is needed to take photos. Please enable it in app settings.</string>
+    <string name="ai_chat_camera_permission_settings">Open Settings</string>
+    <string name="ai_chat_image_limit_reached">Maximum %1$d images per message</string>
+    <string name="ai_chat_des_remove_image">Remove image</string>
     <string name="ai_chat_des_send">Send</string>
     <string name="ai_chat_des_new_conversation">New conversation</string>
     <string name="ai_chat_des_history">History</string>

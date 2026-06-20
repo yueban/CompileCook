@@ -18,15 +18,24 @@ import com.yueban.compilecook.repo.entity.AiChatMessageStatus
 import com.yueban.compilecook.repo.entity.AiChatRole
 import com.yueban.compilecook.repo.entity.toAiChatConversation
 import com.yueban.compilecook.repo.entity.toAiChatMessage
+import com.yueban.compilecook.repo.entity.toAiChatMessages
 import com.yueban.compilecook.repo.entity.toLocalEntity
 import com.yueban.compilecook.util.currentTimeMillis
 import com.yueban.compilecook.util.serialName
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 interface AiChatRepo {
-  suspend fun chat(conversationId: Long, userContent: String, messages: List<AiChatMessage>, systemMessage: String)
+  suspend fun chat(
+    conversationId: Long,
+    userContent: String,
+    imagePaths: List<String>,
+    messages: List<AiChatMessage>,
+    systemMessage: String,
+  )
+
   suspend fun retryMessage(assistantMessageId: Long, systemMessage: String)
   suspend fun getContextContent(context: AiChatContext): String
   fun getConversations(): Flow<List<AiChatConversation>>
@@ -46,6 +55,7 @@ internal class AiChatRepoImpl(
   override suspend fun chat(
     conversationId: Long,
     userContent: String,
+    imagePaths: List<String>,
     messages: List<AiChatMessage>,
     systemMessage: String,
   ) {
@@ -53,9 +63,10 @@ internal class AiChatRepoImpl(
       id = 0L,
       role = AiChatRole.USER,
       content = userContent,
+      images = imagePaths,
       timestamp = currentTimeMillis,
     )
-    aiLocalDataSource.insertMessage(userMsg.toLocalEntity(conversationId))
+    aiLocalDataSource.insertMessageWithImages(userMsg.toLocalEntity(conversationId), imagePaths)
 
     val assistantPlaceholder = AiChatMessage(
       id = 0L,
@@ -66,9 +77,13 @@ internal class AiChatRepoImpl(
     )
     val assistantMessageId = aiLocalDataSource.insertMessage(assistantPlaceholder.toLocalEntity(conversationId))
 
-    val requestMessages = messages.map { AiChatRequestMessage(role = it.role.serialName(), content = it.content) } +
-      AiChatRequestMessage(role = AiChatRole.USER.serialName(), content = userContent)
-    doChat(assistantMessageId, requestMessages, systemMessage)
+    // Include historical images for all messages
+    val requestMessages = messages.map {
+      AiChatRequestMessage(role = it.role.serialName(), content = it.content, imagePaths = it.images)
+    } +
+      AiChatRequestMessage(role = AiChatRole.USER.serialName(), content = userContent, imagePaths = imagePaths)
+    val request = AiChatRequest(messages = requestMessages, systemMessage = systemMessage)
+    doChat(assistantMessageId, request)
   }
 
   override suspend fun retryMessage(assistantMessageId: Long, systemMessage: String) {
@@ -78,8 +93,9 @@ internal class AiChatRepoImpl(
       target.status != AiChatMessageStatus.COMPLETED &&
       target.status != AiChatMessageStatus.STREAMING
     val allMessages = if (isValidTarget) {
-      aiLocalDataSource.getMessagesByConversationId(localEntity.conversationId)
+      aiLocalDataSource.getMessagesWithImagesByConversationId(localEntity.conversationId)
         .firstOrNull().orEmpty()
+        .toAiChatMessages()
     } else {
       emptyList()
     }
@@ -87,23 +103,27 @@ internal class AiChatRepoImpl(
     if (!isValidTarget || targetIndex < 0) return
 
     val idsToDelete = allMessages.drop(targetIndex + 1).map { it.id }
-    if (idsToDelete.isNotEmpty()) aiLocalDataSource.deleteMessagesByIds(idsToDelete)
+    if (idsToDelete.isNotEmpty()) {
+      aiLocalDataSource.deleteMessagesByIds(idsToDelete)
+    }
 
-    val requestMessages = allMessages.take(targetIndex)
-      .map { it.toAiChatMessage() }
-      .map { AiChatRequestMessage(role = it.role.serialName(), content = it.content) }
+    // Include historical images for all messages
+    val requestMessages = allMessages.take(targetIndex).map {
+      AiChatRequestMessage(role = it.role.serialName(), content = it.content, imagePaths = it.images)
+    }
 
     aiLocalDataSource.updateMessageContent(assistantMessageId, "")
     aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.STREAMING.value.toLong())
-    doChat(assistantMessageId, requestMessages, systemMessage)
+    aiLocalDataSource.updateConversationTimestamp(updatedAt = currentTimeMillis, id = localEntity.conversationId)
+    val request = AiChatRequest(messages = requestMessages, systemMessage = systemMessage)
+    doChat(assistantMessageId, request)
   }
 
+  @Suppress("TooGenericExceptionCaught")
   private suspend fun doChat(
     assistantMessageId: Long,
-    requestMessages: List<AiChatRequestMessage>,
-    systemMessage: String,
+    request: AiChatRequest,
   ) {
-    val request = AiChatRequest(messages = requestMessages, systemMessage = systemMessage)
     try {
       val responseBuilder = StringBuilder()
       aiRemoteDataSource.chat(request).collect { token ->
@@ -126,6 +146,11 @@ internal class AiChatRepoImpl(
     } catch (e: AiChatError) {
       Logger.e("AI chat unknown error", e)
       aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.UNKNOWN_ERROR.value.toLong())
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Logger.e("AI chat unexpected error", e)
+      aiLocalDataSource.updateMessageStatus(assistantMessageId, AiChatMessageStatus.UNKNOWN_ERROR.value.toLong())
     }
   }
 
@@ -142,7 +167,7 @@ internal class AiChatRepoImpl(
     aiLocalDataSource.getConversationById(id).map { it?.toAiChatConversation() }
 
   override fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessage>> =
-    aiLocalDataSource.getMessagesByConversationId(conversationId).map { list -> list.map { it.toAiChatMessage() } }
+    aiLocalDataSource.getMessagesWithImagesByConversationId(conversationId).map { it.toAiChatMessages() }
 
   override suspend fun saveConversation(conversation: AiChatConversation): Long =
     aiLocalDataSource.insertConversation(conversation.toLocalEntity())

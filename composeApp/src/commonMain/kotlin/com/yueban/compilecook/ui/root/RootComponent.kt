@@ -111,7 +111,7 @@ class DefaultRootComponent(
       serializer = Unit.serializer(),
       key = KEY_AI_CHAT_SLOT,
       handleBackButton = false,
-      childFactory = { _, childContext -> get<AiComponent> { parametersOf(childContext, ::onAiOutput) } },
+      childFactory = { _, childContext -> get<AiComponent> { parametersOf(childContext) } },
     )
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
     childStack(
@@ -207,12 +207,6 @@ class DefaultRootComponent(
   private fun onDishOutput(output: DishComponent.Output) = navigation.onOutput(output)
 
   private fun onAboutOutput(output: AboutComponent.Output) = navigation.onOutput(output)
-
-  private fun onAiOutput(output: AiComponent.Output) {
-    when (output) {
-      is AiComponent.Output.CameraClicked -> { /* TODO: Camera integration */ }
-    }
-  }
 
   override fun onBackClicked() {
     navigation.pop()

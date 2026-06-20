@@ -19,6 +19,15 @@ CREATE TABLE IF NOT EXISTS AiChatMessageLocalEntity (
 CREATE INDEX IF NOT EXISTS AiChatMessage_conversationId ON AiChatMessageLocalEntity(conversationId);
 CREATE INDEX IF NOT EXISTS AiChatMessage_conversationId_timestamp ON AiChatMessageLocalEntity(conversationId, timestamp);
 
+CREATE TABLE IF NOT EXISTS AiChatMessageImageLocalEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    messageId INTEGER NOT NULL REFERENCES AiChatMessageLocalEntity(id) ON DELETE CASCADE,
+    imagePath TEXT NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS AiChatMessageImage_messageId ON AiChatMessageImageLocalEntity(messageId);
+
 -- Read: Conversations
 getConversations:
 SELECT * FROM AiChatConversationLocalEntity
@@ -33,6 +42,21 @@ getMessagesByConversationId:
 SELECT * FROM AiChatMessageLocalEntity
 WHERE conversationId = ?
 ORDER BY timestamp ASC, id ASC;
+
+-- Read: Messages with image paths (LEFT JOIN, group by messageId in Kotlin)
+getMessagesWithImagesByConversationId:
+SELECT
+  m.id AS id,
+  m.conversationId AS conversationId,
+  m.role AS role,
+  m.content AS content,
+  m.timestamp AS timestamp,
+  m.status AS status,
+  i.imagePath AS imagePath
+FROM AiChatMessageLocalEntity m
+LEFT JOIN AiChatMessageImageLocalEntity i ON m.id = i.messageId
+WHERE m.conversationId = ?
+ORDER BY m.timestamp ASC, m.id ASC, i.position ASC;
 
 getMessageById:
 SELECT * FROM AiChatMessageLocalEntity
@@ -83,3 +107,26 @@ DELETE FROM AiChatConversationLocalEntity WHERE id = ?;
 
 deleteMessagesByConversationId:
 DELETE FROM AiChatMessageLocalEntity WHERE conversationId = ?;
+
+-- Read: Image paths by conversation (for file cleanup)
+getImagePathsByConversationId:
+SELECT i.imagePath FROM AiChatMessageImageLocalEntity i
+INNER JOIN AiChatMessageLocalEntity m ON i.messageId = m.id
+WHERE m.conversationId = ?;
+
+-- Read: Message Images
+getImagesByMessageId:
+SELECT * FROM AiChatMessageImageLocalEntity
+WHERE messageId = ?
+ORDER BY position ASC;
+
+-- Read: Message Images by multiple message IDs
+getImagesByMessageIds:
+SELECT * FROM AiChatMessageImageLocalEntity
+WHERE messageId IN ?
+ORDER BY messageId ASC, position ASC;
+
+-- Insert: Message Images
+insertImage:
+INSERT INTO AiChatMessageImageLocalEntity(messageId, imagePath, position)
+VALUES (?, ?, ?);

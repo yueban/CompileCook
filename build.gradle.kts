@@ -74,6 +74,7 @@ subprojects {
         languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
         languageSettings.optIn("kotlinx.coroutines.FlowPreview")
         languageSettings.optIn("kotlin.time.ExperimentalTime")
+        languageSettings.optIn("kotlin.io.encoding.ExperimentalEncodingApi")
       }
 
       if (project.name == projects.composeApp.name) {
