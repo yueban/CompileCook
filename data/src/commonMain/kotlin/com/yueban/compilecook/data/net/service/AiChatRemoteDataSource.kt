@@ -29,6 +29,7 @@ internal class AiChatRemoteDataSourceImpl(
   private val openAi: OpenAI,
   private val modelId: ModelId,
   private val defaultDispatcher: CoroutineDispatcher,
+  private val ioDispatcher: CoroutineDispatcher,
 ) : AiChatRemoteDataSource {
   @Suppress("TooGenericExceptionCaught")
   override suspend fun chat(request: AiChatRequest): Flow<String> = flow {
@@ -47,7 +48,7 @@ internal class AiChatRemoteDataSourceImpl(
       messages = allMessages,
     )
     try {
-      openAi.chatCompletions(chatRequest).collect { chunk ->
+      openAi.chatCompletions(chatRequest).flowOn(ioDispatcher).collect { chunk ->
         chunk.choices.firstOrNull()?.delta?.content?.let { emit(it) }
       }
     } catch (e: CancellationException) {

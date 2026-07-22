@@ -14,6 +14,7 @@ private val coroutineDispatcherModule = module {
   single<CoroutineDispatcher>(named(DispatcherType.Main)) { Dispatchers.Main }
   single<CoroutineDispatcher>(named(DispatcherType.MainImmediate)) { Dispatchers.Main.immediate }
   single<CoroutineDispatcher>(named(DispatcherType.Default)) { Dispatchers.Default }
+  single<CoroutineDispatcher>(named(DispatcherType.IO)) { ioDispatcher }
 }
 
 val coroutineModule = module {
@@ -34,4 +35,4 @@ val coroutineModule = module {
   includes(coroutineDispatcherModule)
 }
 
-enum class DispatcherType { Main, MainImmediate, Default, }
+enum class DispatcherType { Main, MainImmediate, Default, IO, }
