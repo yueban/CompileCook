@@ -15,7 +15,7 @@ object Configs {
   const val packageName = "com.yueban.compilecook"
   const val applicationId = "com.yueban.compilecook"
   const val appName = "Compile Cook"
-  const val compileSdk = 36
+  const val compileSdk = 37
   const val minSdk = 29
   val versionCode: Int =
     LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.CHINA)).toInt()
