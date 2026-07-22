@@ -36,11 +36,10 @@ object Configs {
   val openAiModel: String get() = localProperties.getProperty("OPEN_AI_MODEL", "")
 }
 
-private val localProperties: Properties by lazy {
-  Properties().apply {
+private val localProperties: Properties
+  get() = Properties().apply {
     val rootDir = System.getProperty("compilecook.project.root")
       ?: System.getProperty("user.dir")
     val file = File(rootDir, "local.properties")
     if (file.exists()) file.inputStream().use { load(it) }
   }
-}
