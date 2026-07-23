@@ -21,11 +21,12 @@ plugins {
 }
 
 val buildDirProvider: DirectoryProperty = project.layout.buildDirectory
-val reportMerge by tasks.registering(ReportMergeTask::class) {
+val reportMerge = tasks.register<ReportMergeTask>("detektReportMerge") {
+  description = "Merges detekt reports from all subprojects."
   output.set(buildDirProvider.get().asFile.resolve("reports/detekt/merge.xml"))
 }
 subprojects {
-  apply(plugin = rootProject.libs.plugins.detekt.get().pluginId)
+  pluginManager.apply(rootProject.libs.plugins.detekt.get().pluginId)
 
   detekt {
     toolVersion = rootProject.libs.versions.detekt.get()
