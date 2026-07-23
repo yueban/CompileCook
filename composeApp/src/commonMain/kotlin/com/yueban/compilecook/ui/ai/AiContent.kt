@@ -18,6 +18,7 @@ fun AiContent(
     animation = backAnimation(
       backHandler = component.backHandler,
       onBack = component::onBackClicked,
+      fadeOnly = true,
     ),
   ) { child ->
     AiChild(child.instance)

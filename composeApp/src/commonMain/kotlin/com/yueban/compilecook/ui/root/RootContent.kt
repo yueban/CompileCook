@@ -138,4 +138,5 @@ private fun RootChild(child: RootComponent.Child) {
 expect fun <C : Any, T : Any> backAnimation(
   backHandler: BackHandler,
   onBack: () -> Unit,
+  fadeOnly: Boolean = false,
 ): StackAnimation<C, T>

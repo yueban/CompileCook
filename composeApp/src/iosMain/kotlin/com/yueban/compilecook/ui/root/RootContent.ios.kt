@@ -9,6 +9,7 @@ import androidx.compose.ui.layout.layout
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.PredictiveBackParams
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.StackAnimation
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimator
 import com.arkivanov.decompose.extensions.compose.stack.animation.isFront
@@ -17,7 +18,10 @@ import com.arkivanov.essenty.backhandler.BackHandler
 actual fun <C : Any, T : Any> backAnimation(
   backHandler: BackHandler,
   onBack: () -> Unit,
-): StackAnimation<C, T> =
+  fadeOnly: Boolean,
+): StackAnimation<C, T> = if (fadeOnly) {
+  stackAnimation(fade())
+} else {
   stackAnimation(
     animator = iosLikeSlide(),
     predictiveBackParams = {
@@ -27,6 +31,7 @@ actual fun <C : Any, T : Any> backAnimation(
       )
     },
   )
+}
 
 private fun iosLikeSlide(animationSpec: FiniteAnimationSpec<Float> = tween()): StackAnimator =
   stackAnimator(animationSpec = animationSpec) { factor, direction ->
