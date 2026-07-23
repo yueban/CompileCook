@@ -89,6 +89,7 @@ slf4j-nop = "2.0.18"
 ##     ⬆ = "2.1.0-alpha1"
 platformtools = "0.7.5"
 openai-client = "4.1.0"
+imagepickerkmp = "1.0.43"
 
 [libraries]
 
@@ -150,3 +151,4 @@ aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3",
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j-nop" }
 platformtools-darkmodedetector = { module = "io.github.kdroidfilter:platformtools.darkmodedetector", version.ref = "platformtools" }
 openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openai-client" }
+imagepickerkmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepickerkmp" }

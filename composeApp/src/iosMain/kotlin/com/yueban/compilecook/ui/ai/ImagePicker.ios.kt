@@ -1,23 +1,7 @@
-@file:Suppress("MatchingDeclarationName", "UnusedPrivateProperty")
-
 package com.yueban.compilecook.ui.ai
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
+import io.github.ismoy.imagepickerkmp.domain.models.PhotoResult
 
-@Composable
-actual fun rememberImagePickerManager(onImagePicked: (ByteArray) -> Unit): ImagePickerManager {
-  // TODO: Implement with PHPickerViewController / UIImagePickerController
-  val currentCallback by rememberUpdatedState(onImagePicked)
-  return remember {
-    object : ImagePickerManager {
-      override fun capturePhoto() = Unit
-      override fun pickFromGallery() = Unit
-
-      // TODO: Implement camera support with PHPickerViewController / UIImagePickerController
-      override fun isCameraAvailable(): Boolean = false
-    }
-  }
-}
+internal actual fun isCameraSupported(): Boolean = true
+internal actual suspend fun PhotoResult.loadBytesSuspend(): ByteArray = loadBytes()

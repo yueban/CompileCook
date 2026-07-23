@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses the camera to take photos for AI chat.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app accesses your photo library to select images for AI chat.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

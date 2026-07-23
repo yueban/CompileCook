@@ -91,6 +91,7 @@ kotlin {
       implementation(libs.aboutlibraries.core)
       implementation(libs.aboutlibraries.compose.m3)
       implementation(libs.platformtools.darkmodedetector)
+      implementation(libs.imagepickerkmp)
     }
     androidMain.dependencies {
       implementation(libs.compose.uiToolingPreview)
