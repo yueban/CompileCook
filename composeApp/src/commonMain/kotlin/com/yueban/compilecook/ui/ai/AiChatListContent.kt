@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -89,17 +88,9 @@ fun AiChatListContent(
 private fun ListTopBar(
   onBackClick: () -> Unit,
 ) {
-  val topBarColor = AppTheme.colorScheme.surfaceVariant
   val onTopBarColor = AppTheme.colorScheme.onSurfaceVariant
 
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .defaultMinSize(minHeight = AppTheme.dimens.aiChatTopBarMinHeight)
-      .background(topBarColor)
-      .padding(horizontal = AppTheme.dimens.tinyGap),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
+  AiDrawerTopBar {
     IconButton(
       onClick = onBackClick,
       modifier = Modifier.size(AppTheme.dimens.iconLarge),

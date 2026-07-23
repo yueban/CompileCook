@@ -1,13 +1,10 @@
 package com.yueban.compilecook.ui.ai
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -70,13 +67,8 @@ internal fun TopBar(
   val onTopBarColor =
     if (showContextChange) AppTheme.colorScheme.onSecondaryContainer else AppTheme.colorScheme.onSurfaceVariant
 
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .defaultMinSize(minHeight = AppTheme.dimens.aiChatTopBarMinHeight)
-      .background(topBarColor)
-      .padding(horizontal = AppTheme.dimens.smallGap),
-    verticalAlignment = Alignment.CenterVertically,
+  AiDrawerTopBar(
+    color = topBarColor,
   ) {
     if (showContextChange) {
       ContextChangeBanner(
