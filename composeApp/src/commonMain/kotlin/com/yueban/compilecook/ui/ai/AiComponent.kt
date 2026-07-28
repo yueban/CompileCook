@@ -5,6 +5,7 @@ import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
@@ -23,6 +24,7 @@ interface AiComponent : BackHandlerOwner {
   val stack: Value<ChildStack<Config, Child>>
   fun updateContext(context: AiChatContext)
   fun onBackClicked()
+  fun resetToRoot()
 
   @Serializable
   sealed interface Config {
@@ -70,6 +72,10 @@ class DefaultAiComponent(
 
   override fun onBackClicked() {
     navigation.pop()
+  }
+
+  override fun resetToRoot() {
+    navigation.navigate { listOf(Config.Chat) }
   }
 
   override fun updateContext(context: AiChatContext) {

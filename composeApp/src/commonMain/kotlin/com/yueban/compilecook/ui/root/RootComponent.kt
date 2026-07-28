@@ -5,7 +5,6 @@ import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
-import com.arkivanov.decompose.router.slot.dismiss
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.active
@@ -54,8 +53,6 @@ import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.service.DeepLinkHandler
 import com.yueban.compilecook.ui.tip.TipComponent
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -65,7 +62,6 @@ import org.koin.core.parameter.parametersOf
 
 private const val KEY_ROOT_CHILD_STACK = "ROOT_CHILD_STACK"
 private const val KEY_AI_CHAT_SLOT = "AI_CHAT_SLOT"
-private const val DRAWER_ANIMATION_DURATION_MS = 300L
 
 data class RootState(
   val isDrawerOpen: Boolean = false,
@@ -132,8 +128,6 @@ class DefaultRootComponent(
     },
   )
   override val messages: Flow<UiMessage> = get<MessageService>().messageFlow
-
-  private var drawerDismissJob: Job? = null
 
   init {
     stack.subscribe {
@@ -221,11 +215,10 @@ class DefaultRootComponent(
   }
 
   override fun openDrawer() {
-    drawerDismissJob?.cancel()
-    drawerDismissJob = null
     if (!uiState.value.isDrawerOpen) {
       aiChatNavigation.activate(Unit)
     }
+    aiChatSlot.value.child?.instance?.resetToRoot()
     setState { copy(isDrawerOpen = true) }
     val context = deriveAiContext(stack.active.instance)
     aiChatSlot.value.child?.instance?.updateContext(context)
@@ -233,12 +226,6 @@ class DefaultRootComponent(
 
   override fun closeDrawer() {
     setState { copy(isDrawerOpen = false) }
-    drawerDismissJob?.cancel()
-    drawerDismissJob = componentScope.launch {
-      // dismiss after drawer closing animation
-      delay(DRAWER_ANIMATION_DURATION_MS)
-      aiChatNavigation.dismiss()
-    }
   }
 
   @Serializable
