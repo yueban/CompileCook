@@ -1,5 +1,7 @@
 package com.yueban.compilecook.util
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -8,13 +10,12 @@ import javax.imageio.ImageIO
 import javax.imageio.ImageWriteParam
 
 actual object ImageCompressor {
-  actual suspend fun compressAndSave(imageBytes: ByteArray, maxWidth: Int, quality: Int): String {
-    val compressed = compress(imageBytes, maxWidth, quality)
-    return ImageFileCache.saveToCache(compressed)
-  }
-
-  private fun compress(imageBytes: ByteArray, maxWidth: Int, quality: Int): ByteArray {
-    val original = ImageIO.read(ByteArrayInputStream(imageBytes)) ?: return imageBytes
+  actual suspend fun compress(
+    imageBytes: ByteArray,
+    maxWidth: Int,
+    quality: Int,
+  ): ByteArray = withContext(Dispatchers.IO) {
+    val original = ImageIO.read(ByteArrayInputStream(imageBytes)) ?: return@withContext imageBytes
 
     val targetWidth = minOf(original.width, maxWidth)
     val targetHeight = (original.height.toLong() * targetWidth / original.width).toInt()
@@ -33,6 +34,11 @@ actual object ImageCompressor {
     writer.output = ImageIO.createImageOutputStream(output)
     writer.write(null, javax.imageio.IIOImage(scaled, null, null), param)
     writer.dispose()
-    return output.toByteArray()
+    output.toByteArray()
+  }
+
+  actual suspend fun getDimensions(imageBytes: ByteArray): ImageDimensions? = withContext(Dispatchers.IO) {
+    val image = ImageIO.read(ByteArrayInputStream(imageBytes)) ?: return@withContext null
+    ImageDimensions(image.width, image.height)
   }
 }

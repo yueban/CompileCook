@@ -9,19 +9,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import com.yueban.compilecook.logger.Logger
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_camera_permission_message
 import compilecook.composeapp.generated.resources.ai_chat_camera_permission_settings
 import compilecook.composeapp.generated.resources.ai_chat_camera_permission_title
 import compilecook.composeapp.generated.resources.ai_chat_cancel
 import compilecook.composeapp.generated.resources.ai_chat_confirm
-import io.github.ismoy.imagepickerkmp.domain.config.GalleryConfig
-import io.github.ismoy.imagepickerkmp.domain.config.PermissionAndConfirmationConfig
-import io.github.ismoy.imagepickerkmp.domain.models.MimeType
-import io.github.ismoy.imagepickerkmp.domain.models.PhotoResult
-import io.github.ismoy.imagepickerkmp.features.imagepicker.config.ImagePickerKMPConfig
-import io.github.ismoy.imagepickerkmp.features.imagepicker.model.ImagePickerResult
-import io.github.ismoy.imagepickerkmp.features.imagepicker.ui.rememberImagePickerKMP
+import io.github.ismoy.imagepickerkmp.config.CameraCaptureConfig
+import io.github.ismoy.imagepickerkmp.config.GalleryConfig
+import io.github.ismoy.imagepickerkmp.config.PermissionAndConfirmationConfig
+import io.github.ismoy.imagepickerkmp.picker.ImagePickerKMPConfig
+import io.github.ismoy.imagepickerkmp.picker.ImagePickerResult
+import io.github.ismoy.imagepickerkmp.picker.MimeType
+import io.github.ismoy.imagepickerkmp.picker.PhotoResult
+import io.github.ismoy.imagepickerkmp.picker.rememberImagePickerKMP
 import org.jetbrains.compose.resources.stringResource
 
 interface ImagePickerManager {
@@ -35,13 +37,14 @@ fun rememberImagePickerManager(onImagePicked: (ByteArray) -> Unit): ImagePickerM
   val currentCallback = rememberUpdatedState(onImagePicked)
   val picker = rememberImagePickerKMP(
     config = ImagePickerKMPConfig(
+      // disable built-in compression, we rely on our own multi-pass ImageCompressor instead
+      cameraCaptureConfig = CameraCaptureConfig(compressionLevel = null),
       galleryConfig = GalleryConfig(
         allowMultiple = false,
         redactGpsData = true,
         mimeTypes = listOf(MimeType.IMAGE_JPEG, MimeType.IMAGE_PNG, MimeType.IMAGE_WEBP),
       ),
       permissionAndConfirmationConfig = PermissionAndConfirmationConfig(
-        skipConfirmation = true,
         customDeniedDialog = { onRetry, onDismiss ->
           AlertDialog(
             onDismissRequest = onDismiss,
@@ -83,6 +86,7 @@ fun rememberImagePickerManager(onImagePicked: (ByteArray) -> Unit): ImagePickerM
   LaunchedEffect(picker.result) {
     val result = picker.result
     if (result is ImagePickerResult.Success) {
+      Logger.d("image selected: ${result.first?.uri}")
       val bytes = result.first?.loadBytesSuspend()?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
       currentCallback.value(bytes)
     }

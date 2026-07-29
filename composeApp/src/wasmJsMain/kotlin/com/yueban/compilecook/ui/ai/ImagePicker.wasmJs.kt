@@ -1,6 +1,6 @@
 package com.yueban.compilecook.ui.ai
 
-import io.github.ismoy.imagepickerkmp.domain.models.PhotoResult
+import io.github.ismoy.imagepickerkmp.picker.PhotoResult
 import kotlin.io.encoding.Base64
 
 internal actual fun isCameraSupported(): Boolean = false

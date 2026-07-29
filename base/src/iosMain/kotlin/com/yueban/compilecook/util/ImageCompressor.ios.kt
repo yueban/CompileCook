@@ -18,12 +18,7 @@ import platform.posix.memcpy
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual object ImageCompressor {
-  actual suspend fun compressAndSave(imageBytes: ByteArray, maxWidth: Int, quality: Int): String {
-    val compressed = compress(imageBytes, maxWidth, quality)
-    return ImageFileCache.saveToCache(compressed)
-  }
-
-  private fun compress(imageBytes: ByteArray, maxWidth: Int, quality: Int): ByteArray {
+  actual suspend fun compress(imageBytes: ByteArray, maxWidth: Int, quality: Int): ByteArray {
     val data = imageBytes.toNSData()
     val image = UIImage(data = data)
     val originalWidth = image.size.useContents { width }
@@ -39,6 +34,18 @@ actual object ImageCompressor {
     UIGraphicsEndImageContext()
 
     return resized?.let { UIImageJPEGRepresentation(it, quality / 100.0)?.toByteArray() } ?: imageBytes
+  }
+
+  actual suspend fun getDimensions(imageBytes: ByteArray): ImageDimensions? {
+    val data = imageBytes.toNSData()
+    val image = UIImage(data = data)
+    val width = image.size.useContents { width }
+    val height = image.size.useContents { height }
+    return if (width > 0 && height > 0) {
+      ImageDimensions(width.toInt(), height.toInt())
+    } else {
+      null
+    }
   }
 
   private fun ByteArray.toNSData(): NSData = NSData.create(

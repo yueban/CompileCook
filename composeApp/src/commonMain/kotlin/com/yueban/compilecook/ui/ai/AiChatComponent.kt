@@ -12,8 +12,8 @@ import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.util.getDisplayName
-import com.yueban.compilecook.util.ImageCompressor
 import com.yueban.compilecook.util.ImageFileCache
+import com.yueban.compilecook.util.compressAndSave
 import com.yueban.compilecook.util.currentTimeMillis
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_system_content_label
@@ -135,7 +135,7 @@ class DefaultAiChatComponent(
     componentScope.launch {
       val path = try {
         withContext(Dispatchers.Default) {
-          ImageCompressor.compressAndSave(imageBytes)
+          compressAndSave(imageBytes)
         }
       } catch (e: CancellationException) {
         compressingImageCount--

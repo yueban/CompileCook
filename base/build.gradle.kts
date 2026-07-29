@@ -75,6 +75,10 @@ kotlin {
     commonTest.dependencies {
       implementation(libs.kotlin.test)
     }
+    wasmJsMain.dependencies {
+      implementation(libs.kotlin.browser)
+      implementation(libs.kotlinx.browser)
+    }
     getByName("androidDeviceTest").dependencies {
       implementation(libs.androidx.test.runner)
       implementation(libs.androidx.test.core)
