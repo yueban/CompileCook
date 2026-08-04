@@ -14,6 +14,12 @@ actual object ImageFileCache {
     return file.absolutePath
   }
 
+  actual suspend fun saveToCacheFromPath(path: String, prefix: String): String {
+    val file = File(cacheDir, "${prefix}_${UUID.randomUUID()}.jpg")
+    File(path).copyTo(file)
+    return file.absolutePath
+  }
+
   actual fun readBytes(path: String): ByteArray {
     val file = File(path)
     return if (file.exists()) file.readBytes() else ByteArray(0)

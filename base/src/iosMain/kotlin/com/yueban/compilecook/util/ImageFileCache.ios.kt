@@ -43,6 +43,13 @@ actual object ImageFileCache {
     return path
   }
 
+  actual suspend fun saveToCacheFromPath(path: String, prefix: String): String {
+    val fileName = "${prefix}_${NSUUID.UUID().UUIDString}.jpg"
+    val dest = "$cacheDir/$fileName"
+    NSFileManager.defaultManager.copyItemAtPath(path, toPath = dest, error = null)
+    return dest
+  }
+
   actual fun readBytes(path: String): ByteArray {
     val data = platform.Foundation.NSData.dataWithContentsOfFile(path) ?: return ByteArray(0)
     return data.toByteArray()

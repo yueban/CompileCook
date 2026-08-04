@@ -1,7 +1,11 @@
 package com.yueban.compilecook.ui.ai
 
-import io.github.ismoy.imagepickerkmp.extensions.loadBytes
+import com.yueban.compilecook.util.ImageSource
+import io.github.ismoy.imagepickerkmp.extensions.absolutePath
 import io.github.ismoy.imagepickerkmp.picker.PhotoResult
 
 internal actual fun isCameraSupported(): Boolean = true
-internal actual suspend fun PhotoResult.loadBytesSuspend(): ByteArray = loadBytes()
+
+internal actual suspend fun PhotoResult.toImageSource(): ImageSource? = runCatching {
+  ImageSource.Path(absolutePath)
+}.getOrNull()?.takeIf { it.path.isNotBlank() }

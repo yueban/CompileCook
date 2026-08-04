@@ -11,8 +11,9 @@ actual object ImageCompressor {
   private var cacheMaxWidth: Int = -1
   private var cacheImageBitmap: JsAny? = null
 
-  actual suspend fun compress(imageBytes: ByteArray, maxWidth: Int, quality: Int): ByteArray {
-    val imageBitmap = getOrDecodeImageBitmap(imageBytes, maxWidth)
+  actual suspend fun compress(source: ImageSource, maxWidth: Int, quality: Int): ByteArray {
+    val bytes = source.toBytes()
+    val imageBitmap = getOrDecodeImageBitmap(bytes, maxWidth)
     val compressedJs = compressImageJs(imageBitmap, maxWidth, quality).await()
     return uint8ArrayToByteArray(compressedJs)
   }
@@ -32,8 +33,8 @@ actual object ImageCompressor {
     return newBitmap
   }
 
-  actual suspend fun getDimensions(imageBytes: ByteArray): ImageDimensions? {
-    val uint8Array = byteArrayToUint8Array(imageBytes)
+  actual suspend fun getDimensions(source: ImageSource): ImageDimensions? {
+    val uint8Array = byteArrayToUint8Array(source.toBytes())
     val bitmap = decodeToImageBitmapJs(uint8Array).await()
     val width = getImageBitmapWidth(bitmap)
     val height = getImageBitmapHeight(bitmap)
@@ -43,6 +44,16 @@ actual object ImageCompressor {
     } else {
       null
     }
+  }
+
+  actual suspend fun getFileSize(source: ImageSource): Long? = when (source) {
+    is ImageSource.Bytes -> source.bytes.size.toLong()
+    is ImageSource.Path -> null
+  }
+
+  private fun ImageSource.toBytes(): ByteArray = when (this) {
+    is ImageSource.Bytes -> bytes
+    is ImageSource.Path -> error("ImageSource.Path is not supported on WasmJS — no filesystem")
   }
 }
 

@@ -9,30 +9,46 @@ const val IMAGE_COMPRESSOR_MIN_QUALITY = 10
 const val IMAGE_COMPRESSOR_MIN_MAX_WIDTH = 320
 private const val IMAGE_COMPRESSOR_DIMENSION_REDUCTION_FACTOR = 0.8
 
+/** Input for image compression. Path avoids loading the full image bytes into memory. */
+sealed interface ImageSource {
+  // Intentionally NOT a data class: ByteArray equality is referential and the
+  // multi-pass compression cache relies on instance identity.
+  @Suppress("UseDataClass")
+  class Bytes(val bytes: ByteArray) : ImageSource
+
+  /** Real file path on disk (WasmJS uses [Bytes] only — no filesystem). */
+  data class Path(val path: String) : ImageSource
+}
+
 expect object ImageCompressor {
-  suspend fun compress(imageBytes: ByteArray, maxWidth: Int, quality: Int): ByteArray
-  suspend fun getDimensions(imageBytes: ByteArray): ImageDimensions?
+  suspend fun compress(source: ImageSource, maxWidth: Int, quality: Int): ByteArray
+  suspend fun getDimensions(source: ImageSource): ImageDimensions?
+  suspend fun getFileSize(source: ImageSource): Long?
 }
 
 suspend fun compressAndSave(
-  imageBytes: ByteArray,
+  source: ImageSource,
   maxWidth: Int = IMAGE_COMPRESSOR_DEFAULT_MAX_WIDTH,
   quality: Int = IMAGE_COMPRESSOR_DEFAULT_QUALITY,
   maxFileSize: Long = IMAGE_COMPRESSOR_DEFAULT_MAX_FILE_SIZE,
 ): String {
-  val originalDimensions = ImageCompressor.getDimensions(imageBytes)
+  val originalSize = ImageCompressor.getFileSize(source)
+  val originalDimensions = ImageCompressor.getDimensions(source)
   Logger.d(
-    "Original image: ${FileSizeFormatter.format(imageBytes.size.toLong())}, " +
+    "Original image: ${FileSizeFormatter.format(originalSize ?: 0L)}, " +
       "dimensions: ${originalDimensions?.width}x${originalDimensions?.height}"
   )
 
-  if (imageBytes.size <= maxFileSize) {
-    return ImageFileCache.saveToCache(imageBytes)
+  if (originalSize != null && originalSize <= maxFileSize) {
+    return when (source) {
+      is ImageSource.Bytes -> ImageFileCache.saveToCache(source.bytes)
+      is ImageSource.Path -> ImageFileCache.saveToCacheFromPath(source.path)
+    }
   }
 
   var currentMaxWidth = maxWidth
   var currentQuality = quality
-  var compressed = ImageCompressor.compress(imageBytes, currentMaxWidth, currentQuality)
+  var compressed = ImageCompressor.compress(source, currentMaxWidth, currentQuality)
 
   while (compressed.size > maxFileSize) {
     when {
@@ -47,10 +63,10 @@ suspend fun compressAndSave(
       }
       else -> break
     }
-    compressed = ImageCompressor.compress(imageBytes, currentMaxWidth, currentQuality)
+    compressed = ImageCompressor.compress(source, currentMaxWidth, currentQuality)
   }
 
-  val compressedDimensions = ImageCompressor.getDimensions(compressed)
+  val compressedDimensions = ImageCompressor.getDimensions(ImageSource.Bytes(compressed))
   Logger.d(
     "Compressed image: ${FileSizeFormatter.format(compressed.size.toLong())}, " +
       "dimensions: ${compressedDimensions?.width}x${compressedDimensions?.height}"

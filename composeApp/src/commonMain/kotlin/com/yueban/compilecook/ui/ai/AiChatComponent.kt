@@ -13,6 +13,7 @@ import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.util.getDisplayName
 import com.yueban.compilecook.util.ImageFileCache
+import com.yueban.compilecook.util.ImageSource
 import com.yueban.compilecook.util.compressAndSave
 import com.yueban.compilecook.util.currentTimeMillis
 import compilecook.composeapp.generated.resources.Res
@@ -62,7 +63,7 @@ interface AiChatComponent : UiStateComponent<AiChatState> {
   fun switchContext()
   fun dismissContextChange()
   fun selectConversation(conversationId: Long)
-  fun onImageSelected(imageBytes: ByteArray)
+  fun onImageSelected(source: ImageSource)
   fun removePendingImage(index: Int)
   fun canPickImage(): Boolean
 
@@ -82,7 +83,6 @@ class DefaultAiChatComponent(
   serializer = AiChatState.serializer(),
 ) {
   private var chatJob: Job? = null
-  private var compressingImageCount = 0
 
   init {
     lifecycle.doOnDestroy { cleanupPendingImages() }
@@ -124,31 +124,32 @@ class DefaultAiChatComponent(
   override fun onHistoryClick() = onOutput(AiChatComponent.Output.HistoryClicked)
 
   override fun canPickImage(): Boolean =
-    uiState.value.pendingImages.size + compressingImageCount < MAX_IMAGES_PER_MESSAGE
+    uiState.value.pendingImages.size + uiState.value.compressingImageCount < MAX_IMAGES_PER_MESSAGE
 
   @Suppress("TooGenericExceptionCaught")
-  override fun onImageSelected(imageBytes: ByteArray) {
+  override fun onImageSelected(source: ImageSource) {
     if (!canPickImage()) return
 
-    compressingImageCount++
-    setState { copy(compressingImageCount = compressingImageCount) }
+    // NOTE: never mirror state fields outside the StateFlow — inside the setState
+    // lambda the receiver's properties shadow outer class fields, so a copy() of a
+    // shadowed field is a silent no-op (the loading state never reaches the UI).
+    setState { copy(compressingImageCount = compressingImageCount + 1) }
     componentScope.launch {
       val path = try {
         withContext(Dispatchers.Default) {
-          compressAndSave(imageBytes)
+          compressAndSave(source)
         }
       } catch (e: CancellationException) {
-        compressingImageCount--
-        setState { copy(compressingImageCount = compressingImageCount) }
+        setState { copy(compressingImageCount = compressingImageCount - 1) }
         throw e
       } catch (e: Exception) {
         Logger.e("Image compression failed", e)
-        compressingImageCount--
-        setState { copy(compressingImageCount = compressingImageCount) }
+        setState { copy(compressingImageCount = compressingImageCount - 1) }
         return@launch
       }
-      compressingImageCount--
-      setState { copy(pendingImages = pendingImages + path, compressingImageCount = compressingImageCount) }
+      setState {
+        copy(pendingImages = pendingImages + path, compressingImageCount = compressingImageCount - 1)
+      }
     }
   }
 

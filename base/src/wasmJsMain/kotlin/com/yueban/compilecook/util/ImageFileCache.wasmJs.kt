@@ -15,6 +15,11 @@ actual object ImageFileCache {
     return key
   }
 
+  actual suspend fun saveToCacheFromPath(path: String, prefix: String): String {
+    // WasmJS has no filesystem — image sources are always [ImageSource.Bytes].
+    error("saveToCacheFromPath is not supported on WasmJS")
+  }
+
   actual fun readBytes(path: String): ByteArray = store[path] ?: ByteArray(0)
 
   actual fun delete(path: String) {

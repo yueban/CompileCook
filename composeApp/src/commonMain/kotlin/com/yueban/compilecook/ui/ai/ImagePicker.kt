@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import com.yueban.compilecook.logger.Logger
+import com.yueban.compilecook.util.ImageSource
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_camera_permission_message
 import compilecook.composeapp.generated.resources.ai_chat_camera_permission_settings
@@ -33,11 +34,12 @@ interface ImagePickerManager {
 }
 
 @Composable
-fun rememberImagePickerManager(onImagePicked: (ByteArray) -> Unit): ImagePickerManager {
+fun rememberImagePickerManager(onImagePicked: (ImageSource) -> Unit): ImagePickerManager {
   val currentCallback = rememberUpdatedState(onImagePicked)
   val picker = rememberImagePickerKMP(
     config = ImagePickerKMPConfig(
       // disable built-in compression, we rely on our own multi-pass ImageCompressor instead
+      // TODO: the built-in compression cannot be disabled on iOS platform.
       cameraCaptureConfig = CameraCaptureConfig(compressionLevel = null),
       galleryConfig = GalleryConfig(
         allowMultiple = false,
@@ -87,8 +89,8 @@ fun rememberImagePickerManager(onImagePicked: (ByteArray) -> Unit): ImagePickerM
     val result = picker.result
     if (result is ImagePickerResult.Success) {
       Logger.d("image selected: ${result.first?.uri}")
-      val bytes = result.first?.loadBytesSuspend()?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
-      currentCallback.value(bytes)
+      val source = result.first?.toImageSource() ?: return@LaunchedEffect
+      currentCallback.value(source)
     }
   }
 
@@ -102,4 +104,4 @@ fun rememberImagePickerManager(onImagePicked: (ByteArray) -> Unit): ImagePickerM
 }
 
 internal expect fun isCameraSupported(): Boolean
-internal expect suspend fun PhotoResult.loadBytesSuspend(): ByteArray
+internal expect suspend fun PhotoResult.toImageSource(): ImageSource?

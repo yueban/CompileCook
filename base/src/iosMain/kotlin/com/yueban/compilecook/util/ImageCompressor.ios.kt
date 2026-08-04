@@ -8,7 +8,11 @@ import kotlinx.cinterop.usePinned
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSData
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSFileSize
+import platform.Foundation.NSNumber
 import platform.Foundation.create
+import platform.Foundation.dataWithContentsOfFile
 import platform.UIKit.UIGraphicsBeginImageContextWithOptions
 import platform.UIKit.UIGraphicsEndImageContext
 import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
@@ -18,13 +22,11 @@ import platform.posix.memcpy
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual object ImageCompressor {
-  actual suspend fun compress(imageBytes: ByteArray, maxWidth: Int, quality: Int): ByteArray {
-    val data = imageBytes.toNSData()
-    val image = UIImage(data = data)
+  actual suspend fun compress(source: ImageSource, maxWidth: Int, quality: Int): ByteArray {
+    val image = decodeImage(source)?.takeIf { it.size.useContents { width > 0.0 } }
+      ?: return fallbackBytes(source)
+
     val originalWidth = image.size.useContents { width }
-
-    if (originalWidth <= 0.0) return imageBytes
-
     val targetWidth = minOf(originalWidth, maxWidth.toDouble())
     val targetHeight = image.size.useContents { height } * (targetWidth / originalWidth)
 
@@ -33,12 +35,11 @@ actual object ImageCompressor {
     val resized = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
 
-    return resized?.let { UIImageJPEGRepresentation(it, quality / 100.0)?.toByteArray() } ?: imageBytes
+    return resized?.let { UIImageJPEGRepresentation(it, quality / 100.0)?.toByteArray() } ?: fallbackBytes(source)
   }
 
-  actual suspend fun getDimensions(imageBytes: ByteArray): ImageDimensions? {
-    val data = imageBytes.toNSData()
-    val image = UIImage(data = data)
+  actual suspend fun getDimensions(source: ImageSource): ImageDimensions? {
+    val image = decodeImage(source) ?: return null
     val width = image.size.useContents { width }
     val height = image.size.useContents { height }
     return if (width > 0 && height > 0) {
@@ -46,6 +47,24 @@ actual object ImageCompressor {
     } else {
       null
     }
+  }
+
+  actual suspend fun getFileSize(source: ImageSource): Long? = when (source) {
+    is ImageSource.Bytes -> source.bytes.size.toLong()
+    is ImageSource.Path -> {
+      val attrs = NSFileManager.defaultManager.attributesOfItemAtPath(source.path, error = null)
+      (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue
+    }
+  }
+
+  private fun decodeImage(source: ImageSource): UIImage? = when (source) {
+    is ImageSource.Path -> UIImage(contentsOfFile = source.path)
+    is ImageSource.Bytes -> UIImage(data = source.bytes.toNSData())
+  }
+
+  private fun fallbackBytes(source: ImageSource): ByteArray = when (source) {
+    is ImageSource.Bytes -> source.bytes
+    is ImageSource.Path -> NSData.dataWithContentsOfFile(source.path)?.toByteArray() ?: ByteArray(0)
   }
 
   private fun ByteArray.toNSData(): NSData = NSData.create(
