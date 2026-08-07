@@ -39,7 +39,6 @@ fun rememberImagePickerManager(onImagePicked: (ImageSource) -> Unit): ImagePicke
   val picker = rememberImagePickerKMP(
     config = ImagePickerKMPConfig(
       // disable built-in compression, we rely on our own multi-pass ImageCompressor instead
-      // TODO: the built-in compression cannot be disabled on iOS platform.
       cameraCaptureConfig = CameraCaptureConfig(compressionLevel = null),
       galleryConfig = GalleryConfig(
         allowMultiple = false,
