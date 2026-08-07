@@ -46,6 +46,7 @@ import com.yueban.compilecook.ui.util.LocalSharedTransitionScope
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.preview.PreviewConstant
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
+import com.yueban.compilecook.ui.util.rememberImageSharedContentState
 
 private const val TRANSITION_DURATION = 300
 
@@ -196,7 +197,7 @@ private fun MarkdownImage(
     if (enableSharedElement && sharedTransitionScope != null && animatedVisibilityScope != null) {
       with(sharedTransitionScope) {
         Modifier.sharedElement(
-          rememberSharedContentState(key = "image_$imageUrl"),
+          rememberImageSharedContentState(imageUrl),
           animatedVisibilityScope = animatedVisibilityScope,
           boundsTransform = { _, _ -> tween(durationMillis = TRANSITION_DURATION) }
         )

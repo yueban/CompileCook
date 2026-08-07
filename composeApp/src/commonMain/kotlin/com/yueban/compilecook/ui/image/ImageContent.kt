@@ -32,6 +32,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import com.yueban.compilecook.ui.util.LocalNavAnimatedVisibilityScope
 import com.yueban.compilecook.ui.util.LocalSharedTransitionScope
+import com.yueban.compilecook.ui.util.rememberImageSharedContentState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -102,7 +103,7 @@ private fun FullscreenImage(
     if (sharedTransitionScope != null && animatedVisibilityScope != null) {
       with(sharedTransitionScope) {
         Modifier.sharedElement(
-          rememberSharedContentState(key = "image_$imageUrl"),
+          rememberImageSharedContentState(imageUrl),
           animatedVisibilityScope = animatedVisibilityScope,
           boundsTransform = { _, _ -> tween(durationMillis = TRANSITION_DURATION) }
         )
