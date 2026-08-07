@@ -9,10 +9,11 @@
 - **Desktop:** `./gradlew :composeApp:run`
 - **Web:** `./gradlew :composeApp:wasmJsBrowserRun`
 - **iOS:** Open `iosApp/iosApp.xcodeproj` in Xcode
-- **Export Library Metadata:** `./gradlew :composeApp:exportLibraryDefinitions` (required for About screen)
+- **Export Library Metadata:** `./gradlew :composeApp:exportLibraryDefinitions` (required for About screen; output is committed at `src/commonMain/composeResources/files/aboutlibraries.json` — regenerate after any dep bump)
 - **All Tests:** `./gradlew test`
 - **Data Tests:** `./gradlew :data:jvmTest`
-- **Detekt:** `./gradlew detekt` (auto-correct enabled)
+- **Repo Tests:** `./gradlew :repo:jvmTest`
+- **Detekt:** `./gradlew detekt` (auto-correct enabled, `maxIssues: 0`)
 - **Clear JVM Data:** `./gradlew :composeApp:clearJvmData`
 
 ## Module Structure
@@ -51,6 +52,8 @@ Remote API -> RemoteDataSource -> toLocalEntity() -> SQLDelight DB
 - **`Dish.sq`**: `DishLocalEntity` + `DishFavoriteLocalEntity`
 - **`Tip.sq`**: `TipLocalEntity` + `TipFavoriteLocalEntity`
 - **`AiChat.sq`**: `AiChatConversationLocalEntity` + `AiChatMessageLocalEntity`
+
+`generateAsync = true` in `data/build.gradle.kts`: generated queries/transactions are suspend — no blocking driver calls.
 
 Domain entities in `repo/entity/` with bidirectional mapping extensions.
 
@@ -102,4 +105,5 @@ Domain entities in `repo/entity/` with bidirectional mapping extensions.
 5. **Wasm-JS single-threaded**: `DbTransactionLock` is no-op. `resolveBaseUrl()` returns relative paths on localhost for webpack proxy.
 6. **`selectLastInsertRowId`**: Must be called in same transaction as insert.
 7. **AI `chat()` inserts both user msg and assistant placeholder** before streaming.
-8. **`DishRepoImpl` auto-syncs** dishes/tips in global scope on construction.
+8. **`DishRepoImpl` auto-syncs** dishes/tips on construction via injected scope.
+9. **API config from `local.properties`**: `API_DOMAIN`, `API_PATH`, `OPEN_AI_API_*` are read into BuildConfig (`APIKonfig`) in `data/build.gradle.kts`. Missing keys silently yield empty base URLs/tokens — remote sync and AI chat fail with no error. `local.properties` is gitignored.
