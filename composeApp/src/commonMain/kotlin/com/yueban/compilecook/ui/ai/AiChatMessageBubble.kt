@@ -1,11 +1,13 @@
 package com.yueban.compilecook.ui.ai
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,9 +18,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntSize
+import coil3.compose.AsyncImagePainter
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatMessageStatus
 import com.yueban.compilecook.ui.theme.AppTheme
@@ -29,9 +36,15 @@ import compilecook.composeapp.generated.resources.ai_chat_error_timeout
 import compilecook.composeapp.generated.resources.ai_chat_error_unknown
 import compilecook.composeapp.generated.resources.ai_chat_retry
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 @Composable
-internal fun MessageBubble(message: AiChatMessage, isLoading: Boolean, onRetry: () -> Unit) {
+internal fun MessageBubble(
+  message: AiChatMessage,
+  isLoading: Boolean,
+  onRetry: () -> Unit,
+  onImageClick: (String) -> Unit,
+) {
   val isRetryable = message.status == AiChatMessageStatus.NETWORK_ERROR ||
     message.status == AiChatMessageStatus.TIMEOUT_ERROR ||
     message.status == AiChatMessageStatus.SERVER_ERROR ||
@@ -51,6 +64,7 @@ internal fun MessageBubble(message: AiChatMessage, isLoading: Boolean, onRetry: 
         images = message.images,
         isUser = message.isUser,
         status = message.status,
+        onImageClick = onImageClick,
       )
       if (message.isStreaming) {
         CircularProgressIndicator(
@@ -81,6 +95,7 @@ private fun MessageBubbleContent(
   images: List<String> = emptyList(),
   isUser: Boolean,
   status: AiChatMessageStatus = AiChatMessageStatus.COMPLETED,
+  onImageClick: (String) -> Unit,
 ) {
   val isError = status != AiChatMessageStatus.COMPLETED &&
     status != AiChatMessageStatus.STREAMING &&
@@ -118,7 +133,7 @@ private fun MessageBubbleContent(
   ) {
     Column {
       if (images.isNotEmpty()) {
-        MessageImageGrid(images = images)
+        MessageImageGrid(images = images, onImageClick = onImageClick)
         if (displayText.isNotBlank()) {
           Spacer(modifier = Modifier.height(AppTheme.dimens.smallGap))
         }
@@ -136,19 +151,45 @@ private fun MessageBubbleContent(
 }
 
 @Composable
-private fun MessageImageGrid(images: List<String>) {
+private fun MessageImageGrid(
+  images: List<String>,
+  onImageClick: (String) -> Unit,
+) {
   val columns = if (images.size == 1) 1 else 2
+  val imageSizes = remember { mutableStateMapOf<String, IntSize>() }
+
   Column(verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.tinyGap)) {
     images.chunked(columns).forEach { row ->
-      Row(horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.tinyGap)) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.tinyGap),
+      ) {
         row.forEach { imagePath ->
+          val imageSize = imageSizes[imagePath]
+          val imageHeightModifier = if (imageSize == null) {
+            Modifier.height(AppTheme.dimens.aiChatMessageImageHeight)
+          } else {
+            Modifier.aspectRatio(imageSize.width.toFloat() / imageSize.height)
+          }
+
           AiChatImage(
             path = imagePath,
             contentDescription = null,
             modifier = Modifier
               .weight(1f)
-              .height(AppTheme.dimens.aiChatMessageImageHeight)
-              .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall)),
+              .then(imageHeightModifier)
+              .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall))
+              .clickable { onImageClick(imagePath) },
+            contentScale = ContentScale.Fit,
+            onState = { state ->
+              val intrinsicSize = (state as? AsyncImagePainter.State.Success)?.painter?.intrinsicSize
+              if (intrinsicSize != null && intrinsicSize.width > 0f && intrinsicSize.height > 0f) {
+                val size = IntSize(intrinsicSize.width.roundToInt(), intrinsicSize.height.roundToInt())
+                if (imageSizes[imagePath] != size) {
+                  imageSizes[imagePath] = size
+                }
+              }
+            },
           )
         }
         if (row.size < columns) {

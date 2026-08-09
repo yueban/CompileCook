@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImagePainter
 import com.yueban.compilecook.ui.theme.AppTheme
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_choose_gallery
@@ -50,6 +51,7 @@ expect fun AiChatImage(
   contentDescription: String?,
   modifier: Modifier = Modifier,
   contentScale: ContentScale = ContentScale.Crop,
+  onState: (AsyncImagePainter.State) -> Unit = {},
 )
 
 @Composable

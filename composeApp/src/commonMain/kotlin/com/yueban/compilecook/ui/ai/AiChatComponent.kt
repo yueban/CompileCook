@@ -55,6 +55,7 @@ data class AiChatState(
 
 interface AiChatComponent : UiStateComponent<AiChatState> {
   val onOutput: (Output) -> Unit
+  fun onImageClicked(imagePath: String)
   fun onHistoryClick()
   fun sendMessage(text: String)
   fun retryMessage(assistantMessageId: Long)
@@ -69,6 +70,7 @@ interface AiChatComponent : UiStateComponent<AiChatState> {
 
   sealed interface Output {
     data object HistoryClicked : Output
+    data class ImageClicked(val imagePath: String) : Output
   }
 }
 
@@ -122,6 +124,8 @@ class DefaultAiChatComponent(
   }
 
   override fun onHistoryClick() = onOutput(AiChatComponent.Output.HistoryClicked)
+
+  override fun onImageClicked(imagePath: String) = onOutput(AiChatComponent.Output.ImageClicked(imagePath))
 
   override fun canPickImage(): Boolean =
     uiState.value.pendingImages.size + uiState.value.compressingImageCount < MAX_IMAGES_PER_MESSAGE

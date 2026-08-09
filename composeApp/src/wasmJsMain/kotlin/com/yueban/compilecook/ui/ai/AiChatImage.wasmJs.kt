@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
 import com.yueban.compilecook.util.ImageFileCache
 import com.yueban.compilecook.util.MEM_CACHE_SCHEME
 import kotlin.io.encoding.Base64
@@ -37,6 +38,7 @@ actual fun AiChatImage(
   contentDescription: String?,
   modifier: Modifier,
   contentScale: ContentScale,
+  onState: (AsyncImagePainter.State) -> Unit,
 ) {
   if (path.startsWith(MEM_CACHE_SCHEME)) {
     val dataUri = remember(path) {
@@ -49,6 +51,7 @@ actual fun AiChatImage(
         contentDescription = contentDescription,
         modifier = modifier,
         contentScale = contentScale,
+        onState = onState,
       )
     }
   } else {
@@ -57,6 +60,7 @@ actual fun AiChatImage(
       contentDescription = contentDescription,
       modifier = modifier,
       contentScale = contentScale,
+      onState = onState,
     )
   }
 }

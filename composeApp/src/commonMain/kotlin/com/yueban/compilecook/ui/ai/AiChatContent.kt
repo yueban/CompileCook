@@ -147,6 +147,7 @@ fun AiChatContent(
             message = message,
             isLoading = state.isLoading,
             onRetry = { component.retryMessage(message.id) },
+            onImageClick = component::onImageClicked,
           )
         }
       }

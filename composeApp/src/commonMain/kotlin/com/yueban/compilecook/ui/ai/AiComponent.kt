@@ -26,6 +26,10 @@ interface AiComponent : BackHandlerOwner {
   fun onBackClicked()
   fun resetToRoot()
 
+  sealed interface Output {
+    data class ImageClicked(val imagePath: String) : Output
+  }
+
   @Serializable
   sealed interface Config {
     @Serializable data object Chat : Config
@@ -40,6 +44,7 @@ interface AiComponent : BackHandlerOwner {
 
 class DefaultAiComponent(
   componentContext: ComponentContext,
+  private val onOutput: (AiComponent.Output) -> Unit,
 ) : AiComponent, BaseComponent(componentContext) {
   private val navigation = StackNavigation<Config>()
 
@@ -60,6 +65,7 @@ class DefaultAiComponent(
 
   private fun onChatOutput(output: AiChatComponent.Output) = when (output) {
     is AiChatComponent.Output.HistoryClicked -> navigation.push(Config.ChatList)
+    is AiChatComponent.Output.ImageClicked -> onOutput(AiComponent.Output.ImageClicked(output.imagePath))
   }
 
   private fun onChatListOutput(output: AiChatListComponent.Output) = when (output) {

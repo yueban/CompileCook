@@ -117,7 +117,9 @@ class DefaultRootComponent(
       serializer = Unit.serializer(),
       key = KEY_AI_CHAT_SLOT,
       handleBackButton = false,
-      childFactory = { _, childContext -> get<AiComponent> { parametersOf(childContext) } },
+      childFactory = { _, childContext ->
+        get<AiComponent> { parametersOf(childContext, ::onAiOutput) }
+      },
     )
   override val stack: Value<ChildStack<Config, RootComponent.Child>> =
     childStack(
@@ -210,6 +212,12 @@ class DefaultRootComponent(
     when (output) {
       is TipComponent.Output.ImageClicked -> imagePreviewSlotHolder.show(output.imageUrl)
       else -> navigation.onOutput(output)
+    }
+  }
+
+  private fun onAiOutput(output: AiComponent.Output) {
+    when (output) {
+      is AiComponent.Output.ImageClicked -> imagePreviewSlotHolder.show(output.imagePath)
     }
   }
 
