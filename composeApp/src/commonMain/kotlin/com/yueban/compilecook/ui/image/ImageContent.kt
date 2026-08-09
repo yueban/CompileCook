@@ -141,8 +141,9 @@ private fun FullscreenImage(
         }
       ),
   ) {
+    val imageModel = rememberImageModel(imageUrl)
     AsyncImage(
-      model = imageUrl,
+      model = imageModel,
       contentDescription = null,
       onState = onState,
       contentScale = ContentScale.Fit,

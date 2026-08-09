@@ -30,7 +30,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
+import com.yueban.compilecook.ui.image.rememberImageModel
 import com.yueban.compilecook.ui.theme.AppTheme
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_choose_gallery
@@ -41,18 +43,25 @@ import org.jetbrains.compose.resources.stringResource
 /**
  * Displays an image from [ImageFileCache] path.
  *
- * On most platforms this delegates to Coil's [AsyncImage].
- * On wasmJS, where cache paths use a custom `mem://` scheme that Coil cannot resolve,
- * bytes are converted to `data:` URIs that Coil's [DataUriFetcher][coil3.decode.DataUriFetcher] handles natively.
+ * Image model resolution is centralized in [rememberImageModel], including the WASM `mem://`
+ * conversion.
  */
 @Composable
-expect fun AiChatImage(
+fun AiChatImage(
   path: String,
   contentDescription: String?,
   modifier: Modifier = Modifier,
   contentScale: ContentScale = ContentScale.Crop,
   onState: (AsyncImagePainter.State) -> Unit = {},
-)
+) {
+  AsyncImage(
+    model = rememberImageModel(path),
+    contentDescription = contentDescription,
+    modifier = modifier,
+    contentScale = contentScale,
+    onState = onState,
+  )
+}
 
 @Composable
 internal fun ImagePickerSheet(
