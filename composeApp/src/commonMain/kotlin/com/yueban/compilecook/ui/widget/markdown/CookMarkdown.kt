@@ -17,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
@@ -43,7 +42,7 @@ import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.rememberMarkdownState
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
-import com.yueban.compilecook.ui.util.imagePreviewSharedElementSource
+import com.yueban.compilecook.ui.util.imagePreviewSharedElementPlaceholder
 import com.yueban.compilecook.ui.util.imagePreviewSourceBounds
 import com.yueban.compilecook.ui.util.preview.PreviewConstant
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
@@ -188,11 +187,10 @@ private fun MarkdownImage(
       painter = imageData.painter,
       contentDescription = imageData.contentDescription,
       modifier = imageModifier
-        .imagePreviewSharedElementSource(imageUrl)
+        .imagePreviewSharedElementPlaceholder(imageUrl)
         .imagePreviewSourceBounds(imageUrl)
         .clip(AppTheme.shapes.small)
-        .then(imageData.modifier)
-        .alpha(0f),
+        .then(imageData.modifier),
       alignment = imageData.alignment,
       contentScale = ContentScale.Crop,
       alpha = imageData.alpha,

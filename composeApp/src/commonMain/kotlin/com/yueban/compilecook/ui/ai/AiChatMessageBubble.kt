@@ -23,7 +23,6 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntSize
@@ -31,7 +30,7 @@ import coil3.compose.AsyncImagePainter
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatMessageStatus
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.imagePreviewSharedElementSource
+import com.yueban.compilecook.ui.util.imagePreviewSharedElementPlaceholder
 import com.yueban.compilecook.ui.util.imagePreviewSourceBounds
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_error_network
@@ -187,9 +186,8 @@ private fun MessageImageGrid(
             Box(
               modifier = Modifier
                 .fillMaxSize()
-                .imagePreviewSharedElementSource(imagePath)
-                .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall))
-                .alpha(0f),
+                .imagePreviewSharedElementPlaceholder(imagePath)
+                .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall)),
             )
             AiChatImage(
               path = imagePath,
