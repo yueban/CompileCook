@@ -1,5 +1,7 @@
 package com.yueban.compilecook.ui.root
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -28,6 +30,7 @@ import com.yueban.compilecook.ui.ai.AiChatDrawerLayout
 import com.yueban.compilecook.ui.ai.AiContent
 import com.yueban.compilecook.ui.dish.DishContent
 import com.yueban.compilecook.ui.dish.DishListContent
+import com.yueban.compilecook.ui.image.ImageContent
 import com.yueban.compilecook.ui.main.MainContent
 import com.yueban.compilecook.ui.root.RootComponent.Child.AboutChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.DishChild
@@ -43,6 +46,7 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
   val state by component.uiState.collectAsStateWithLifecycle()
   val snackbarHostState = remember { SnackbarHostState() }
   val aiChatSlot by component.aiChatSlot.subscribeAsState()
+  val imagePreviewSlot by component.imagePreviewSlot.subscribeAsState()
 
   LaunchedEffect(component) {
     component.messages.collect { message ->
@@ -95,33 +99,42 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
     }
   }
 
-  AiChatDrawerLayout(
-    isDrawerOpen = state.isDrawerOpen,
-    onCloseDrawer = component::closeDrawer,
-    mainContent = {
-      CompositionLocalProvider(LocalUriHandler provides customUriHandler) {
-        Scaffold(
-          snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) { _ ->
-          ChildStack(
-            stack = component.stack,
-            modifier = modifier,
-            animation = backAnimation(
-              backHandler = component.backHandler,
-              onBack = component::onBackClicked,
-            ),
-          ) { child ->
-            RootChild(child.instance)
+  Box(modifier = modifier) {
+    AiChatDrawerLayout(
+      isDrawerOpen = state.isDrawerOpen,
+      onCloseDrawer = component::closeDrawer,
+      mainContent = {
+        CompositionLocalProvider(LocalUriHandler provides customUriHandler) {
+          Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+          ) { _ ->
+            ChildStack(
+              stack = component.stack,
+              modifier = Modifier.fillMaxSize(),
+              animation = backAnimation(
+                backHandler = component.backHandler,
+                onBack = component::onBackClicked,
+              ),
+            ) { child ->
+              RootChild(child.instance)
+            }
           }
         }
-      }
-    },
-    aiContent = {
-      aiChatSlot.child?.instance?.let { component ->
-        AiContent(component = component)
-      }
-    },
-  )
+      },
+      aiContent = {
+        aiChatSlot.child?.instance?.let { aiComponent ->
+          AiContent(component = aiComponent)
+        }
+      },
+    )
+
+    imagePreviewSlot.child?.instance?.let { imagePreviewComponent ->
+      ImageContent(
+        component = imagePreviewComponent,
+        modifier = Modifier.fillMaxSize(),
+      )
+    }
+  }
 }
 
 @Composable

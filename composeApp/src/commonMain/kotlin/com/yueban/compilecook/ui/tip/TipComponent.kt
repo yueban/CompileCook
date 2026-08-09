@@ -1,8 +1,6 @@
 package com.yueban.compilecook.ui.tip
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.slot.ChildSlot
-import com.arkivanov.decompose.value.Value
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.yueban.compilecook.repo.DishRepo
@@ -13,10 +11,9 @@ import com.yueban.compilecook.ui.base.ToggleAiDrawerOutput
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.base.Uninitialized
-import com.yueban.compilecook.ui.image.ImageComponent
-import com.yueban.compilecook.ui.image.ImageSlotHolder
 import com.yueban.compilecook.ui.tip.TipComponent.Output.AiClicked
 import com.yueban.compilecook.ui.tip.TipComponent.Output.BackClicked
+import com.yueban.compilecook.ui.tip.TipComponent.Output.ImageClicked
 import com.yueban.compilecook.ui.widget.markdown.TocItem
 import com.yueban.compilecook.ui.widget.markdown.extractToc
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -27,8 +24,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-private const val KEY_TIP_IMAGE_CHILD_SLOT = "TIP_IMAGE_CHILD_SLOT"
-
 @Serializable
 data class TipState(
   val tipName: String,
@@ -37,7 +32,6 @@ data class TipState(
 )
 
 interface TipComponent : UiStateComponent<TipState> {
-  val imageSlot: Value<ChildSlot<String, ImageComponent>>
   fun onBackClicked()
   fun onAiClicked()
   fun onImageClicked(imageUrl: String)
@@ -45,6 +39,7 @@ interface TipComponent : UiStateComponent<TipState> {
   sealed interface Output {
     data object BackClicked : Output, BackOutput
     data object AiClicked : Output, ToggleAiDrawerOutput
+    data class ImageClicked(val imageUrl: String) : Output
   }
 }
 
@@ -58,9 +53,6 @@ class DefaultTipComponent(
   initialState = TipState(tipName = tipName),
   serializer = TipState.serializer(),
 ) {
-  private val imageSlotHolder = ImageSlotHolder(componentContext = componentContext, key = KEY_TIP_IMAGE_CHILD_SLOT)
-  override val imageSlot: Value<ChildSlot<String, ImageComponent>> = imageSlotHolder.slot
-
   init {
     dishRepo.getTipByName(tipName)
       .filterNotNull()
@@ -83,5 +75,5 @@ class DefaultTipComponent(
 
   override fun onAiClicked() = onOutput(AiClicked)
 
-  override fun onImageClicked(imageUrl: String) = imageSlotHolder.show(imageUrl)
+  override fun onImageClicked(imageUrl: String) = onOutput(ImageClicked(imageUrl))
 }

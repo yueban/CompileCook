@@ -1,6 +1,5 @@
 package com.yueban.compilecook.ui.widget.markdown
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,32 +40,22 @@ import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.rememberMarkdownState
 import com.yueban.compilecook.ui.theme.AppTheme
-import com.yueban.compilecook.ui.util.LocalNavAnimatedVisibilityScope
-import com.yueban.compilecook.ui.util.LocalSharedTransitionScope
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.preview.PreviewConstant
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
-import com.yueban.compilecook.ui.util.rememberImageSharedContentState
 
-private const val TRANSITION_DURATION = 300
-
-/**
- * @param enableSharedElement disable shared element transitions on Markdown while overlay is visible to avoid duplicate
- *                            shared key conflicts.
- */
 @Composable
 fun CookMarkdown(
   state: State,
   modifier: Modifier = Modifier,
   listState: LazyListState,
   onImageClick: (String) -> Unit = {},
-  enableSharedElement: Boolean,
 ) {
   Markdown(
     state = state,
     colors = cookMarkdownColors(),
     typography = cookMarkdownTypography(),
-    components = cookMarkdownComponents(onImageClick, enableSharedElement),
+    components = cookMarkdownComponents(onImageClick),
     // disable content animation
     animations = markdownAnimations(animateTextSize = { this }),
     success = { successState, components, mod ->
@@ -137,14 +126,12 @@ private fun cookMarkdownTypography(): MarkdownTypography = with(AppTheme) {
 @Composable
 private fun cookMarkdownComponents(
   onImageClick: (String) -> Unit,
-  enableSharedElement: Boolean,
 ) = markdownComponents(
-  image = { CustomImageComponent(model = it, onImageClick = onImageClick, enableSharedElement = enableSharedElement) },
+  image = { CustomImageComponent(model = it, onImageClick = onImageClick) },
   inlineImage = {
     CustomInlineImageComponent(
       model = it,
       onImageClick = onImageClick,
-      enableSharedElement = enableSharedElement
     )
   },
 )
@@ -153,15 +140,12 @@ private fun cookMarkdownComponents(
 private fun CustomImageComponent(
   model: MarkdownComponentModel,
   onImageClick: (String) -> Unit,
-  enableSharedElement: Boolean,
 ) {
   LocalImageTransformer.current.transform(model.content)?.let { imageData ->
     MarkdownImage(
       imageData = imageData,
       modifier = Modifier.fillMaxWidth(),
-      imageUrl = model.content,
       onClick = { onImageClick(model.content) },
-      enableSharedElement = enableSharedElement,
     )
   }
 }
@@ -170,14 +154,11 @@ private fun CustomImageComponent(
 private fun CustomInlineImageComponent(
   model: MarkdownComponentModel,
   onImageClick: (String) -> Unit,
-  enableSharedElement: Boolean,
 ) {
   LocalImageTransformer.current.transform(model.content)?.let { imageData ->
     MarkdownImage(
       imageData = imageData,
-      imageUrl = model.content,
       onClick = { onImageClick(model.content) },
-      enableSharedElement = enableSharedElement,
     )
   }
 }
@@ -186,26 +167,8 @@ private fun CustomInlineImageComponent(
 private fun MarkdownImage(
   imageData: ImageData,
   modifier: Modifier = Modifier,
-  imageUrl: String,
   onClick: (() -> Unit),
-  enableSharedElement: Boolean,
 ) {
-  val sharedTransitionScope = LocalSharedTransitionScope.current
-  val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
-
-  val sharedElementModifier =
-    if (enableSharedElement && sharedTransitionScope != null && animatedVisibilityScope != null) {
-      with(sharedTransitionScope) {
-        Modifier.sharedElement(
-          rememberImageSharedContentState(imageUrl),
-          animatedVisibilityScope = animatedVisibilityScope,
-          boundsTransform = { _, _ -> tween(durationMillis = TRANSITION_DURATION) }
-        )
-      }
-    } else {
-      Modifier
-    }
-
   Image(
     painter = imageData.painter,
     contentDescription = imageData.contentDescription,
@@ -217,7 +180,6 @@ private fun MarkdownImage(
       )
       .clip(AppTheme.shapes.small)
       .clickable(onClick = onClick)
-      .then(sharedElementModifier)
       .then(imageData.modifier),
     alignment = imageData.alignment,
     contentScale = ContentScale.Crop,
@@ -233,5 +195,5 @@ private fun PreviewCookMarkdown() = PreviewWrapper {
     content = PreviewConstant.dishDetail.content.trimIndent(),
   )
   val state by markdownState.state.collectAsState()
-  CookMarkdown(state = state, listState = rememberLazyListState(), enableSharedElement = true)
+  CookMarkdown(state = state, listState = rememberLazyListState())
 }

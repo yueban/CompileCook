@@ -1,7 +1,6 @@
 package com.yueban.compilecook.ui.image
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,9 +29,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
-import com.yueban.compilecook.ui.util.LocalNavAnimatedVisibilityScope
-import com.yueban.compilecook.ui.util.LocalSharedTransitionScope
-import com.yueban.compilecook.ui.util.rememberImageSharedContentState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -43,7 +39,6 @@ import kotlin.math.roundToInt
 private const val DISMISS_THRESHOLD_FACTOR = 4f
 private const val SENSITIVITY_FACTOR = 3f
 private const val SCALE_FRACTION = 0.5f
-private const val TRANSITION_DURATION = 300
 private const val OVERLAY_MAX_ALPHA = 1f
 
 @Composable
@@ -96,22 +91,6 @@ private fun FullscreenImage(
   dragToDismissState: DragToDismissState,
   onState: (AsyncImagePainter.State) -> Unit,
 ) {
-  val sharedTransitionScope = LocalSharedTransitionScope.current
-  val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
-
-  val sharedElementModifier =
-    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-      with(sharedTransitionScope) {
-        Modifier.sharedElement(
-          rememberImageSharedContentState(imageUrl),
-          animatedVisibilityScope = animatedVisibilityScope,
-          boundsTransform = { _, _ -> tween(durationMillis = TRANSITION_DURATION) }
-        )
-      }
-    } else {
-      Modifier
-    }
-
   Box(
     modifier = Modifier
       .offset { IntOffset(dragToDismissState.offsetX.roundToInt(), dragToDismissState.offsetY.roundToInt()) }
@@ -125,8 +104,7 @@ private fun FullscreenImage(
         } else {
           Modifier.fillMaxSize()
         }
-      )
-      .then(sharedElementModifier)
+      ),
   ) {
     AsyncImage(
       model = imageUrl,

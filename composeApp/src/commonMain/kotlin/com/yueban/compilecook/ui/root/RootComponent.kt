@@ -32,6 +32,8 @@ import com.yueban.compilecook.ui.dish.DishComponent
 import com.yueban.compilecook.ui.dish.DishListComponent
 import com.yueban.compilecook.ui.dish.DishListComponent.Output.DishClicked
 import com.yueban.compilecook.ui.dish.DishListSource
+import com.yueban.compilecook.ui.image.ImageComponent
+import com.yueban.compilecook.ui.image.ImageSlotHolder
 import com.yueban.compilecook.ui.main.MainComponent
 import com.yueban.compilecook.ui.main.MainComponent.MainTab
 import com.yueban.compilecook.ui.main.MainComponent.Output.AboutClicked
@@ -62,6 +64,7 @@ import org.koin.core.parameter.parametersOf
 
 private const val KEY_ROOT_CHILD_STACK = "ROOT_CHILD_STACK"
 private const val KEY_AI_CHAT_SLOT = "AI_CHAT_SLOT"
+private const val KEY_IMAGE_PREVIEW_SLOT = "IMAGE_PREVIEW_SLOT"
 
 data class RootState(
   val isDrawerOpen: Boolean = false,
@@ -73,6 +76,7 @@ interface RootComponent :
   UiStateComponent<RootState> {
   val stack: Value<ChildStack<Config, Child>>
   val aiChatSlot: Value<ChildSlot<Unit, AiComponent>>
+  val imagePreviewSlot: Value<ChildSlot<String, ImageComponent>>
   val messages: Flow<UiMessage>
   fun onDeepLink(url: String)
   fun onUriClicked(uri: String): Boolean
@@ -101,6 +105,12 @@ class DefaultRootComponent(
   private val deepLinkHandler: DeepLinkHandler = get()
   private val navigation = StackNavigation<Config>()
   private val aiChatNavigation = SlotNavigation<Unit>()
+  private val imagePreviewSlotHolder = ImageSlotHolder(
+    componentContext = componentContext,
+    key = KEY_IMAGE_PREVIEW_SLOT,
+  )
+  override val imagePreviewSlot: Value<ChildSlot<String, ImageComponent>> = imagePreviewSlotHolder.slot
+
   override val aiChatSlot: Value<ChildSlot<Unit, AiComponent>> =
     componentContext.childSlot(
       source = aiChatNavigation,
@@ -196,9 +206,19 @@ class DefaultRootComponent(
     }
   }
 
-  private fun onTipOutput(output: TipComponent.Output) = navigation.onOutput(output)
+  private fun onTipOutput(output: TipComponent.Output) {
+    when (output) {
+      is TipComponent.Output.ImageClicked -> imagePreviewSlotHolder.show(output.imageUrl)
+      else -> navigation.onOutput(output)
+    }
+  }
 
-  private fun onDishOutput(output: DishComponent.Output) = navigation.onOutput(output)
+  private fun onDishOutput(output: DishComponent.Output) {
+    when (output) {
+      is DishComponent.Output.ImageClicked -> imagePreviewSlotHolder.show(output.imageUrl)
+      else -> navigation.onOutput(output)
+    }
+  }
 
   private fun onAboutOutput(output: AboutComponent.Output) = navigation.onOutput(output)
 
