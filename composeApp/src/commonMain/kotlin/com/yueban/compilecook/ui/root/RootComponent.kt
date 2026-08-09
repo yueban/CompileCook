@@ -217,7 +217,7 @@ class DefaultRootComponent(
 
   private fun onAiOutput(output: AiComponent.Output) {
     when (output) {
-      is AiComponent.Output.ImageClicked -> imagePreviewSlotHolder.show(output.imagePath)
+      is AiComponent.Output.ImageClicked -> imagePreviewSlotHolder.show(output.imageRef)
     }
   }
 

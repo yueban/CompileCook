@@ -6,7 +6,7 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUUID
 import platform.Foundation.NSUserDomainMask
@@ -16,10 +16,10 @@ import platform.Foundation.writeToFile
 import platform.posix.memcpy
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-actual object ImageFileCache {
-  private val cacheDir: String by lazy {
+actual object ImageFileStore {
+  private val storageDir: String by lazy {
     val base = NSFileManager.defaultManager.URLForDirectory(
-      NSCachesDirectory,
+      NSApplicationSupportDirectory,
       NSUserDomainMask,
       null,
       true,
@@ -35,28 +35,36 @@ actual object ImageFileCache {
     dir
   }
 
-  actual suspend fun saveToCache(bytes: ByteArray, prefix: String): String {
+  actual suspend fun save(bytes: ByteArray, prefix: String): String {
     val fileName = "${prefix}_${NSUUID.UUID().UUIDString}.jpg"
-    val path = "$cacheDir/$fileName"
+    val path = "$storageDir/$fileName"
     val data = bytes.toNSData()
     data.writeToFile(path, true)
-    return path
+    return "$LOCAL_IMAGE_SCHEME$fileName"
   }
 
-  actual suspend fun saveToCacheFromPath(path: String, prefix: String): String {
+  actual suspend fun saveFromPath(path: String, prefix: String): String {
     val fileName = "${prefix}_${NSUUID.UUID().UUIDString}.jpg"
-    val dest = "$cacheDir/$fileName"
+    val dest = "$storageDir/$fileName"
     NSFileManager.defaultManager.copyItemAtPath(path, toPath = dest, error = null)
-    return dest
+    return "$LOCAL_IMAGE_SCHEME$fileName"
   }
 
-  actual fun readBytes(path: String): ByteArray {
-    val data = platform.Foundation.NSData.dataWithContentsOfFile(path) ?: return ByteArray(0)
+  actual fun resolve(imageRef: String): String = pathFor(imageRef)
+
+  actual fun readBytes(imageRef: String): ByteArray {
+    val data = platform.Foundation.NSData.dataWithContentsOfFile(pathFor(imageRef)) ?: return ByteArray(0)
     return data.toByteArray()
   }
 
-  actual fun delete(path: String) {
-    NSFileManager.defaultManager.removeItemAtPath(path, error = null)
+  actual fun delete(imageRef: String) {
+    NSFileManager.defaultManager.removeItemAtPath(pathFor(imageRef), error = null)
+  }
+
+  private fun pathFor(imageRef: String): String = if (imageRef.startsWith(LOCAL_IMAGE_SCHEME)) {
+    "$storageDir/${imageRef.removePrefix(LOCAL_IMAGE_SCHEME)}"
+  } else {
+    imageRef
   }
 
   private fun ByteArray.toNSData(): platform.Foundation.NSData = platform.Foundation.NSData.create(

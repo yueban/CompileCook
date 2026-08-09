@@ -11,7 +11,7 @@ import com.yueban.compilecook.data.db.entity.AiChatMessageLocalEntity
 import com.yueban.compilecook.data.db.entity.AiChatQueries
 import com.yueban.compilecook.data.db.entity.GetMessagesWithImagesByConversationId
 import com.yueban.compilecook.logger.Logger
-import com.yueban.compilecook.util.ImageFileCache
+import com.yueban.compilecook.util.ImageFileStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -25,7 +25,7 @@ interface AiChatLocalDataSource {
   fun getMessagesWithImagesByConversationId(conversationId: Long): Flow<List<GetMessagesWithImagesByConversationId>>
   suspend fun getMessageById(id: Long): AiChatMessageLocalEntity?
   suspend fun insertMessage(message: AiChatMessageLocalEntity): Long
-  suspend fun insertMessageWithImages(message: AiChatMessageLocalEntity, imagePaths: List<String>): Long
+  suspend fun insertMessageWithImages(message: AiChatMessageLocalEntity, imageRefs: List<String>): Long
   suspend fun updateConversationTimestamp(updatedAt: Long, id: Long)
   suspend fun updateMessageContent(id: Long, content: String)
   suspend fun updateMessageStatus(id: Long, status: Long)
@@ -54,10 +54,10 @@ class AiChatLocalDataSourceImpl(
   }
 
   override suspend fun deleteConversationById(id: Long) = write {
-    val imagePaths = aiChatQueries.getImagePathsByConversationId(id).awaitAsList()
-    imagePaths.forEach { ImageFileCache.delete(it) }
+    val imageRefs = aiChatQueries.getImagePathsByConversationId(id).awaitAsList()
+    imageRefs.forEach { ImageFileStore.delete(it) }
     aiChatQueries.deleteConversationById(id)
-    Logger.d("delete conversation: $id, cleaned ${imagePaths.size} images")
+    Logger.d("delete conversation: $id, cleaned ${imageRefs.size} images")
   }
 
   override fun getMessagesByConversationId(conversationId: Long): Flow<List<AiChatMessageLocalEntity>> =
@@ -84,16 +84,16 @@ class AiChatLocalDataSourceImpl(
 
   override suspend fun insertMessageWithImages(
     message: AiChatMessageLocalEntity,
-    imagePaths: List<String>,
+    imageRefs: List<String>,
   ): Long = write {
     aiChatQueries.transactionWithResult {
       aiChatQueries.insertMessage(message)
       val id = aiChatQueries.selectLastInsertRowId().awaitAsOne()
-      imagePaths.forEachIndexed { index, imagePath ->
-        aiChatQueries.insertImage(messageId = id, imagePath = imagePath, position = index.toLong())
+      imageRefs.forEachIndexed { index, imageRef ->
+        aiChatQueries.insertImage(messageId = id, imagePath = imageRef, position = index.toLong())
       }
       aiChatQueries.updateConversationTimestamp(updatedAt = message.timestamp, id = message.conversationId)
-      Logger.d("insert message with images: $id, imageCount=${imagePaths.size}")
+      Logger.d("insert message with images: $id, imageCount=${imageRefs.size}")
       id
     }
   }
@@ -128,16 +128,16 @@ class AiChatLocalDataSourceImpl(
 
   override suspend fun deleteMessagesByIds(ids: List<Long>) = write {
     if (ids.isEmpty()) return@write
-    aiChatQueries.getImagesByMessageIds(ids).awaitAsList().forEach { ImageFileCache.delete(it.imagePath) }
+    aiChatQueries.getImagesByMessageIds(ids).awaitAsList().forEach { ImageFileStore.delete(it.imagePath) }
     aiChatQueries.deleteMessagesByIds(ids)
     Logger.d("delete messages by ids: ${ids.size}")
   }
 
   override suspend fun deleteMessagesByConversationId(conversationId: Long) = write {
-    val imagePaths = aiChatQueries.getImagePathsByConversationId(conversationId).awaitAsList()
-    imagePaths.forEach { ImageFileCache.delete(it) }
+    val imageRefs = aiChatQueries.getImagePathsByConversationId(conversationId).awaitAsList()
+    imageRefs.forEach { ImageFileStore.delete(it) }
     aiChatQueries.deleteMessagesByConversationId(conversationId)
-    Logger.d("delete messages by conversation: $conversationId, cleaned ${imagePaths.size} images")
+    Logger.d("delete messages by conversation: $conversationId, cleaned ${imageRefs.size} images")
   }
 }
 

@@ -41,21 +41,21 @@ import compilecook.composeapp.generated.resources.ai_chat_take_photo
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Displays an image from [ImageFileCache] path.
+ * Displays an image from an [ImageFileStore] reference.
  *
  * Image model resolution is centralized in [rememberImageModel], including the WASM `mem://`
  * conversion.
  */
 @Composable
 fun AiChatImage(
-  path: String,
+  imageRef: String,
   contentDescription: String?,
   modifier: Modifier = Modifier,
   contentScale: ContentScale = ContentScale.Crop,
   onState: (AsyncImagePainter.State) -> Unit = {},
 ) {
   AsyncImage(
-    model = rememberImageModel(path),
+    model = rememberImageModel(imageRef),
     contentDescription = contentDescription,
     modifier = modifier,
     contentScale = contentScale,
@@ -119,10 +119,10 @@ private fun ImagePickerOption(
 }
 
 @Composable
-internal fun PendingImageThumbnail(imagePath: String, onRemove: () -> Unit) {
+internal fun PendingImageThumbnail(imageRef: String, onRemove: () -> Unit) {
   Box(modifier = Modifier.size(AppTheme.dimens.aiChatImageThumbnailSize)) {
     AiChatImage(
-      path = imagePath,
+      imageRef = imageRef,
       contentDescription = null,
       modifier = Modifier
         .fillMaxSize()

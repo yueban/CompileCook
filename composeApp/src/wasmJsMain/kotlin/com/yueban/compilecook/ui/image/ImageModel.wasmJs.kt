@@ -2,7 +2,7 @@ package com.yueban.compilecook.ui.image
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.yueban.compilecook.util.ImageFileCache
+import com.yueban.compilecook.util.ImageFileStore
 import com.yueban.compilecook.util.MEM_CACHE_SCHEME
 import kotlin.io.encoding.Base64
 
@@ -32,7 +32,7 @@ internal actual fun rememberImageModel(imageRef: String): Any? {
   if (!imageRef.startsWith(MEM_CACHE_SCHEME)) return imageRef
 
   return remember(imageRef) {
-    ImageFileCache.readBytes(imageRef)
+    ImageFileStore.readBytes(imageRef)
       .takeIf { it.isNotEmpty() }
       ?.let(::bytesToDataUri)
   }

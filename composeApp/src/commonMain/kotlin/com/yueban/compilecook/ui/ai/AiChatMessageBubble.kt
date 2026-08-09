@@ -167,8 +167,8 @@ private fun MessageImageGrid(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.tinyGap),
       ) {
-        row.forEach { imagePath ->
-          val imageSize = imageSizes[imagePath]
+        row.forEach { imageRef ->
+          val imageSize = imageSizes[imageRef]
           val imageHeightModifier = if (imageSize == null) {
             Modifier.height(AppTheme.dimens.aiChatMessageImageHeight)
           } else {
@@ -179,18 +179,18 @@ private fun MessageImageGrid(
             modifier = Modifier
               .weight(1f)
               .then(imageHeightModifier)
-              .imagePreviewSourceBounds(imagePath)
+              .imagePreviewSourceBounds(imageRef)
               .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall))
-              .clickable { onImageClick(imagePath) },
+              .clickable { onImageClick(imageRef) },
           ) {
             Box(
               modifier = Modifier
                 .fillMaxSize()
-                .imagePreviewSharedElementPlaceholder(imagePath)
+                .imagePreviewSharedElementPlaceholder(imageRef)
                 .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall)),
             )
             AiChatImage(
-              path = imagePath,
+              imageRef = imageRef,
               contentDescription = null,
               modifier = Modifier.fillMaxSize(),
               contentScale = ContentScale.Fit,
@@ -198,8 +198,8 @@ private fun MessageImageGrid(
                 val intrinsicSize = (state as? AsyncImagePainter.State.Success)?.painter?.intrinsicSize
                 if (intrinsicSize != null && intrinsicSize.width > 0f && intrinsicSize.height > 0f) {
                   val size = IntSize(intrinsicSize.width.roundToInt(), intrinsicSize.height.roundToInt())
-                  if (imageSizes[imagePath] != size) {
-                    imageSizes[imagePath] = size
+                  if (imageSizes[imageRef] != size) {
+                    imageSizes[imageRef] = size
                   }
                 }
               },

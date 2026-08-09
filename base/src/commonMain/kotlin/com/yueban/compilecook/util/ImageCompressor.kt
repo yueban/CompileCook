@@ -41,8 +41,8 @@ suspend fun compressAndSave(
 
   if (originalSize != null && originalSize <= maxFileSize) {
     return when (source) {
-      is ImageSource.Bytes -> ImageFileCache.saveToCache(source.bytes)
-      is ImageSource.Path -> ImageFileCache.saveToCacheFromPath(source.path)
+      is ImageSource.Bytes -> ImageFileStore.save(source.bytes)
+      is ImageSource.Path -> ImageFileStore.saveFromPath(source.path)
     }
   }
 
@@ -72,5 +72,5 @@ suspend fun compressAndSave(
       "dimensions: ${compressedDimensions?.width}x${compressedDimensions?.height}"
   )
 
-  return ImageFileCache.saveToCache(compressed)
+  return ImageFileStore.save(compressed)
 }

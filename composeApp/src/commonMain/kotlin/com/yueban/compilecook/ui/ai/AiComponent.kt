@@ -27,7 +27,7 @@ interface AiComponent : BackHandlerOwner {
   fun resetToRoot()
 
   sealed interface Output {
-    data class ImageClicked(val imagePath: String) : Output
+    data class ImageClicked(val imageRef: String) : Output
   }
 
   @Serializable
@@ -65,7 +65,7 @@ class DefaultAiComponent(
 
   private fun onChatOutput(output: AiChatComponent.Output) = when (output) {
     is AiChatComponent.Output.HistoryClicked -> navigation.push(Config.ChatList)
-    is AiChatComponent.Output.ImageClicked -> onOutput(AiComponent.Output.ImageClicked(output.imagePath))
+    is AiChatComponent.Output.ImageClicked -> onOutput(AiComponent.Output.ImageClicked(output.imageRef))
   }
 
   private fun onChatListOutput(output: AiChatListComponent.Output) = when (output) {

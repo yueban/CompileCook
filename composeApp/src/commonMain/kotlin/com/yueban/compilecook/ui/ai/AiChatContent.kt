@@ -198,9 +198,9 @@ private fun ImagePreviewRow(
       .padding(bottom = AppTheme.dimens.smallGap),
     horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.smallGap),
   ) {
-    pendingImages.forEachIndexed { index, imagePath ->
+    pendingImages.forEachIndexed { index, imageRef ->
       PendingImageThumbnail(
-        imagePath = imagePath,
+        imageRef = imageRef,
         onRemove = { onRemoveImage(index) },
       )
     }

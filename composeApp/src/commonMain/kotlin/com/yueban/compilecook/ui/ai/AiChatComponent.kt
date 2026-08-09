@@ -12,7 +12,7 @@ import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.ui.base.UiStateComponent
 import com.yueban.compilecook.ui.base.UiStateComponentImpl
 import com.yueban.compilecook.ui.util.getDisplayName
-import com.yueban.compilecook.util.ImageFileCache
+import com.yueban.compilecook.util.ImageFileStore
 import com.yueban.compilecook.util.ImageSource
 import com.yueban.compilecook.util.compressAndSave
 import com.yueban.compilecook.util.currentTimeMillis
@@ -55,7 +55,7 @@ data class AiChatState(
 
 interface AiChatComponent : UiStateComponent<AiChatState> {
   val onOutput: (Output) -> Unit
-  fun onImageClicked(imagePath: String)
+  fun onImageClicked(imageRef: String)
   fun onHistoryClick()
   fun sendMessage(text: String)
   fun retryMessage(assistantMessageId: Long)
@@ -70,7 +70,7 @@ interface AiChatComponent : UiStateComponent<AiChatState> {
 
   sealed interface Output {
     data object HistoryClicked : Output
-    data class ImageClicked(val imagePath: String) : Output
+    data class ImageClicked(val imageRef: String) : Output
   }
 }
 
@@ -125,7 +125,7 @@ class DefaultAiChatComponent(
 
   override fun onHistoryClick() = onOutput(AiChatComponent.Output.HistoryClicked)
 
-  override fun onImageClicked(imagePath: String) = onOutput(AiChatComponent.Output.ImageClicked(imagePath))
+  override fun onImageClicked(imageRef: String) = onOutput(AiChatComponent.Output.ImageClicked(imageRef))
 
   override fun canPickImage(): Boolean =
     uiState.value.pendingImages.size + uiState.value.compressingImageCount < MAX_IMAGES_PER_MESSAGE
@@ -159,7 +159,7 @@ class DefaultAiChatComponent(
 
   override fun removePendingImage(index: Int) {
     val path = uiState.value.pendingImages.getOrNull(index) ?: return
-    ImageFileCache.delete(path)
+    ImageFileStore.delete(path)
     setState { copy(pendingImages = pendingImages.toMutableList().apply { removeAt(index) }) }
   }
 
@@ -167,7 +167,7 @@ class DefaultAiChatComponent(
   override fun sendMessage(text: String) {
     if ((text.isBlank() && uiState.value.pendingImages.isEmpty()) || uiState.value.isLoading) return
 
-    val imagePaths = uiState.value.pendingImages
+    val imageRefs = uiState.value.pendingImages
     setState { copy(isLoading = true, pendingImages = emptyList()) }
 
     chatJob = componentScope.launch {
@@ -175,7 +175,7 @@ class DefaultAiChatComponent(
         val conversationId = getOrCreateConversationId()
         val messages = uiState.value.messages // snapshot BEFORE insert to avoid stale read
         val systemMessage = buildSystemMessage(uiState.value.currentContext)
-        aiRepo.chat(conversationId, text, imagePaths, messages, systemMessage)
+        aiRepo.chat(conversationId, text, imageRefs, messages, systemMessage)
       } catch (e: CancellationException) {
         throw e
       } catch (e: Exception) {
@@ -264,7 +264,7 @@ class DefaultAiChatComponent(
   }
 
   private fun cleanupPendingImages() {
-    uiState.value.pendingImages.forEach { ImageFileCache.delete(it) }
+    uiState.value.pendingImages.forEach { ImageFileStore.delete(it) }
   }
 
   private suspend fun getOrCreateConversationId(): Long {

@@ -31,7 +31,7 @@ interface AiChatRepo {
   suspend fun chat(
     conversationId: Long,
     userContent: String,
-    imagePaths: List<String>,
+    imageRefs: List<String>,
     messages: List<AiChatMessage>,
     systemMessage: String,
   )
@@ -55,7 +55,7 @@ internal class AiChatRepoImpl(
   override suspend fun chat(
     conversationId: Long,
     userContent: String,
-    imagePaths: List<String>,
+    imageRefs: List<String>,
     messages: List<AiChatMessage>,
     systemMessage: String,
   ) {
@@ -63,10 +63,10 @@ internal class AiChatRepoImpl(
       id = 0L,
       role = AiChatRole.USER,
       content = userContent,
-      images = imagePaths,
+      images = imageRefs,
       timestamp = currentTimeMillis,
     )
-    aiLocalDataSource.insertMessageWithImages(userMsg.toLocalEntity(conversationId), imagePaths)
+    aiLocalDataSource.insertMessageWithImages(userMsg.toLocalEntity(conversationId), imageRefs)
 
     val assistantPlaceholder = AiChatMessage(
       id = 0L,
@@ -79,9 +79,9 @@ internal class AiChatRepoImpl(
 
     // Include historical images for all messages
     val requestMessages = messages.map {
-      AiChatRequestMessage(role = it.role.serialName(), content = it.content, imagePaths = it.images)
+      AiChatRequestMessage(role = it.role.serialName(), content = it.content, imageRefs = it.images)
     } +
-      AiChatRequestMessage(role = AiChatRole.USER.serialName(), content = userContent, imagePaths = imagePaths)
+      AiChatRequestMessage(role = AiChatRole.USER.serialName(), content = userContent, imageRefs = imageRefs)
     val request = AiChatRequest(messages = requestMessages, systemMessage = systemMessage)
     doChat(assistantMessageId, request)
   }
@@ -109,7 +109,7 @@ internal class AiChatRepoImpl(
 
     // Include historical images for all messages
     val requestMessages = allMessages.take(targetIndex).map {
-      AiChatRequestMessage(role = it.role.serialName(), content = it.content, imagePaths = it.images)
+      AiChatRequestMessage(role = it.role.serialName(), content = it.content, imageRefs = it.images)
     }
 
     aiLocalDataSource.updateMessageContent(assistantMessageId, "")

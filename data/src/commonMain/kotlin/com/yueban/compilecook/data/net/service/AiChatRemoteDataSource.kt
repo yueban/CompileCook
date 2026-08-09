@@ -18,7 +18,7 @@ import com.yueban.compilecook.data.net.error.AiChatNetworkError
 import com.yueban.compilecook.data.net.error.AiChatServerError
 import com.yueban.compilecook.data.net.error.AiChatTimeoutError
 import com.yueban.compilecook.data.net.error.AiChatUnknownError
-import com.yueban.compilecook.util.ImageFileCache
+import com.yueban.compilecook.util.ImageFileStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -74,9 +74,9 @@ internal class AiChatRemoteDataSourceImpl(
 @OptIn(ExperimentalEncodingApi::class)
 private fun AiChatRequestMessage.toChatMessage(): ChatMessage {
   val chatRole = ChatRole(role)
-  return if (imagePaths.isNotEmpty()) {
-    val parts = imagePaths.mapNotNull { path ->
-      val bytes = ImageFileCache.readBytes(path)
+  return if (imageRefs.isNotEmpty()) {
+    val parts = imageRefs.mapNotNull { imageRef ->
+      val bytes = ImageFileStore.readBytes(imageRef)
       if (bytes.isEmpty()) null else ImagePart(url = "data:image/jpeg;base64,${Base64.encode(bytes)}")
     } + TextPart(content)
     ChatMessage(role = chatRole, content = parts)
