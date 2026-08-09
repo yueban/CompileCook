@@ -1,6 +1,7 @@
 package com.yueban.compilecook.ui.image
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,16 +21,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
+import com.yueban.compilecook.ui.util.IMAGE_PREVIEW_TRANSITION_DURATION
+import com.yueban.compilecook.ui.util.LocalImagePreviewSourceBounds
+import com.yueban.compilecook.ui.util.imagePreviewSharedElementTarget
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.max
@@ -39,6 +47,7 @@ import kotlin.math.roundToInt
 private const val DISMISS_THRESHOLD_FACTOR = 4f
 private const val SENSITIVITY_FACTOR = 3f
 private const val SCALE_FRACTION = 0.5f
+private const val MIN_FLYBACK_SCALE = 0.01f
 private const val OVERLAY_MAX_ALPHA = 1f
 
 @Composable
@@ -50,6 +59,8 @@ fun ImageContent(
 
   val dragToDismissState = rememberDragToDismissState(onDismiss = component::onBackClicked)
   var imagePainterState by remember { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
+  var containerBounds by remember { mutableStateOf<Rect?>(null) }
+  val sourceBounds = LocalImagePreviewSourceBounds.current[state.imageUrl]
 
   BoxWithConstraints(
     modifier = modifier
@@ -57,23 +68,40 @@ fun ImageContent(
       .drawBehind {
         drawRect(Color.Black.copy(alpha = dragToDismissState.alpha))
       }
-      .pointerInput(Unit) {
+      .onGloballyPositioned { coordinates ->
+        containerBounds = coordinates.boundsInRoot()
+      }
+      .pointerInput(sourceBounds, containerBounds) {
         detectDragGestures(
           onDrag = { change, dragAmount ->
             change.consume()
             dragToDismissState.onDrag(dragAmount, size)
           },
-          onDragEnd = { dragToDismissState.onDragEnd(size) }
+          onDragEnd = {
+            dragToDismissState.onDragEnd(
+              containerSize = size,
+              containerBounds = containerBounds,
+              sourceBounds = sourceBounds,
+            )
+          }
         )
       }
       .clickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = null,
-        onClick = { component.onBackClicked() }
+        onClick = {
+          if (!dragToDismissState.isDismissing) {
+            dragToDismissState.dismissToSource(
+              containerBounds = containerBounds,
+              sourceBounds = sourceBounds,
+            )
+          }
+        }
       ),
     contentAlignment = Alignment.Center
   ) {
     val contentSize = calculateFittedSize(imagePainterState, constraints.maxWidth, constraints.maxHeight)
+    dragToDismissState.updateContentSize(contentSize)
 
     FullscreenImage(
       imageUrl = state.imageUrl,
@@ -104,6 +132,13 @@ private fun FullscreenImage(
         } else {
           Modifier.fillMaxSize()
         }
+      )
+      .then(
+        if (dragToDismissState.isDismissing) {
+          Modifier
+        } else {
+          Modifier.imagePreviewSharedElementTarget(imageUrl)
+        }
       ),
   ) {
     AsyncImage(
@@ -125,13 +160,22 @@ private class DragToDismissState(
   private val _offsetY = Animatable(0f)
   private val _scale = Animatable(1f)
   private val _alpha = Animatable(OVERLAY_MAX_ALPHA)
+  private var contentSize: IntSize? = null
+  private var _isDismissing by mutableStateOf(false)
 
   val offsetX: Float get() = _offsetX.value
   val offsetY: Float get() = _offsetY.value
   val scale: Float get() = _scale.value
   val alpha: Float get() = _alpha.value
+  val isDismissing: Boolean get() = _isDismissing
+
+  fun updateContentSize(contentSize: IntSize?) {
+    this.contentSize = contentSize
+  }
 
   fun onDrag(dragAmount: Offset, containerSize: IntSize) {
+    if (_isDismissing) return
+
     scope.launch {
       val newX = _offsetX.value + dragAmount.x
       val newY = _offsetY.value + dragAmount.y
@@ -148,22 +192,91 @@ private class DragToDismissState(
     }
   }
 
-  fun onDragEnd(containerSize: IntSize) {
+  fun onDragEnd(
+    containerSize: IntSize,
+    containerBounds: Rect?,
+    sourceBounds: Rect?,
+  ) {
+    if (_isDismissing) return
+
     scope.launch {
       val shouldDismiss = abs(_offsetY.value) > containerSize.height / DISMISS_THRESHOLD_FACTOR ||
         abs(_offsetX.value) > containerSize.width / DISMISS_THRESHOLD_FACTOR
 
       if (shouldDismiss) {
-        onDismiss()
+        dismissToSource(containerBounds, sourceBounds)
       } else {
-        launch { _offsetX.animateTo(0f) }
-        launch { _offsetY.animateTo(0f) }
-        launch { _scale.animateTo(1f) }
-        launch { _alpha.animateTo(OVERLAY_MAX_ALPHA) }
+        coroutineScope {
+          launch { _offsetX.animateTo(0f) }
+          launch { _offsetY.animateTo(0f) }
+          launch { _scale.animateTo(1f) }
+          launch { _alpha.animateTo(OVERLAY_MAX_ALPHA) }
+        }
       }
     }
   }
+
+  fun dismissToSource(containerBounds: Rect?, sourceBounds: Rect?) {
+    if (_isDismissing) return
+
+    scope.launch {
+      val currentContentSize = contentSize
+      val flybackTarget = if (currentContentSize != null && containerBounds != null && sourceBounds != null) {
+        val targetScale = min(
+          sourceBounds.width / currentContentSize.width,
+          sourceBounds.height / currentContentSize.height,
+        ).coerceAtLeast(MIN_FLYBACK_SCALE)
+        FlybackTarget(
+          offsetX = sourceBounds.center.x - containerBounds.center.x,
+          offsetY = sourceBounds.center.y - containerBounds.center.y,
+          scale = targetScale,
+        )
+      } else {
+        null
+      }
+
+      if (flybackTarget == null) {
+        onDismiss()
+        return@launch
+      }
+
+      _isDismissing = true
+      coroutineScope {
+        launch {
+          _offsetX.animateTo(
+            targetValue = flybackTarget.offsetX,
+            animationSpec = tween(IMAGE_PREVIEW_TRANSITION_DURATION),
+          )
+        }
+        launch {
+          _offsetY.animateTo(
+            targetValue = flybackTarget.offsetY,
+            animationSpec = tween(IMAGE_PREVIEW_TRANSITION_DURATION),
+          )
+        }
+        launch {
+          _scale.animateTo(
+            targetValue = flybackTarget.scale,
+            animationSpec = tween(IMAGE_PREVIEW_TRANSITION_DURATION),
+          )
+        }
+        launch {
+          _alpha.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(IMAGE_PREVIEW_TRANSITION_DURATION),
+          )
+        }
+      }
+      onDismiss()
+    }
+  }
 }
+
+private data class FlybackTarget(
+  val offsetX: Float,
+  val offsetY: Float,
+  val scale: Float,
+)
 
 @Composable
 private fun rememberDragToDismissState(onDismiss: () -> Unit): DragToDismissState {

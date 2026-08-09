@@ -1,5 +1,11 @@
 package com.yueban.compilecook.ui.root
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
@@ -9,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,8 +46,14 @@ import com.yueban.compilecook.ui.root.RootComponent.Child.DishListChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.MainChild
 import com.yueban.compilecook.ui.root.RootComponent.Child.TipChild
 import com.yueban.compilecook.ui.tip.TipContent
+import com.yueban.compilecook.ui.util.IMAGE_PREVIEW_TRANSITION_DURATION
+import com.yueban.compilecook.ui.util.LocalImagePreviewActive
+import com.yueban.compilecook.ui.util.LocalImagePreviewSourceBounds
+import com.yueban.compilecook.ui.util.LocalSharedTransitionScope
 import com.yueban.compilecook.ui.util.stringRes
 import org.jetbrains.compose.resources.getString
+
+private const val IMAGE_PREVIEW_OVERLAY_LABEL = "IMAGE_PREVIEW_OVERLAY"
 
 @Composable
 fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
@@ -47,6 +61,7 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
   val snackbarHostState = remember { SnackbarHostState() }
   val aiChatSlot by component.aiChatSlot.subscribeAsState()
   val imagePreviewSlot by component.imagePreviewSlot.subscribeAsState()
+  val imagePreviewSourceBounds = remember { mutableStateMapOf<String, Rect>() }
 
   LaunchedEffect(component) {
     component.messages.collect { message ->
@@ -99,40 +114,64 @@ fun RootContent(component: RootComponent, modifier: Modifier = Modifier) {
     }
   }
 
-  Box(modifier = modifier) {
-    AiChatDrawerLayout(
-      isDrawerOpen = state.isDrawerOpen,
-      onCloseDrawer = component::closeDrawer,
-      mainContent = {
-        CompositionLocalProvider(LocalUriHandler provides customUriHandler) {
-          Scaffold(
-            snackbarHost = { SnackbarHost(snackbarHostState) }
-          ) { _ ->
-            ChildStack(
-              stack = component.stack,
-              modifier = Modifier.fillMaxSize(),
-              animation = backAnimation(
-                backHandler = component.backHandler,
-                onBack = component::onBackClicked,
-              ),
-            ) { child ->
-              RootChild(child.instance)
+  SharedTransitionLayout(modifier = modifier) {
+    CompositionLocalProvider(
+      LocalSharedTransitionScope provides this@SharedTransitionLayout,
+      LocalImagePreviewActive provides (imagePreviewSlot.child != null),
+      LocalImagePreviewSourceBounds provides imagePreviewSourceBounds,
+    ) {
+      Box(modifier = Modifier.fillMaxSize()) {
+        AiChatDrawerLayout(
+          isDrawerOpen = state.isDrawerOpen,
+          onCloseDrawer = component::closeDrawer,
+          mainContent = {
+            CompositionLocalProvider(LocalUriHandler provides customUriHandler) {
+              Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) }
+              ) { _ ->
+                ChildStack(
+                  stack = component.stack,
+                  modifier = Modifier.fillMaxSize(),
+                  animation = backAnimation(
+                    backHandler = component.backHandler,
+                    onBack = component::onBackClicked,
+                  ),
+                ) { child ->
+                  RootChild(child.instance)
+                }
+              }
             }
+          },
+          aiContent = {
+            aiChatSlot.child?.instance?.let { aiComponent ->
+              AiContent(component = aiComponent)
+            }
+          },
+        )
+
+        AnimatedContent(
+          targetState = imagePreviewSlot.child?.instance,
+          transitionSpec = {
+            (
+              fadeIn(
+                animationSpec = tween(IMAGE_PREVIEW_TRANSITION_DURATION),
+                initialAlpha = 0f,
+              ) togetherWith fadeOut(
+                animationSpec = tween(IMAGE_PREVIEW_TRANSITION_DURATION),
+              )
+              ) using null
+          },
+          modifier = Modifier.fillMaxSize(),
+          label = IMAGE_PREVIEW_OVERLAY_LABEL,
+        ) { imagePreviewComponent ->
+          imagePreviewComponent?.let {
+            ImageContent(
+              component = it,
+              modifier = Modifier.fillMaxSize(),
+            )
           }
         }
-      },
-      aiContent = {
-        aiChatSlot.child?.instance?.let { aiComponent ->
-          AiContent(component = aiComponent)
-        }
-      },
-    )
-
-    imagePreviewSlot.child?.instance?.let { imagePreviewComponent ->
-      ImageContent(
-        component = imagePreviewComponent,
-        modifier = Modifier.fillMaxSize(),
-      )
+      }
     }
   }
 }

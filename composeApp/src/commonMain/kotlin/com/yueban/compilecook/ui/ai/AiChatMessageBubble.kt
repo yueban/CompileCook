@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntSize
@@ -29,6 +31,8 @@ import coil3.compose.AsyncImagePainter
 import com.yueban.compilecook.repo.entity.AiChatMessage
 import com.yueban.compilecook.repo.entity.AiChatMessageStatus
 import com.yueban.compilecook.ui.theme.AppTheme
+import com.yueban.compilecook.ui.util.imagePreviewSharedElementSource
+import com.yueban.compilecook.ui.util.imagePreviewSourceBounds
 import compilecook.composeapp.generated.resources.Res
 import compilecook.composeapp.generated.resources.ai_chat_error_network
 import compilecook.composeapp.generated.resources.ai_chat_error_server
@@ -172,25 +176,37 @@ private fun MessageImageGrid(
             Modifier.aspectRatio(imageSize.width.toFloat() / imageSize.height)
           }
 
-          AiChatImage(
-            path = imagePath,
-            contentDescription = null,
+          Box(
             modifier = Modifier
               .weight(1f)
               .then(imageHeightModifier)
+              .imagePreviewSourceBounds(imagePath)
               .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall))
               .clickable { onImageClick(imagePath) },
-            contentScale = ContentScale.Fit,
-            onState = { state ->
-              val intrinsicSize = (state as? AsyncImagePainter.State.Success)?.painter?.intrinsicSize
-              if (intrinsicSize != null && intrinsicSize.width > 0f && intrinsicSize.height > 0f) {
-                val size = IntSize(intrinsicSize.width.roundToInt(), intrinsicSize.height.roundToInt())
-                if (imageSizes[imagePath] != size) {
-                  imageSizes[imagePath] = size
+          ) {
+            Box(
+              modifier = Modifier
+                .fillMaxSize()
+                .imagePreviewSharedElementSource(imagePath)
+                .clip(RoundedCornerShape(AppTheme.dimens.radiusSmall))
+                .alpha(0f),
+            )
+            AiChatImage(
+              path = imagePath,
+              contentDescription = null,
+              modifier = Modifier.fillMaxSize(),
+              contentScale = ContentScale.Fit,
+              onState = { state ->
+                val intrinsicSize = (state as? AsyncImagePainter.State.Success)?.painter?.intrinsicSize
+                if (intrinsicSize != null && intrinsicSize.width > 0f && intrinsicSize.height > 0f) {
+                  val size = IntSize(intrinsicSize.width.roundToInt(), intrinsicSize.height.roundToInt())
+                  if (imageSizes[imagePath] != size) {
+                    imageSizes[imagePath] = size
+                  }
                 }
-              }
-            },
-          )
+              },
+            )
+          }
         }
         if (row.size < columns) {
           repeat(columns - row.size) {

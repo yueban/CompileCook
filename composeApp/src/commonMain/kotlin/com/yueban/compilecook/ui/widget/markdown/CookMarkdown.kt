@@ -2,6 +2,7 @@ package com.yueban.compilecook.ui.widget.markdown
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
@@ -41,6 +43,8 @@ import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.rememberMarkdownState
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
+import com.yueban.compilecook.ui.util.imagePreviewSharedElementSource
+import com.yueban.compilecook.ui.util.imagePreviewSourceBounds
 import com.yueban.compilecook.ui.util.preview.PreviewConstant
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
 
@@ -145,6 +149,7 @@ private fun CustomImageComponent(
     MarkdownImage(
       imageData = imageData,
       modifier = Modifier.fillMaxWidth(),
+      imageUrl = model.content,
       onClick = { onImageClick(model.content) },
     )
   }
@@ -158,6 +163,7 @@ private fun CustomInlineImageComponent(
   LocalImageTransformer.current.transform(model.content)?.let { imageData ->
     MarkdownImage(
       imageData = imageData,
+      imageUrl = model.content,
       onClick = { onImageClick(model.content) },
     )
   }
@@ -167,25 +173,44 @@ private fun CustomInlineImageComponent(
 private fun MarkdownImage(
   imageData: ImageData,
   modifier: Modifier = Modifier,
+  imageUrl: String,
   onClick: (() -> Unit),
 ) {
-  Image(
-    painter = imageData.painter,
-    contentDescription = imageData.contentDescription,
-    modifier = modifier
-      .height(AppTheme.dimens.markdownImageHeight)
-      .padding(
-        vertical = AppTheme.dimens.markdownImageVerticalPadding,
-        horizontal = AppTheme.dimens.markdownImageHorizontalPadding
-      )
-      .clip(AppTheme.shapes.small)
-      .clickable(onClick = onClick)
-      .then(imageData.modifier),
-    alignment = imageData.alignment,
-    contentScale = ContentScale.Crop,
-    alpha = imageData.alpha,
-    colorFilter = imageData.colorFilter
-  )
+  val imageModifier = modifier
+    .height(AppTheme.dimens.markdownImageHeight)
+    .padding(
+      vertical = AppTheme.dimens.markdownImageVerticalPadding,
+      horizontal = AppTheme.dimens.markdownImageHorizontalPadding
+    )
+
+  Box {
+    Image(
+      painter = imageData.painter,
+      contentDescription = imageData.contentDescription,
+      modifier = imageModifier
+        .imagePreviewSharedElementSource(imageUrl)
+        .imagePreviewSourceBounds(imageUrl)
+        .clip(AppTheme.shapes.small)
+        .then(imageData.modifier)
+        .alpha(0f),
+      alignment = imageData.alignment,
+      contentScale = ContentScale.Crop,
+      alpha = imageData.alpha,
+      colorFilter = imageData.colorFilter,
+    )
+    Image(
+      painter = imageData.painter,
+      contentDescription = imageData.contentDescription,
+      modifier = imageModifier
+        .clip(AppTheme.shapes.small)
+        .clickable(onClick = onClick)
+        .then(imageData.modifier),
+      alignment = imageData.alignment,
+      contentScale = ContentScale.Crop,
+      alpha = imageData.alpha,
+      colorFilter = imageData.colorFilter,
+    )
+  }
 }
 
 @UniversalScreenPreview
