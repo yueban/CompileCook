@@ -1,6 +1,7 @@
 package com.yueban.compilecook.ui.image
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -19,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -28,8 +31,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
@@ -53,6 +58,8 @@ private const val OVERLAY_MAX_ALPHA = 1f
 @Composable
 fun ImageContent(
   component: ImageComponent,
+  cornerRadius: Dp = 0.dp,
+  sourceCornerRadius: Dp = 0.dp,
   modifier: Modifier = Modifier,
 ) {
   val state by component.uiState.collectAsStateWithLifecycle()
@@ -100,6 +107,17 @@ fun ImageContent(
       ),
     contentAlignment = Alignment.Center
   ) {
+    val manualCornerRadius by animateDpAsState(
+      targetValue = if (dragToDismissState.isDismissing) sourceCornerRadius else 0.dp,
+      animationSpec = tween(IMAGE_PREVIEW_TRANSITION_DURATION),
+      label = "image_preview_manual_corner_radius",
+    )
+    val effectiveCornerRadius = if (dragToDismissState.isDismissing) {
+      manualCornerRadius
+    } else {
+      cornerRadius
+    }
+
     val contentSize = calculateFittedSize(imagePainterState, constraints.maxWidth, constraints.maxHeight)
     dragToDismissState.updateContentSize(contentSize)
 
@@ -107,6 +125,7 @@ fun ImageContent(
       imageUrl = state.imageUrl,
       contentSize = contentSize,
       dragToDismissState = dragToDismissState,
+      cornerRadius = effectiveCornerRadius,
       onState = { imagePainterState = it }
     )
   }
@@ -117,6 +136,7 @@ private fun FullscreenImage(
   imageUrl: String,
   contentSize: IntSize?,
   dragToDismissState: DragToDismissState,
+  cornerRadius: Dp,
   onState: (AsyncImagePainter.State) -> Unit,
 ) {
   Box(
@@ -139,7 +159,8 @@ private fun FullscreenImage(
         } else {
           Modifier.imagePreviewSharedElementTarget(imageUrl)
         }
-      ),
+      )
+      .clip(RoundedCornerShape(cornerRadius)),
   ) {
     val imageModel = rememberImageModel(imageUrl)
     AsyncImage(
