@@ -78,6 +78,8 @@ kotlin {
     wasmJsMain.dependencies {
       implementation(libs.kotlin.browser)
       implementation(libs.kotlinx.browser)
+      // Pin kotlin-test to the compiler version (wrapper embeds an older one that the Wasm linker rejects).
+      implementation(libs.kotlin.test)
     }
     getByName("androidDeviceTest").dependencies {
       implementation(libs.androidx.test.runner)
