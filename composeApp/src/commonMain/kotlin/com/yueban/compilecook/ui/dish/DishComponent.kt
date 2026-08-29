@@ -2,7 +2,7 @@ package com.yueban.compilecook.ui.dish
 
 import com.arkivanov.decompose.ComponentContext
 import com.mikepenz.markdown.model.State
-import com.mikepenz.markdown.model.parseMarkdownFlow
+import com.mikepenz.markdown.model.asMarkdownState
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.repo.entity.DishDetail
 import com.yueban.compilecook.ui.base.Async
@@ -18,8 +18,6 @@ import com.yueban.compilecook.ui.dish.DishComponent.Output.ImageClicked
 import com.yueban.compilecook.ui.widget.markdown.TocItem
 import com.yueban.compilecook.ui.widget.markdown.extractToc
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.Serializable
@@ -62,11 +60,10 @@ class DefaultDishComponent(
         copy(dishAsync = it)
       }
 
-    uiState.map { it.dishAsync.value }
-      .filterNotNull()
+    uiState.mapNotNull { it.dishAsync.value }
       .map { it.content }
       .distinctUntilChanged()
-      .flatMapLatest { parseMarkdownFlow(it) }
+      .asMarkdownState()
       .execute(retainValue = DishState::contentAsync) {
         copy(contentAsync = it)
       }

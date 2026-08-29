@@ -2,7 +2,7 @@ package com.yueban.compilecook.ui.tip
 
 import com.arkivanov.decompose.ComponentContext
 import com.mikepenz.markdown.model.State
-import com.mikepenz.markdown.model.parseMarkdownFlow
+import com.mikepenz.markdown.model.asMarkdownState
 import com.yueban.compilecook.repo.DishRepo
 import com.yueban.compilecook.ui.base.Async
 import com.yueban.compilecook.ui.base.BackOutput
@@ -18,7 +18,6 @@ import com.yueban.compilecook.ui.widget.markdown.TocItem
 import com.yueban.compilecook.ui.widget.markdown.extractToc
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.Serializable
@@ -58,7 +57,7 @@ class DefaultTipComponent(
       .filterNotNull()
       .map { it.content }
       .distinctUntilChanged()
-      .flatMapLatest { parseMarkdownFlow(it) }
+      .asMarkdownState()
       .execute(retainValue = TipState::contentAsync) {
         copy(contentAsync = it)
       }
