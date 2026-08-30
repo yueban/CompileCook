@@ -2,12 +2,15 @@
 
 package com.yueban.compilecook
 
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
@@ -28,9 +31,15 @@ import io.github.kdroidfilter.platformtools.darkmodedetector.mac.setMacOsAdaptiv
 import io.github.kdroidfilter.platformtools.darkmodedetector.windows.setWindowsAdaptiveTitleBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import java.awt.Dimension
 import java.io.File
+import kotlin.math.roundToInt
 
 private const val SAVED_STATE_FILE_NAME = "saved_state.dat"
+private val WINDOW_INITIAL_WIDTH = 1280.dp
+private val WINDOW_INITIAL_HEIGHT = 800.dp
+private val WINDOW_MIN_WIDTH = 800.dp
+private val WINDOW_MIN_HEIGHT = 600.dp
 
 fun main() {
   // must be called before AppInitializer.init() because MainScope() triggers AWT initialization,
@@ -45,14 +54,17 @@ fun main() {
   val stateKeeper = StateKeeperDispatcher(stateKeeperFile.readSerializableContainer())
 
   application {
-    val windowState = rememberWindowState()
+    val windowState = rememberWindowState(
+      width = WINDOW_INITIAL_WIDTH,
+      height = WINDOW_INITIAL_HEIGHT,
+    )
 
     Window(
       onCloseRequest = {
         stateKeeper.save().writeToFile(stateKeeperFile)
         exitApplication()
       },
-      onKeyEvent = { event ->
+      onKeyEvent = { event: KeyEvent ->
         if ((event.key == Key.Escape) && (event.type == KeyEventType.KeyUp)) {
           backDispatcher.back()
         } else {
@@ -64,6 +76,12 @@ fun main() {
       icon = painterResource(Res.drawable.app_icon)
     ) {
       window.setWindowsAdaptiveTitleBar()
+      SideEffect {
+        window.minimumSize = Dimension(
+          WINDOW_MIN_WIDTH.value.roundToInt(),
+          WINDOW_MIN_HEIGHT.value.roundToInt(),
+        )
+      }
 
       LifecycleController(
         lifecycleRegistry = lifecycle,
