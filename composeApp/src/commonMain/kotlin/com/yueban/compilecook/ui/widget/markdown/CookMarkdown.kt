@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -159,7 +158,6 @@ private fun CustomImageComponent(
       MarkdownImage(
         imageData = imageData,
         alt = alt,
-        modifier = Modifier.fillMaxWidth(),
         imageUrl = model.content,
         onClick = { onImageClick(model.content) },
       )
@@ -184,12 +182,11 @@ private fun CustomInlineImageComponent(
 @Composable
 private fun MarkdownImage(
   imageData: ImageData,
-  modifier: Modifier = Modifier,
   alt: String? = null,
   imageUrl: String,
   onClick: (() -> Unit),
 ) {
-  val imageModifier = modifier
+  val imageModifier = Modifier
     .height(AppTheme.dimens.markdownImageHeight)
     .padding(
       vertical = AppTheme.dimens.markdownImageVerticalPadding,
