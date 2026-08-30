@@ -77,7 +77,7 @@ object PreviewConstant {
     description = "这是一道软糯爽口的意大利面的做法，非常简单，用时大概 30 分钟。",
     category = DishCategory.STAPLE,
     difficulty = 3,
-    image = "https://media.githubusercontent.com/media/Anduin2017/HowToCook/master/dishes/staple/炒意大利面/a.jpg",
+    image = "https://raw.githubusercontent.com/Anduin2017/HowToCook/master/dishes/staple/炒意大利面/a.jpg",
     isFavorite = false,
   )
 
@@ -92,7 +92,7 @@ object PreviewConstant {
     content = """
       # 炒意大利面的做法
     
-      ![意大利面](https://media.githubusercontent.com/media/Anduin2017/HowToCook/master/dishes/staple/炒意大利面/a.jpg)
+      ![意大利面](https://raw.githubusercontent.com/Anduin2017/HowToCook/master/dishes/staple/炒意大利面/a.jpg)
       
       这是一道软糯爽口的意大利面的做法，非常简单，用时大概 30 分钟。
       

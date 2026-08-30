@@ -3,8 +3,8 @@ package com.yueban.compilecook.ui.util
 import coil3.intercept.Interceptor
 import coil3.request.ImageResult
 
-private const val PROXY_BASE = "https://gh-usercontent-proxy.yueban.site"
-private const val GITHUB_MEDIA_BASE = "https://media.githubusercontent.com"
+private const val GITHUB_PROXY_BASE = "https://gh-proxy.com/"
+private const val GITHUB_RAW_BASE = "https://raw.githubusercontent.com/"
 
 class CoilImageProxyInterceptor : Interceptor {
   override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
@@ -12,8 +12,8 @@ class CoilImageProxyInterceptor : Interceptor {
     val url = request.data.toString()
 
     val newRequest =
-      if (url.contains(GITHUB_MEDIA_BASE)) {
-        val newUrl = url.replace(GITHUB_MEDIA_BASE, "$PROXY_BASE/media")
+      if (url.contains(GITHUB_RAW_BASE)) {
+        val newUrl = "$GITHUB_PROXY_BASE$url"
         request.newBuilder().data(newUrl).build()
       } else {
         request

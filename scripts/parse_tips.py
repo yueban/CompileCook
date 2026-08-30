@@ -63,7 +63,7 @@ def convert_tips_to_json(output_file):
 
                 # Fix Links
                 content = re.sub(r"!\[(.*?)\]\((.*?)\)",
-                    lambda m: f"![{m.group(1)}]({resolve_internal_url(m.group(2), current_file_dir_rel_to_repo, 'https://media.githubusercontent.com/media/Anduin2017/HowToCook/master/')})",
+                    lambda m: f"![{m.group(1)}]({resolve_internal_url(m.group(2), current_file_dir_rel_to_repo, 'https://raw.githubusercontent.com/Anduin2017/HowToCook/master/')})",
                     content, flags=re.IGNORECASE)
 
                 content = re.sub(r"(?<!\!)\[(.*?)\]\((.*?)\)",
