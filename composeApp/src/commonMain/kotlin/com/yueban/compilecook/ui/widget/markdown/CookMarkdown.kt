@@ -29,7 +29,6 @@ import com.mikepenz.markdown.compose.LocalImageTransformer
 import com.mikepenz.markdown.compose.LocalReferenceLinkHandler
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.MarkdownElement
-import com.mikepenz.markdown.compose.components.MarkdownComponentModel
 import com.mikepenz.markdown.compose.components.MarkdownComponents
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.ImageAltTooltip
@@ -51,6 +50,7 @@ import com.yueban.compilecook.ui.util.imagePreviewSharedElementPlaceholder
 import com.yueban.compilecook.ui.util.imagePreviewSourceBounds
 import com.yueban.compilecook.ui.util.preview.PreviewConstant
 import com.yueban.compilecook.ui.util.preview.PreviewWrapper
+import org.intellij.markdown.ast.ASTNode
 
 @Composable
 fun CookMarkdown(
@@ -136,10 +136,16 @@ private fun cookMarkdownTypography(): MarkdownTypography = with(AppTheme) {
 private fun cookMarkdownComponents(
   onImageClick: (String) -> Unit,
 ) = markdownComponents(
-  image = { CustomImageComponent(model = it, onImageClick = onImageClick) },
+  image = {
+    CustomImageComponent(
+      content = it.content,
+      node = it.node,
+      onImageClick = onImageClick
+    )
+  },
   inlineImage = {
     CustomInlineImageComponent(
-      model = it,
+      link = it.content,
       onImageClick = onImageClick,
     )
   },
@@ -147,19 +153,20 @@ private fun cookMarkdownComponents(
 
 @Composable
 private fun CustomImageComponent(
-  model: MarkdownComponentModel,
+  content: String,
+  node: ASTNode,
   onImageClick: (String) -> Unit,
 ) {
-  val link = model.node.resolveImageLink(model.content, LocalReferenceLinkHandler.current) ?: return
-  val alt = model.node.resolveImageAlt(model.content)
+  val link = node.resolveImageLink(content, LocalReferenceLinkHandler.current) ?: return
+  val alt = node.resolveImageAlt(content)
 
   LocalImageTransformer.current.transform(link)?.let { imageData ->
     ImageAltTooltip(alt) {
       MarkdownImage(
         imageData = imageData,
         alt = alt,
-        imageUrl = model.content,
-        onClick = { onImageClick(model.content) },
+        imageUrl = link,
+        onClick = { onImageClick(link) },
       )
     }
   }
@@ -167,14 +174,14 @@ private fun CustomImageComponent(
 
 @Composable
 private fun CustomInlineImageComponent(
-  model: MarkdownComponentModel,
+  link: String,
   onImageClick: (String) -> Unit,
 ) {
-  LocalImageTransformer.current.transform(model.content)?.let { imageData ->
+  LocalImageTransformer.current.transform(link)?.let { imageData ->
     MarkdownImage(
       imageData = imageData,
-      imageUrl = model.content,
-      onClick = { onImageClick(model.content) },
+      imageUrl = link,
+      onClick = { onImageClick(link) },
     )
   }
 }
