@@ -27,11 +27,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.mikepenz.markdown.compose.LocalImageTransformer
+import com.mikepenz.markdown.compose.LocalReferenceLinkHandler
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.MarkdownElement
 import com.mikepenz.markdown.compose.components.MarkdownComponentModel
 import com.mikepenz.markdown.compose.components.MarkdownComponents
 import com.mikepenz.markdown.compose.components.markdownComponents
+import com.mikepenz.markdown.compose.elements.ImageAltTooltip
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.ImageData
@@ -39,7 +41,11 @@ import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
+import com.mikepenz.markdown.model.markdownAnnotator
+import com.mikepenz.markdown.model.markdownAnnotatorConfig
 import com.mikepenz.markdown.model.rememberMarkdownState
+import com.mikepenz.markdown.utils.resolveImageAlt
+import com.mikepenz.markdown.utils.resolveImageLink
 import com.yueban.compilecook.ui.theme.AppTheme
 import com.yueban.compilecook.ui.util.UniversalScreenPreview
 import com.yueban.compilecook.ui.util.imagePreviewSharedElementPlaceholder
@@ -58,6 +64,7 @@ fun CookMarkdown(
     state = state,
     colors = cookMarkdownColors(),
     typography = cookMarkdownTypography(),
+    annotator = markdownAnnotator(config = markdownAnnotatorConfig(showImageAltTooltip = true)),
     components = cookMarkdownComponents(onImageClick),
     // disable content animation
     animations = markdownAnimations(animateTextSize = { this }),
@@ -144,13 +151,19 @@ private fun CustomImageComponent(
   model: MarkdownComponentModel,
   onImageClick: (String) -> Unit,
 ) {
-  LocalImageTransformer.current.transform(model.content)?.let { imageData ->
-    MarkdownImage(
-      imageData = imageData,
-      modifier = Modifier.fillMaxWidth(),
-      imageUrl = model.content,
-      onClick = { onImageClick(model.content) },
-    )
+  val link = model.node.resolveImageLink(model.content, LocalReferenceLinkHandler.current) ?: return
+  val alt = model.node.resolveImageAlt(model.content)
+
+  LocalImageTransformer.current.transform(link)?.let { imageData ->
+    ImageAltTooltip(alt) {
+      MarkdownImage(
+        imageData = imageData,
+        alt = alt,
+        modifier = Modifier.fillMaxWidth(),
+        imageUrl = model.content,
+        onClick = { onImageClick(model.content) },
+      )
+    }
   }
 }
 
@@ -172,6 +185,7 @@ private fun CustomInlineImageComponent(
 private fun MarkdownImage(
   imageData: ImageData,
   modifier: Modifier = Modifier,
+  alt: String? = null,
   imageUrl: String,
   onClick: (() -> Unit),
 ) {
@@ -185,7 +199,7 @@ private fun MarkdownImage(
   Box {
     Image(
       painter = imageData.painter,
-      contentDescription = imageData.contentDescription,
+      contentDescription = alt ?: imageData.contentDescription,
       modifier = imageModifier
         .imagePreviewSharedElementPlaceholder(imageUrl)
         .imagePreviewSourceBounds(imageUrl)

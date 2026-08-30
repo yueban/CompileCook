@@ -15,6 +15,7 @@ import com.yueban.compilecook.ui.main.MainDishState
 import com.yueban.compilecook.ui.main.MainTipState
 import com.yueban.compilecook.ui.tip.TipState
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 
 object PreviewData {
@@ -76,7 +77,10 @@ object PreviewData {
 
   val tipState by lazy {
     val markdownContent = PreviewConstant.tipDetail.content.trimIndent()
-    val rootNode = MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdownContent)
+    val rootNode = MarkdownParser(
+      flavour = GFMFlavourDescriptor(),
+      cancellationToken = CancellationToken.NonCancellable
+    ).buildMarkdownTreeFromString(markdownContent as CharSequence)
     val markdownState = State.Success(rootNode, markdownContent, true)
     TipState(
       tipName = PreviewConstant.tipDetail.name,
@@ -86,7 +90,10 @@ object PreviewData {
 
   val dishState by lazy {
     val markdownContent = PreviewConstant.dishDetail.content.trimIndent()
-    val rootNode = MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdownContent)
+    val rootNode = MarkdownParser(
+      flavour = GFMFlavourDescriptor(),
+      cancellationToken = CancellationToken.NonCancellable
+    ).buildMarkdownTreeFromString(markdownContent as CharSequence)
     val markdownState = State.Success(rootNode, markdownContent, true)
     DishState(
       dishName = PreviewConstant.dishDetail.name,
