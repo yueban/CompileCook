@@ -3,10 +3,12 @@ package com.yueban.compilecook.ui.widget.markdown
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -167,6 +169,7 @@ private fun CustomImageComponent(
         alt = alt,
         imageUrl = link,
         onClick = { onImageClick(link) },
+        preserveAspect = true,
       )
     }
   }
@@ -192,9 +195,68 @@ private fun MarkdownImage(
   alt: String? = null,
   imageUrl: String,
   onClick: (() -> Unit),
+  preserveAspect: Boolean = false,
 ) {
-  val imageModifier = Modifier
-    .height(AppTheme.dimens.markdownImageHeight)
+  if (preserveAspect) {
+    MarkdownImageAspectWrapper(
+      imageData = imageData,
+      alt = alt,
+      imageUrl = imageUrl,
+      onClick = onClick,
+    )
+  } else {
+    MarkdownImageContent(
+      imageData = imageData,
+      alt = alt,
+      imageUrl = imageUrl,
+      onClick = onClick,
+      sizeModifier = Modifier.height(AppTheme.dimens.markdownImageHeight),
+    )
+  }
+}
+
+@Composable
+private fun MarkdownImageAspectWrapper(
+  imageData: ImageData,
+  alt: String?,
+  imageUrl: String,
+  onClick: (() -> Unit),
+) {
+  val imageHeight = AppTheme.dimens.markdownImageHeight
+  val verticalPadding = AppTheme.dimens.markdownImageVerticalPadding
+  val horizontalPadding = AppTheme.dimens.markdownImageHorizontalPadding
+  val size = Coil3ImageTransformerImpl.intrinsicSize(imageData.painter)
+  val aspect = if (size.width > 0 && size.height > 0) size.width / size.height else 1f
+
+  BoxWithConstraints {
+    val contentHeight = imageHeight - verticalPadding * 2
+    val naturalContentWidth = contentHeight * aspect
+    val contentWidth = minOf(naturalContentWidth, maxWidth - horizontalPadding * 2)
+    val width = contentWidth + horizontalPadding * 2
+    val height = if (contentWidth == naturalContentWidth) {
+      imageHeight
+    } else {
+      contentWidth / aspect + verticalPadding * 2
+    }
+    MarkdownImageContent(
+      imageData = imageData,
+      alt = alt,
+      imageUrl = imageUrl,
+      onClick = onClick,
+      sizeModifier = Modifier.width(width).height(height),
+    )
+  }
+}
+
+@Composable
+private fun MarkdownImageContent(
+  imageData: ImageData,
+  alt: String?,
+  imageUrl: String,
+  onClick: (() -> Unit),
+  sizeModifier: Modifier,
+) {
+  val imageModifier = sizeModifier
     .padding(
       vertical = AppTheme.dimens.markdownImageVerticalPadding,
       horizontal = AppTheme.dimens.markdownImageHorizontalPadding
